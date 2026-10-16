@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\FareestimateController;
 use App\Http\Controllers\FareruleController;
+use App\Http\Controllers\FuelcostestimateController;
 use App\Http\Controllers\FuelpriceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
+use App\Models\FuelcostEstimate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,3 +35,7 @@ Route::post('/fuel_prices', [FuelpriceController::class, 'store']);
 // Fare_Estimates
 Route::get('/fare_estimates', [FareestimateController::class, 'index']);
 Route::post('/fare_estimates', [FareestimateController::class, 'store']);
+
+// Fuel_Cost_Estimates
+Route::get('/fuel_cost_estimates', [FuelcostestimateController::class, 'index']);
+Route::post('/fuel_cost_estimates', [FuelcostestimateController::class, 'store']);
