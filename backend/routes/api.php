@@ -1,9 +1,10 @@
 <?php
 
+use App\Http\Controllers\FareestimateController;
 use App\Http\Controllers\FareruleController;
+use App\Http\Controllers\FuelpriceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
-use App\Models\FareRule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,3 +25,11 @@ Route::post('/users', [UserController::class, 'store']);
 // Fare_Rule
 Route::get('/fare_rules', [FareruleController::class, 'index']);
 Route::post('/fare_rules', [FareruleController::class, 'store']);
+
+// Fuel_Price
+Route::get('/fuel_prices', [FuelpriceController::class, 'index']);
+Route::post('/fuel_prices', [FuelpriceController::class, 'store']);
+
+// Fare_Estimates
+Route::get('/fare_estimates', [FareestimateController::class, 'index']);
+Route::post('/fare_estimates', [FareestimateController::class, 'store']);
