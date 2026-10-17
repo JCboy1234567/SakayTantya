@@ -22,6 +22,7 @@ Route::post('/vehicle', [VehicleController::class, 'store']);
 // Users
 Route::get('/users', [UserController::class, 'index']);
 Route::post('/users', [UserController::class, 'store']);
+Route::post('/login', [UserController::class, 'login']);
 
 
 // Fare_Rule

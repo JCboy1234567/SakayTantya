@@ -11,6 +11,7 @@ import {
   LucideShieldCheck,
   LucideMapPin,
 } from '@lucide/angular';
+import { AuthServices } from '../../core/services/auth.services';
 
 @Component({
   selector: 'app-login',
@@ -39,14 +40,15 @@ export class Login {
   readonly ShieldCheck = LucideShieldCheck;
   readonly MapPin = LucideMapPin;
 
-
   showPassword = false;
   rememberMe = true;
   email = '';
   password = '';
   errorMessage = '';
+  isLoading = false;
+  showSuccessModal = false; // <--- Para sa Success Modal
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthServices) {}
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
@@ -60,6 +62,27 @@ export class Login {
       return;
     }
 
-    console.log('Login form submitted', { email: this.email, password: this.password });
+    this.isLoading = true;
+
+    this.authService.login({ email: this.email, password: this.password }).subscribe({
+      next: (response: any) => {
+        console.log('Login successful:', response);
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
+
+        this.isLoading = false;
+        this.showSuccessModal = true; // Ipakita ang Success Modal
+
+        // Mag-redirect sa dashboard pagkatapos ng 2 segundo
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']);
+        }, 2000);
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        console.error('Login error:', err);
+        this.errorMessage = err.error?.message || 'Invalid email or password or connection failed.';
+      }
+    });
   }
 }
