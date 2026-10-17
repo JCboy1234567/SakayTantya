@@ -1,8 +1,8 @@
-
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthServices } from '../../core/services/auth.services';
 
 import {
   LucideMapPin,
@@ -44,9 +44,11 @@ export class CreateAccount {
   showConfirmPassword = false;
 
   errorMessage = '';
-  successMessage = '';
+  passwordMismatchError = ''; // <--- Para sa error sa ilalim ng confirm password
+  isLoading = false;
+  showSuccessModal = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthServices) {}
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
@@ -57,8 +59,9 @@ export class CreateAccount {
   }
 
   onSubmit(): void {
+    console.log('onSubmit clicked!');
     this.errorMessage = '';
-    this.successMessage = '';
+    this.passwordMismatchError = '';
 
     // Validate required fields
     if (
@@ -68,6 +71,7 @@ export class CreateAccount {
       !this.confirmPassword
     ) {
       this.errorMessage = 'Please complete all required fields.';
+      console.log('Validation failed: missing fields');
       return;
     }
 
@@ -76,29 +80,47 @@ export class CreateAccount {
 
     if (!emailPattern.test(this.email.trim())) {
       this.errorMessage = 'Please enter a valid email address.';
+      console.log('Validation failed: invalid email');
       return;
     }
 
     // Validate password length
     if (this.password.length < 8) {
       this.errorMessage = 'Password must be at least 8 characters.';
+      console.log('Validation failed: short password');
       return;
     }
 
-    // Validate password confirmation
+    // Validate password confirmation (ilagay sa baba ng input)
     if (this.password !== this.confirmPassword) {
-      this.errorMessage = 'Passwords do not match.';
+      this.passwordMismatchError = 'Passwords do not match.';
+      console.log('Validation failed: passwords do not match');
       return;
     }
 
-    // UI testing only — not yet connected to Laravel API
-    console.log('Create account form submitted', {
+    console.log('All validations passed, calling authService.register...');
+    this.isLoading = true;
+
+    this.authService.register({
       name: this.name.trim(),
-      email: this.email.trim()
+      email: this.email.trim(),
+      password: this.password,
+      role: 'admin'
+    }).subscribe({
+      next: (res: any) => {
+        console.log('API SUCCESS RESPONSE:', res);
+        this.isLoading = false;
+        this.showSuccessModal = true;
+
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
+      },
+      error: (err: any) => {
+        console.error('API ERROR:', err);
+        this.isLoading = false;
+        this.errorMessage = err.error?.message || err.message || 'Failed to create account. Please try again.';
+      }
     });
-
-    this.successMessage = 'Form validation successful! Registration API is not connected yet.';
-
-    // Do not navigate or claim an account was created until the API succeeds.
   }
 }

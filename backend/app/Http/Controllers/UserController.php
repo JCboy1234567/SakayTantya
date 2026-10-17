@@ -36,4 +36,37 @@ class UserController extends Controller
 
             return response()->json($user, 201);
         }
+
+        /**
+         * Authenticate user login.
+         */
+        public function login(Request $request)
+        {
+            $credentials = $request->validate([
+                'email' => 'required|email',
+                'password' => 'required|string',
+            ]);
+
+            $user = User::where('email', $credentials['email'])->first();
+
+            if (!$user || !\Illuminate\Support\Facades\Hash::check($credentials['password'], $user->password)) {
+                return response()->json([
+                    'message' => 'Invalid email or password.'
+                ], 401);
+            }
+
+            // Optional: Kung gumagamit ka ng Laravel Sanctum para sa tokens
+            // $token = $user->createToken('admin-token')->plainTextToken;
+
+            return response()->json([
+                'message' => 'Login successful',
+                // 'token' => $token,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role
+                ]
+            ], 200);
+        }
 }
