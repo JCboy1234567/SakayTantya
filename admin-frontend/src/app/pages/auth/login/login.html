@@ -1,0 +1,191 @@
+
+<div class="relative min-h-screen overflow-hidden bg-white text-slate-800">
+
+  <!-- Background decorations -->
+  <div class="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-green-200/30 blur-3xl"></div>
+  <div class="pointer-events-none absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-lime-200/20 blur-3xl"></div>
+
+  <!-- Header -->
+  <header class="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-7 lg:px-12">
+    <a routerLink="/login" class="inline-flex items-center">
+      <img
+        src="/images/sakaytantiya-logo.svg"
+        alt="SakayTantya"
+        class="h-10 w-auto object-contain"
+      />
+    </a>
+
+    <div class="hidden items-center gap-2 text-sm text-slate-600 sm:flex">
+      <svg lucideMapPin class="size-4 text-green-700"></svg>
+      <span>Transport Operations · Tagum City, PH</span>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="relative z-10 mx-auto flex min-h-[calc(100vh-110px)] max-w-7xl items-center justify-center px-5 pb-12">
+    <section class="grid w-full max-w-5xl items-center gap-12 lg:grid-cols-2 lg:gap-16">
+
+      <!-- Left content -->
+      <div class="hidden lg:block">
+        <div class="mb-6 flex size-16 items-center justify-center rounded-2xl">
+            <img src="/icons/sakaytantiya-icon.svg" alt="">
+        </div>
+
+        <p class="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-green-800">
+          SakayTantya Administration
+        </p>
+
+        <h1 class="max-w-lg text-4xl font-bold leading-tight tracking-tight text-green-950 xl:text-5xl">
+          Smarter routes.
+          <br />
+          Better decisions.
+        </h1>
+
+        <p class="mt-5 max-w-md leading-7 text-slate-600">
+          Manage fare configurations, fuel-price references, and transportation
+          information through one organized dashboard.
+        </p>
+
+        <div class="mt-9 flex items-center gap-3 text-sm text-slate-600">
+          <span class="h-1 w-10 rounded-full bg-green-700"></span>
+          Transportation information for Tagum City
+        </div>
+      </div>
+
+      <!-- Login card -->
+      <div class="w-full max-w-md justify-self-center">
+        <div class="rounded-3xl border border-slate-200 bg-white p-7 shadow-xl shadow-green-950/5 sm:p-10">
+
+          <!-- Card header -->
+          <div class="mb-8 text-center">
+            <div class="mx-auto mb-5 flex size-16 items-center justify-center rounded-2xl">
+              <img src="/icons/sakaytantiya-icon.svg" alt="">
+            </div>
+
+            <h2 class="text-3xl font-bold tracking-tight text-green-950">
+              Welcome back
+            </h2>
+
+            <p class="mt-2 text-sm text-slate-600">
+              Sign in to SakayTantya Admin
+            </p>
+          </div>
+
+          <!-- Error message -->
+          @if (errorMessage) {
+            <div role="alert" class="alert alert-error mb-5 text-sm">
+              <span>{{ errorMessage }}</span>
+            </div>
+          }
+
+          <form (ngSubmit)="onSubmit()" class="space-y-5">
+
+            <!-- Email -->
+            <div>
+              <label for="email" class="mb-2 block text-sm font-semibold text-slate-800">
+                Email address
+              </label>
+
+              <label class="input input-bordered flex h-12 w-full items-center gap-3 rounded-xl border-slate-300 bg-white text-slate-800 focus-within:border-green-700 focus-within:outline-none">
+                <svg lucideMail class="size-5 shrink-0 text-slate-500"></svg>
+
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  [(ngModel)]="email"
+                  placeholder="admin@example.com"
+                  autocomplete="username"
+                  class="grow bg-white text-slate-800 placeholder:text-slate-400"
+                  required
+                />
+              </label>
+            </div>
+
+            <!-- Password -->
+            <div>
+              <label for="password" class="mb-2 block text-sm font-semibold text-slate-800">
+                Password
+              </label>
+
+              <label class="input input-bordered flex h-12 w-full items-center gap-3 rounded-xl border-slate-300 bg-white text-slate-800 focus-within:border-green-700 focus-within:outline-none">
+                <svg lucideLockKeyhole class="size-5 shrink-0 text-slate-500"></svg>
+
+                <input
+                  id="password"
+                  name="password"
+                  [type]="showPassword ? 'text' : 'password'"
+                  [(ngModel)]="password"
+                  placeholder="Enter your password"
+                  autocomplete="current-password"
+                  class="grow bg-white text-slate-800 placeholder:text-slate-400"
+                  required
+                />
+
+                <button
+                  type="button"
+                  class="shrink-0 text-slate-500 transition-colors hover:text-green-800"
+                  (click)="togglePassword()"
+                  [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+                >
+                  @if (showPassword) {
+                    <svg lucideEyeOff class="size-5"></svg>
+                  } @else {
+                    <svg lucideEye class="size-5"></svg>
+                  }
+                </button>
+              </label>
+            </div>
+
+            <!-- Remember me -->
+            <div class="flex items-center justify-between gap-3 text-sm">
+              <label class="flex cursor-pointer items-center gap-2 text-slate-700">
+                <input
+                  type="checkbox"
+                  name="rememberMe"
+                  class="checkbox checkbox-sm checkbox-success"
+                  [(ngModel)]="rememberMe"
+                />
+                <span>Remember me</span>
+              </label>
+
+              <a
+                routerLink="/forgot-password"
+                class="font-semibold text-green-800 transition-colors hover:text-green-950"
+              >
+                Forgot password?
+              </a>
+            </div>
+
+            <!-- Submit -->
+            <button
+              type="submit"
+              class="btn h-12 min-h-12 w-full rounded-xl border-0 bg-green-800 text-base font-semibold text-white shadow-lg shadow-green-900/10 hover:bg-green-900"
+            >
+              Sign in
+              <svg lucideArrowRight class="size-5"></svg>
+            </button>
+          </form>
+
+          <div class="divider my-7 text-slate-300"></div>
+
+          <!-- Create account -->
+          <p class="text-center text-sm text-slate-600">
+            Need an admin account?
+            <a
+              routerLink="/create-account"
+              class="ml-1 font-bold text-green-800 transition-colors hover:text-green-950"
+            >
+              Create account
+            </a>
+          </p>
+        </div>
+
+        <!-- Footer -->
+        <p class="mt-6 text-center text-xs text-slate-500">
+          © 2026 SakayTantya · Administrative access
+        </p>
+      </div>
+    </section>
+  </main>
+</div>
