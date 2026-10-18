@@ -1,0 +1,96 @@
+<header
+  class="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-base-300 bg-base-100/95 px-4 backdrop-blur-md sm:px-6 lg:px-8"
+>
+  <!-- Left section -->
+  <div class="flex items-center gap-3">
+    <button
+      type="button"
+      class="btn btn-ghost btn-square lg:hidden"
+      aria-label="Open navigation menu"
+    >
+      <svg lucideMenu class="h-6 w-6"></svg>
+    </button>
+
+    <div>
+      <h2 class="text-lg font-bold sm:text-xl">Admin Dashboard</h2>
+      <p class="hidden text-sm text-base-content/60 sm:block">
+        Transportation Fare Estimation System
+      </p>
+    </div>
+  </div>
+
+  <!-- Right section -->
+  <div class="flex items-center gap-2 sm:gap-4">
+    <div class="hidden text-right md:block">
+      <p class="text-sm font-medium">
+        {{ today | date: 'EEEE' }}
+      </p>
+      <p class="text-xs text-base-content/60">
+        {{ today | date: 'MMMM d, y' }}
+      </p>
+    </div>
+
+    <div class="dropdown dropdown-end">
+      <button
+        tabindex="0"
+        type="button"
+        class="btn btn-ghost btn-circle"
+        aria-label="Notifications"
+      >
+        <span class="indicator">
+          <svg lucideBell class="h-5 w-5"></svg>
+          <span class="badge indicator-item badge-primary badge-xs"></span>
+        </span>
+      </button>
+
+      <div
+        tabindex="0"
+        class="dropdown-content z-50 mt-3 w-64 rounded-box border border-base-300 bg-base-100 p-4 shadow-xl"
+      >
+        <h3 class="font-semibold">Notifications</h3>
+        <p class="mt-2 text-sm text-base-content/60">
+          No new notifications.
+        </p>
+      </div>
+    </div>
+
+    <div class="dropdown dropdown-end">
+      <button
+        tabindex="0"
+        type="button"
+        class="btn btn-ghost gap-2 px-2"
+      >
+        <div class="avatar avatar-placeholder">
+          <div class="w-9 rounded-full bg-green-800 text-primary-content">
+            <span class="font-semibold">{{ userInitial }}</span>
+          </div>
+        </div>
+
+        <span class="hidden text-sm font-medium sm:block">
+          {{ userName }}
+        </span>
+
+        <svg lucideChevronDown class="h-4 w-4"></svg>
+      </button>
+
+      <ul
+        tabindex="0"
+        class="dropdown-content menu z-50 mt-3 w-52 rounded-box border border-base-300 bg-base-100 p-2 shadow-xl"
+      >
+        <li>
+          <a routerLink="/settings">
+            <svg lucideSettings class="h-4 w-4"></svg>
+            Settings
+          </a>
+        </li>
+
+        <li>
+          <button type="button" (click)="logout()">
+            <svg lucideLogOut class="h-4 w-4"></svg>
+            Sign Out
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>
