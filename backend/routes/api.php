@@ -6,7 +6,6 @@ use App\Http\Controllers\FuelcostestimateController;
 use App\Http\Controllers\FuelpriceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
-use App\Models\FuelcostEstimate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,29 +13,33 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-// Vehicle
-Route::get('/vehicle', [VehicleController::class, 'index']);
-Route::post('/vehicle', [VehicleController::class, 'store']);
-
-
-// Users
-Route::get('/users', [UserController::class, 'index']);
-Route::post('/users', [UserController::class, 'store']);
+// Public Authentication Routes
 Route::post('/login', [UserController::class, 'login']);
+Route::post('/users', [UserController::class, 'store']); // Register account
 
-
-// Fare_Rule
+// Public or General Get Routes (Kung kailangan makita ng users/admin ang lists)
+Route::get('/vehicle', [VehicleController::class, 'index']);
+Route::get('/users', [UserController::class, 'index']);
 Route::get('/fare_rules', [FareruleController::class, 'index']);
-Route::post('/fare_rules', [FareruleController::class, 'store']);
-
-// Fuel_Price
 Route::get('/fuel_prices', [FuelpriceController::class, 'index']);
-Route::post('/fuel_prices', [FuelpriceController::class, 'store']);
-
-// Fare_Estimates
 Route::get('/fare_estimates', [FareestimateController::class, 'index']);
-Route::post('/fare_estimates', [FareestimateController::class, 'store']);
-
-// Fuel_Cost_Estimates
 Route::get('/fuel_cost_estimates', [FuelcostestimateController::class, 'index']);
-Route::post('/fuel_cost_estimates', [FuelcostestimateController::class, 'store']);
+
+
+// ==========================================
+// PROTECTED ADMIN-ONLY ROUTES (Middleware: role:admin)
+// ==========================================
+Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    // Vehicle management
+    Route::post('/vehicle', [VehicleController::class, 'store']);
+
+    // Fare Rules management
+    Route::post('/fare_rules', [FareruleController::class, 'store']);
+
+    // Fuel Prices management
+    Route::post('/fuel_prices', [FuelpriceController::class, 'store']);
+
+    // Fare & Fuel Cost Estimates (kung admin lang ang pwede mag-save)
+    Route::post('/fare_estimates', [FareestimateController::class, 'store']);
+    Route::post('/fuel_cost_estimates', [FuelcostestimateController::class, 'store']);
+});
