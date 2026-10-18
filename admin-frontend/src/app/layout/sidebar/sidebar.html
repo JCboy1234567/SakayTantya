@@ -1,0 +1,113 @@
+<aside
+  class="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-base-300 bg-base-100 lg:flex"
+>
+  <!-- Logo -->
+  <div class="flex h-20 items-center gap-3 border-b border-base-300 px-6">
+    
+      <img
+        src="/images/sakaytantiya-logo.svg"
+        alt="SakayTantya"
+        class="h-10 w-auto object-contain"
+      />
+
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex-1 space-y-2 overflow-y-auto p-4">
+    <p class="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-base-content/50">
+      Main Menu
+    </p>
+
+    <a
+      routerLink="/overview"
+      routerLinkActive="active"
+      class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors hover:bg-base-200 [&.active]:bg-green-800 [&.active]:text-primary-content"
+    >
+      <svg lucideLayoutDashboard class="h-5 w-5"></svg>
+      <span>Overview</span>
+    </a>
+
+    <a
+      routerLink="/routes-estimates"
+      routerLinkActive="active"
+      class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors hover:bg-base-200 [&.active]:bg-green-800 [&.active]:text-primary-content"
+    >
+      <svg lucideMap class="h-5 w-5"></svg>
+      <span>Routes & Estimates</span>
+    </a>
+
+    <a
+      routerLink="/fare-configurations"
+      routerLinkActive="active"
+      class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors hover:bg-base-200 [&.active]:bg-green-800 [&.active]:text-primary-content"
+    >
+      <svg lucideSlidersHorizontal class="h-5 w-5"></svg>
+      <span>Fare Configurations</span>
+    </a>
+
+    <a
+      routerLink="/fuelprice-reference"
+      routerLinkActive="active"
+      class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors hover:bg-base-200 [&.active]:bg-green-800 [&.active]:text-primary-content"
+    >
+      <svg lucideFuel class="h-5 w-5"></svg>
+      <span>Fuel Price Reference</span>
+    </a>
+
+    <a
+      routerLink="/vehicles-efficiency"
+      routerLinkActive="active"
+      class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors hover:bg-base-200 [&.active]:bg-green-800 [&.active]:text-primary-content"
+    >
+      <svg lucideBike class="h-5 w-5"></svg>
+      <span>Vehicles & Efficiency</span>
+    </a>
+
+    <a
+      routerLink="/service-availability"
+      routerLinkActive="active"
+      class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors hover:bg-base-200 [&.active]:bg-green-800 [&.active]:text-primary-content"
+    >
+      <svg lucideClipboardList class="h-5 w-5"></svg>
+      <span>Service Availability</span>
+    </a>
+
+    <a
+      routerLink="/testing-feedback"
+      routerLinkActive="active"
+      class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors hover:bg-base-200 [&.active]:bg-green-800 [&.active]:text-primary-content"
+    >
+      <svg lucideMessageSquare class="h-5 w-5"></svg>
+      <span>Testing & Feedback</span>
+    </a>
+
+    <div class="divider my-4"></div>
+
+    <p class="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-base-content/50">
+      System
+    </p>
+
+    <a
+      routerLink="/settings"
+      routerLinkActive="active"
+      class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors hover:bg-base-200 [&.active]:bg-green-800 [&.active]:text-primary-content"
+    >
+      <svg lucideSettings class="h-5 w-5"></svg>
+      <span>Settings</span>
+    </a>
+  </nav>
+
+  <!-- Footer -->
+  <div class="flex flex-col justify-center border-t border-base-300 p-4">
+    <div class="flex items-center gap-3 rounded-xl bg-base-200 p-3">
+      <div class="flex size-13 items-center rounded-2xl bg-green-100 text-green-800">
+        <img src="/icons/sakaytantiya-icon.svg" alt="">
+     </div>
+
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-sm font-semibold">Administrator</p>
+        <p class="truncate text-xs text-base-content/60">System Management</p>
+      </div>
+    </div>
+  </div>
+</aside>
