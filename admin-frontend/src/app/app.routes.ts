@@ -1,7 +1,8 @@
 import { Routes } from '@angular/router';
 import { Login } from './auth/login/login';
 import { CreateAccount } from './auth/create-account/create-account';
-import { DashboardLayout } from './layout/dashboard-layout/dashboard-layout'; // Siguraduhing tama ang import path nito
+import { DashboardLayout } from './layout/dashboard-layout/dashboard-layout';
+import { roleGuardGuard } from './core/guards/role.guard-guard';
 
 import { Overview } from './pages/overview/overview';
 import { RoutesEstimates } from './pages/routes-estimates/routes-estimates';
@@ -30,6 +31,8 @@ export const routes: Routes = [
     {
         path: '',
         component: DashboardLayout,
+        canActivate: [roleGuardGuard],
+        data: { role: 'admin' }, // Admin role lamang ang pinapayagan dito
         children: [
             {
                 path: 'dashboard',
