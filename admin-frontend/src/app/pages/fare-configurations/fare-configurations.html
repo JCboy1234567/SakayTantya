@@ -1,1 +1,278 @@
-<p>fare-configurations works!</p>
+<div class="space-y-6">
+
+  <!-- Page Header -->
+  <section class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+    <div>
+      <h1 class="text-xl font-bold tracking-tight text-base-content sm:text-2xl flex items-center gap-2">
+        <svg lucideSlidersHorizontal class="h-6 w-6 text-green-800"></svg>
+        Fare Configurations (Static Demo)
+      </h1>
+      <p class="mt-1 text-xs text-base-content/60">
+        Review and simulate local transportation tariff structures for Tagum City transport types.
+      </p>
+    </div>
+
+    <div class="flex gap-2">
+      <button
+        type="button"
+        (click)="openAddModal()"
+        class="btn btn-sm bg-green-900 text-white text-xs hover:bg-green-950 gap-1.5 border-0 shadow-md"
+      >
+        <svg lucidePlus class="h-4 w-4"></svg>
+        Add New Fare Rule
+      </button>
+    </div>
+  </section>
+
+  <!-- Success Notification Alert -->
+  @if (successMessage) {
+    <div class="alert alert-success text-sm py-3 shadow-sm animate-fade-in">
+      <span>{{ successMessage }}</span>
+    </div>
+  }
+
+  <!-- Feature Overview Cards -->
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="card border border-base-300 bg-base-100 shadow-sm p-4">
+      <p class="text-xs text-base-content/60 font-medium">Active Configurations</p>
+      <p class="text-2xl font-bold text-green-900 mt-1">02</p>
+      <p class="text-[10px] text-base-content/50 mt-1">Enforced across route estimation tool</p>
+    </div>
+    <div class="card border border-base-300 bg-base-100 shadow-sm p-4">
+      <p class="text-xs text-base-content/60 font-medium">Draft / Pending</p>
+      <p class="text-2xl font-bold text-amber-600 mt-1">01</p>
+      <p class="text-[10px] text-base-content/50 mt-1">Under review for 2026 adjustment</p>
+    </div>
+    <div class="card border border-base-300 bg-base-100 shadow-sm p-4">
+      <p class="text-xs text-base-content/60 font-medium">Governing Authority</p>
+      <p class="text-lg font-bold text-base-content mt-1">Tagum City LGU</p>
+      <p class="text-[10px] text-base-content/50 mt-1">Local Transport Franchise Board</p>
+    </div>
+  </div>
+
+  <!-- Fare Rules Table Card -->
+  <div class="card border border-base-300 bg-base-100 shadow-sm overflow-hidden">
+    <div class="card-body p-0">
+      <div class="p-4 border-b border-base-200 flex items-center justify-between">
+        <h2 class="text-sm font-bold">Configured Tariff Rules</h2>
+        <span class="badge badge-ghost text-xs">Static Demo Mode</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="table table-sm w-full">
+          <thead class="bg-base-200/70 text-[10px] uppercase tracking-wider">
+            <tr>
+              <th>Vehicle & Fuel</th>
+              <th>Base Fare</th>
+              <th>Distance Included</th>
+              <th>Rate / KM</th>
+              <th>Minimum Fare</th>
+              <th>Validity</th>
+              <th>Status</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (rule of fareRules; track rule.id) {
+              <tr class="hover:bg-base-200/40">
+                <td>
+                  <p class="font-bold text-base-content">{{ rule.vehicle }}</p>
+                  <p class="text-[10px] text-base-content/60">{{ rule.fuel }} · {{ rule.source }}</p>
+                </td>
+                <td class="font-bold text-green-900">{{ rule.baseFare }}</td>
+                <td>{{ rule.includedDistance }}</td>
+                <td>{{ rule.ratePerKm }}</td>
+                <td>{{ rule.minimumFare }}</td>
+                <td class="text-xs">
+                  <p>{{ rule.validFrom }}</p>
+                  <p class="text-[10px] text-base-content/50">to {{ rule.validUntil }}</p>
+                </td>
+                <td>
+                  <span
+                    class="badge badge-sm font-semibold"
+                    [class.badge-success]="rule.status === 'Enabled'"
+                    [class.badge-warning]="rule.status === 'Draft'"
+                  >
+                    {{ rule.status }}
+                  </span>
+                </td>
+                <td class="text-right">
+                  <div class="flex items-center justify-end gap-1">
+                    <button type="button" class="btn btn-ghost btn-xs text-green-800 tooltip" data-tip="Edit Rule">
+                      <svg lucidePencil class="h-3.5 w-3.5"></svg>
+                    </button>
+                    <button type="button" (click)="deleteRule(rule.id)" class="btn btn-ghost btn-xs text-error tooltip" data-tip="Delete Rule">
+                      <svg lucideTrash2 class="h-3.5 w-3.5"></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODERN MODAL: Add New Fare Rule (Explicit Dark/Light Responsive Colors) -->
+  @if (showAddModal) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+      <div class="bg-base-100 text-base-content rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-base-300 space-y-4 max-h-[90vh] overflow-y-auto">
+
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between border-b border-base-200 pb-3">
+          <div class="flex items-center gap-3">
+            <div class="flex size-10 items-center justify-center rounded-xl bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300">
+              <svg lucideSlidersHorizontal class="h-5 w-5"></svg>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-base-content">Add Fare Configuration</h3>
+              <p class="text-xs opacity-70">Configure tariff brackets for Tagum City transit</p>
+            </div>
+          </div>
+          <button type="button" (click)="closeAddModal()" class="btn btn-sm btn-ghost btn-circle">
+            <svg lucideX class="h-5 w-5"></svg>
+          </button>
+        </div>
+
+        <!-- Modal Form -->
+        <form (ngSubmit)="onSubmitRule()" class="space-y-3 text-xs">
+
+          <!-- Vehicle Type -->
+          <div class="form-control">
+            <label class="label font-semibold pb-1">
+              <span class="label-text text-xs font-semibold text-base-content">Vehicle Type</span>
+            </label>
+            <select
+              [(ngModel)]="newRule.vehicle"
+              name="vehicle"
+              class="select select-bordered select-sm w-full text-xs bg-base-100 text-base-content"
+            >
+              <option>Motorized Tricycle</option>
+              <option>Multicab / Jeepney</option>
+              <option>Modern PUV</option>
+              <option>Van / UV Express</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <!-- Base Fare -->
+            <div class="form-control">
+              <label class="label font-semibold pb-1">
+                <span class="label-text text-xs font-semibold text-base-content">Base Fare (₱)</span>
+              </label>
+              <input
+                type="number"
+                step="0.50"
+                [(ngModel)]="newRule.baseFare"
+                name="baseFare"
+                class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
+                required
+              />
+            </div>
+
+            <!-- Included Distance -->
+            <div class="form-control">
+              <label class="label font-semibold pb-1">
+                <span class="label-text text-xs font-semibold text-base-content">Included Distance (KM)</span>
+              </label>
+              <input
+                type="number"
+                step="0.5"
+                [(ngModel)]="newRule.includedDistance"
+                name="includedDistance"
+                class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <!-- Rate Per KM -->
+            <div class="form-control">
+              <label class="label font-semibold pb-1">
+                <span class="label-text text-xs font-semibold text-base-content">Rate Per KM (₱)</span>
+              </label>
+              <input
+                type="number"
+                step="0.50"
+                [(ngModel)]="newRule.ratePerKm"
+                name="ratePerKm"
+                class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
+                required
+              />
+            </div>
+
+            <!-- Minimum Fare -->
+            <div class="form-control">
+              <label class="label font-semibold pb-1">
+                <span class="label-text text-xs font-semibold text-base-content">Minimum Fare (₱)</span>
+              </label>
+              <input
+                type="number"
+                step="0.50"
+                [(ngModel)]="newRule.minimumFare"
+                name="minimumFare"
+                class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <!-- Valid From -->
+            <div class="form-control">
+              <label class="label font-semibold pb-1">
+                <span class="label-text text-xs font-semibold text-base-content">Valid From</span>
+              </label>
+              <input
+                type="date"
+                [(ngModel)]="newRule.validFrom"
+                name="validFrom"
+                class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
+                required
+              />
+            </div>
+
+            <!-- Valid Until -->
+            <div class="form-control">
+              <label class="label font-semibold pb-1">
+                <span class="label-text text-xs font-semibold text-base-content">Valid Until</span>
+              </label>
+              <input
+                type="date"
+                [(ngModel)]="newRule.validUntil"
+                name="validUntil"
+                class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
+                placeholder="Indefinite"
+              />
+            </div>
+          </div>
+
+          <!-- Source Reference -->
+          <div class="form-control">
+            <label class="label font-semibold pb-1">
+              <span class="label-text text-xs font-semibold text-base-content">Source / Ordinance Reference</span>
+            </label>
+            <input
+              type="text"
+              [(ngModel)]="newRule.source"
+              name="source"
+              class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
+              placeholder="e.g. City Ordinance No. 2026-XX"
+              required
+            />
+          </div>
+
+          <!-- Modal Actions -->
+          <div class="modal-action pt-3 flex gap-2 border-t border-base-200 mt-4">
+            <button type="button" (click)="closeAddModal()" class="btn btn-sm btn-ghost">Cancel</button>
+            <button type="submit" class="btn btn-sm bg-green-900 text-white hover:bg-green-950 border-0 px-5">Save Configuration</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  }
+
+</div>

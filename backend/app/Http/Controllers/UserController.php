@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -30,7 +31,7 @@ class UserController extends Controller
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-                'password' => bcrypt($validated['password']),
+                'password' => Hash::make($validated['password']),
                 'role' => $validated['role'] ?? 'user',
             ]);
 
@@ -49,18 +50,18 @@ class UserController extends Controller
 
             $user = User::where('email', $credentials['email'])->first();
 
-            if (!$user || !\Illuminate\Support\Facades\Hash::check($credentials['password'], $user->password)) {
+            if (!$user || !Hash::check($credentials['password'], $user->password)) {
                 return response()->json([
                     'message' => 'Invalid email or password.'
                 ], 401);
             }
 
-            // Optional: Kung gumagamit ka ng Laravel Sanctum para sa tokens
-            // $token = $user->createToken('admin-token')->plainTextToken;
+            // Generate Laravel Sanctum API Token
+            $token = $user->createToken('admin-token')->plainTextToken;
 
             return response()->json([
                 'message' => 'Login successful',
-                // 'token' => $token,
+                'token' => $token,
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,

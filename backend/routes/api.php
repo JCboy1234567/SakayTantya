@@ -38,6 +38,8 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 
     // Fuel Prices management
     Route::post('/fuel_prices', [FuelpriceController::class, 'store']);
+    Route::put('/fuel_prices/{id}', [FuelpriceController::class, 'update']);
+    Route::delete('/fuel_prices/{id}', [FuelpriceController::class, 'destroy']);
 
     // Fare & Fuel Cost Estimates (kung admin lang ang pwede mag-save)
     Route::post('/fare_estimates', [FareestimateController::class, 'store']);
