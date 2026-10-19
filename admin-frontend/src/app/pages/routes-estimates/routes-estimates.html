@@ -1,1 +1,205 @@
-<p>routes-estimates works!</p>
+<div class="space-y-6">
+
+  <!-- Page Header -->
+  <section class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+    <div>
+      <h1 class="text-xl font-bold tracking-tight text-base-content sm:text-2xl flex items-center gap-2">
+        <svg lucideRoute class="h-6 w-6 text-green-800"></svg>
+        Routes & Fare Estimates
+      </h1>
+      <p class="mt-1 text-xs text-base-content/60">
+        Simulate road distances, calculate fares based on active vehicle rules, and review past estimations.
+      </p>
+    </div>
+
+    <div class="flex gap-2">
+      <button type="button" class="btn btn-sm btn-outline border-base-300 text-xs">
+        <svg lucideClock class="h-4 w-4"></svg>
+        Export History
+      </button>
+    </div>
+  </section>
+
+  <!-- Main Grid: Simulator & Quick Info -->
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+
+    <!-- Route Simulator Card (2 Cols) -->
+    <div class="card border border-base-300 bg-base-100 shadow-sm lg:col-span-2">
+      <div class="card-body gap-4 p-6">
+        <div class="flex items-center justify-between border-b border-base-200 pb-3">
+          <h2 class="text-sm font-bold flex items-center gap-2">
+            <svg lucideCalculator class="h-4 w-4 text-green-800"></svg>
+            Interactive Route Simulator
+          </h2>
+          <span class="badge badge-success badge-sm text-[10px]">Active Rules Applied</span>
+        </div>
+
+        <form class="space-y-4">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <!-- Pickup -->
+            <div class="form-control">
+              <label class="label text-xs font-semibold">Pickup Location</label>
+              <div class="relative flex items-center">
+                <span class="absolute left-3 text-green-800">
+                  <svg lucideMapPin class="h-4 w-4"></svg>
+                </span>
+                <input
+                  type="text"
+                  [(ngModel)]="pickup"
+                  name="pickup"
+                  class="input input-bordered input-sm w-full pl-9 text-xs"
+                  placeholder="Enter pickup point"
+                />
+              </div>
+            </div>
+
+            <!-- Destination -->
+            <div class="form-control">
+              <label class="label text-xs font-semibold">Destination Location</label>
+              <div class="relative flex items-center">
+                <span class="absolute left-3 text-green-800">
+                  <svg lucideMapPin class="h-4 w-4"></svg>
+                </span>
+                <input
+                  type="text"
+                  [(ngModel)]="destination"
+                  name="destination"
+                  class="input input-bordered input-sm w-full pl-9 text-xs"
+                  placeholder="Enter destination point"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <!-- Distance -->
+            <div class="form-control">
+              <label class="label text-xs font-semibold">Distance (KM)</label>
+              <input
+                type="number"
+                step="0.1"
+                [(ngModel)]="distanceKm"
+                name="distanceKm"
+                class="input input-bordered input-sm text-xs w-full"
+              />
+            </div>
+
+            <!-- Vehicle Type -->
+            <div class="form-control">
+              <label class="label text-xs font-semibold">Vehicle Type</label>
+              <select
+                [(ngModel)]="selectedVehicle"
+                name="selectedVehicle"
+                class="select select-bordered select-sm text-xs w-full"
+              >
+                <option>Motorized Tricycle</option>
+                <option>Multicab / Jeepney</option>
+                <option>Modern PUV</option>
+              </select>
+            </div>
+
+            <!-- Base Fare Info -->
+            <div class="form-control">
+              <label class="label text-xs font-semibold">Base Fare Rule</label>
+              <div class="text-xs font-medium py-2 px-3 bg-base-200/50 rounded-lg flex items-center justify-between">
+                <span>₱{{ baseFare.toFixed(2) }} ({{ includedKm }}km)</span>
+                <span class="text-green-800 font-bold">+₱{{ ratePerKm.toFixed(2) }}/km</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Result banner -->
+          <div class="mt-4 flex flex-col sm:flex-row items-center justify-between rounded-2xl bg-green-900 p-4 text-white gap-4">
+            <div>
+              <p class="text-xs text-green-100">Estimated Calculated Fare</p>
+              <p class="text-2xl font-bold text-lime-300">₱{{ calculatedFare.toFixed(2) }}</p>
+            </div>
+            <button
+              type="button"
+              (click)="onSimulate()"
+              class="btn btn-sm bg-lime-400 text-green-950 font-bold hover:bg-lime-300 border-0 gap-1.5 w-full sm:w-auto"
+            >
+              <span>Calculate & Save</span>
+              <svg lucideArrowRight class="h-4 w-4"></svg>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Quick Stats / Info Card (1 Col) -->
+    <div class="card border border-base-300 bg-base-100 shadow-sm flex flex-col justify-between">
+      <div class="card-body gap-4 p-6">
+        <h2 class="text-sm font-bold flex items-center gap-2">
+          <svg lucideBike class="h-4 w-4 text-green-800"></svg>
+          Quick Route Metrics
+        </h2>
+
+        <div class="space-y-3 text-xs">
+          <div class="flex justify-between p-2.5 rounded-lg bg-base-200/50">
+            <span class="text-base-content/60">Total Active Routes</span>
+            <span class="font-bold">24 Routes</span>
+          </div>
+          <div class="flex justify-between p-2.5 rounded-lg bg-base-200/50">
+            <span class="text-base-content/60">Average Distance</span>
+            <span class="font-bold">4.8 KM</span>
+          </div>
+          <div class="flex justify-between p-2.5 rounded-lg bg-base-200/50">
+            <span class="text-base-content/60">Standard Tricycle Rate</span>
+            <span class="font-bold">₱15.00 Base</span>
+          </div>
+        </div>
+
+        <div class="rounded-xl border border-green-200 bg-green-50 p-3 text-[11px] text-green-950">
+          <p class="font-semibold mb-1">
+            Tagum City Standard
+          </p>
+          Estimates automatically sync with the active fare configurations set by administrators.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Recent Estimations Table -->
+  <div class="card border border-base-300 bg-base-100 shadow-sm overflow-hidden">
+    <div class="card-body p-0">
+      <div class="p-4 border-b border-base-200 flex items-center justify-between">
+        <h2 class="text-sm font-bold">Recent Route Calculations</h2>
+        <span class="text-xs text-base-content/60">Showing latest audit entries</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="table table-xs w-full">
+          <thead class="bg-base-200/70 uppercase text-[9px]">
+            <tr>
+              <th>ID</th>
+              <th>Initiated By</th>
+              <th>Pickup</th>
+              <th>Destination</th>
+              <th>Distance</th>
+              <th>Vehicle</th>
+              <th>Estimated Fare</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (est of recentEstimates; track est.id) {
+              <tr class="hover:bg-base-200/40">
+                <td class="font-bold">#{{ est.id }}</td>
+                <td>{{ est.user }}</td>
+                <td>{{ est.pickup }}</td>
+                <td>{{ est.destination }}</td>
+                <td>{{ est.distance }}</td>
+                <td>{{ est.vehicle }}</td>
+                <td class="font-bold text-green-900">{{ est.fare }}</td>
+                <td class="text-base-content/60">{{ est.date }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
