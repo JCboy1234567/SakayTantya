@@ -6,7 +6,6 @@ import {
   LucideSlidersHorizontal,
   LucideFuel,
   LucideBike,
-  LucideClipboardList,
   LucideMessageSquare,
   LucideSettings,
 } from '@lucide/angular';
@@ -22,7 +21,6 @@ import {
     LucideSlidersHorizontal,
     LucideFuel,
     LucideBike,
-    LucideClipboardList,
     LucideMessageSquare,
     LucideSettings,
   ],

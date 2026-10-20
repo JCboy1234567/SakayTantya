@@ -40,6 +40,18 @@ export class FareService {
     });
   }
 
+  updateVehicle(id: number, vehicleData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/vehicle/${id}`, vehicleData, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  deleteVehicle(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/vehicle/${id}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
   // Fuel Prices
   getFuelPrices(): Observable<any> {
     return this.http.get(`${this.apiUrl}/fuel_prices`);
@@ -59,6 +71,50 @@ export class FareService {
 
   deleteFuelPrice(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/fuel_prices/${id}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  // Service Availability
+  getServiceAvailability(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/service_availability`);
+  }
+
+  createServiceAvailability(serviceData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/service_availability`, serviceData, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  updateServiceAvailability(id: number, serviceData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/service_availability/${id}`, serviceData, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  deleteServiceAvailability(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/service_availability/${id}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  // Testing & Feedback
+  getTestingFeedback(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/testing_feedback`);
+  }
+
+  createTestingFeedback(feedbackData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/testing_feedback`, feedbackData);
+  }
+
+  updateTestingFeedback(id: number, feedbackData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/testing_feedback/${id}`, feedbackData, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  deleteTestingFeedback(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/testing_feedback/${id}`, {
       headers: this.getAuthHeaders()
     });
   }

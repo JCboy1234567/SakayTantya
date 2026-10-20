@@ -9,7 +9,6 @@ import { RoutesEstimates } from './pages/routes-estimates/routes-estimates';
 import { FareConfigurations } from './pages/fare-configurations/fare-configurations';
 import { FuelpriceReference } from './pages/fuelprice-reference/fuelprice-reference';
 import { VehiclesEfficiency } from './pages/vehicles-efficiency/vehicles-efficiency';
-import { ServiceAvailability } from './pages/service-availability/service-availability';
 import { TestingFeedback } from './pages/testing-feedback/testing-feedback';
 import { Settings } from './pages/settings/settings';
 import { UnderWork } from './pages/under-work/under-work';
@@ -57,10 +56,6 @@ export const routes: Routes = [
             {
                 path: 'vehicles-efficiency',
                 component: VehiclesEfficiency
-            },
-            {
-                path: 'service-availability',
-                component: ServiceAvailability
             },
             {
                 path: 'testing-feedback',
