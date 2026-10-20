@@ -1,1 +1,435 @@
-<p>vehicles-efficiency works!</p>
+<div class="space-y-6">
+
+  <!-- Page Header -->
+  <section class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+    <div>
+      <h1 class="text-xl font-bold tracking-tight text-base-content sm:text-2xl flex items-center gap-2">
+        <svg lucideTruck class="h-6 w-6 text-green-800"></svg>
+        Vehicles & Efficiency Reference
+      </h1>
+      <p class="mt-1 text-xs text-base-content/60">
+        Manage vehicle profiles, fuel types, and kilometer-per-liter efficiency coefficients for route cost estimation.
+      </p>
+    </div>
+
+    <div class="flex gap-2">
+      <button
+        type="button"
+        (click)="openAddModal()"
+        class="btn btn-sm bg-green-900 text-white text-xs hover:bg-green-950 gap-1.5 border-0 shadow-md"
+      >
+        <svg lucidePlus class="h-4 w-4"></svg>
+        Add Vehicle Profile
+      </button>
+    </div>
+  </section>
+
+  <!-- Success & Error Notifications -->
+  @if (successMessage) {
+    <div class="alert alert-success text-sm py-3 shadow-sm animate-fade-in">
+      <span>{{ successMessage }}</span>
+    </div>
+  }
+  @if (errorMessage) {
+    <div class="alert alert-error text-sm py-3 shadow-sm animate-fade-in text-white">
+      <span>{{ errorMessage }}</span>
+    </div>
+  }
+
+  <!-- Feature Overview Cards -->
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="card border border-base-300 bg-base-100 shadow-sm p-4">
+      <p class="text-xs text-base-content/60 font-medium">Registered Vehicles</p>
+      <p class="text-2xl font-bold text-green-900 mt-1">{{ vehicles.length }}</p>
+      <p class="text-[10px] text-base-content/50 mt-1">Fetched live from Laravel backend</p>
+    </div>
+    <div class="card border border-base-300 bg-base-100 shadow-sm p-4">
+      <p class="text-xs text-base-content/60 font-medium">Active Status</p>
+      <p class="text-lg font-bold text-base-content mt-1">Operational Sync</p>
+      <p class="text-[10px] text-base-content/50 mt-1">Connected to Data Base</p>
+    </div>
+    <div class="card border border-base-300 bg-base-100 shadow-sm p-4">
+      <p class="text-xs text-base-content/60 font-medium">Governing Authority</p>
+      <p class="text-lg font-bold text-base-content mt-1">Tagum City Transport Board</p>
+      <p class="text-[10px] text-base-content/50 mt-1">Fleet Efficiency Standards</p>
+    </div>
+  </div>
+
+  <!-- Vehicles Table Card -->
+  <div class="card border border-base-300 bg-base-100 shadow-sm overflow-hidden">
+    <div class="card-body p-0">
+      <div class="p-4 border-b border-base-200 flex items-center justify-between">
+        <h2 class="text-sm font-bold">Vehicle Profiles & Efficiency</h2>
+        @if (isLoading) {
+          <span class="flex items-center gap-1.5 text-xs text-base-content/60">
+            <svg lucideLoader class="h-3.5 w-3.5 animate-spin"></svg> Loading...
+          </span>
+        } @else {
+          <span class="badge badge-success badge-sm text-xs">Live Database</span>
+        }
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="table table-sm w-full">
+          <thead class="bg-base-200/70 text-[10px] uppercase tracking-wider">
+            <tr>
+              <th>ID</th>
+              <th>Vehicle Name</th>
+              <th>Fuel Type</th>
+              <th>Efficiency (KM/L)</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (isLoading) {
+              <tr>
+                <td colspan="7" class="text-center py-8 text-base-content/60 text-xs">
+                  Fetching vehicle records from Laravel API...
+                </td>
+              </tr>
+            } @else if (vehicles.length === 0) {
+              <tr>
+                <td colspan="7" class="text-center py-8 text-base-content/60 text-xs">
+                  No vehicle profiles found in the database. Click "Add Vehicle Profile" to create one.
+                </td>
+              </tr>
+            } @else {
+              @for (vehicle of vehicles; track vehicle.id) {
+                <tr class="hover:bg-base-200/40">
+                  <td class="font-mono text-xs opacity-60">#{{ vehicle.id }}</td>
+                  <td>
+                    <p class="font-bold text-base-content">{{ vehicle.vehicle_name }}</p>
+                  </td>
+                  <td>
+                    <span class="badge badge-sm badge-outline font-medium">{{ vehicle.fuel_type }}</span>
+                  </td>
+                  <td class="font-bold text-green-900 text-sm">{{ Number(vehicle.fuel_efficiency_km_per_liter).toFixed(2) }} KM/L</td>
+                  <td class="text-xs text-base-content/70 max-w-xs truncate">{{ vehicle.description || 'N/A' }}</td>
+                  <td>
+                    <span
+                      class="badge badge-sm font-semibold"
+                      [class.badge-success]="vehicle.is_active == 1 || vehicle.is_active === true"
+                      [class.badge-ghost]="vehicle.is_active == 0 || vehicle.is_active === false"
+                    >
+                      {{ (vehicle.is_active == 1 || vehicle.is_active === true) ? 'Active' : 'Inactive' }}
+                    </span>
+                  </td>
+                  <td class="text-right">
+                    <div class="flex items-center justify-end gap-1">
+                      <button type="button" (click)="openEditModal(vehicle)" class="btn btn-ghost btn-xs text-green-800 tooltip" data-tip="Edit Profile">
+                        <svg lucidePencil class="h-3.5 w-3.5"></svg>
+                      </button>
+                      <button type="button" (click)="openDeleteModal(vehicle)" class="btn btn-ghost btn-xs text-error tooltip" data-tip="Delete Profile">
+                        <svg lucideTrash class="h-3.5 w-3.5"></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODERN MODAL: Add New Vehicle Profile -->
+  @if (showAddModal) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+      <div class="bg-base-100 text-base-content rounded-2xl max-w-md w-full p-6 shadow-2xl border border-base-300 space-y-4">
+
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between border-b border-base-200 pb-3">
+          <div class="flex items-center gap-3">
+            <div class="flex size-10 items-center justify-center rounded-xl bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300">
+              <svg lucideTruck class="h-5 w-5"></svg>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-base-content">Add Vehicle Profile</h3>
+              <p class="text-xs opacity-70">Register fleet type and fuel efficiency in database</p>
+            </div>
+          </div>
+          <button type="button" (click)="closeAddModal()" class="btn btn-sm btn-ghost btn-circle">
+            <svg lucideX class="h-5 w-5"></svg>
+          </button>
+        </div>
+
+        <!-- Modal Form -->
+        <form (ngSubmit)="onSubmitVehicle()" class="space-y-3 text-xs">
+
+          <!-- Vehicle Name -->
+          <div class="form-control">
+            <label class="label font-semibold pb-1">
+              <span class="label-text text-xs font-semibold text-base-content">Vehicle / Transport Name</span>
+            </label>
+            <input
+              type="text"
+              [(ngModel)]="newVehicle.vehicle_name"
+              name="vehicle_name"
+              class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
+              placeholder="e.g. Motorized Tricycle (Standard)"
+              required
+            />
+          </div>
+
+          <!-- Fuel Type -->
+          <div class="form-control">
+            <label class="label font-semibold pb-1">
+              <span class="label-text text-xs font-semibold text-base-content">Fuel Type</span>
+            </label>
+            <select
+              [(ngModel)]="newVehicle.fuel_type"
+              name="fuel_type"
+              class="select select-bordered select-sm w-full text-xs bg-base-100 text-base-content"
+              required
+            >
+              <option>Gasoline (Regular)</option>
+              <option>Gasoline (Premium)</option>
+              <option>Diesel</option>
+              <option>Electric / Hybrid</option>
+              <option>LPG / Autogas</option>
+            </select>
+          </div>
+
+          <!-- Fuel Efficiency -->
+          <div class="form-control">
+            <label class="label font-semibold pb-1">
+              <span class="label-text text-xs font-semibold text-base-content">Fuel Efficiency (KM / Liter)</span>
+            </label>
+            <input
+              type="number"
+              step="0.1"
+              [(ngModel)]="newVehicle.fuel_efficiency_km_per_liter"
+              name="fuel_efficiency_km_per_liter"
+              class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
+              required
+            />
+          </div>
+
+          <!-- Description -->
+          <div class="form-control">
+            <label class="label font-semibold pb-1">
+              <span class="label-text text-xs font-semibold text-base-content">Description / Notes</span>
+            </label>
+            <textarea
+              [(ngModel)]="newVehicle.description"
+              name="description"
+              class="textarea textarea-bordered textarea-sm text-xs w-full bg-base-100 text-base-content h-20"
+              placeholder="Optional route coverage or seating capacity notes..."
+            ></textarea>
+          </div>
+
+          <!-- Status -->
+          <div class="form-control">
+            <label class="label font-semibold pb-1">
+              <span class="label-text text-xs font-semibold text-base-content">Operational Status</span>
+            </label>
+            <select
+              [(ngModel)]="newVehicle.is_active"
+              name="is_active"
+              class="select select-bordered select-sm w-full text-xs bg-base-100 text-base-content"
+            >
+              <option [ngValue]="true">Active</option>
+              <option [ngValue]="false">Inactive</option>
+            </select>
+          </div>
+
+          <!-- Modal Actions -->
+          <div class="modal-action pt-3 flex gap-2 border-t border-base-200 mt-4">
+            <button type="button" (click)="closeAddModal()" class="btn btn-sm btn-ghost" [disabled]="isSubmitting">Cancel</button>
+            <button type="submit" class="btn btn-sm bg-green-900 text-white hover:bg-green-950 border-0 px-5 gap-2" [disabled]="isSubmitting">
+              @if (isSubmitting) {
+                <svg lucideLoader class="h-4 w-4 animate-spin"></svg> Saving...
+              } @else {
+                Save to Database
+              }
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  }
+
+  <!-- MODERN MODAL: Edit Vehicle Profile -->
+  @if (showEditModal) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+      <div class="bg-base-100 text-base-content rounded-2xl max-w-md w-full p-6 shadow-2xl border border-base-300 space-y-4">
+
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between border-b border-base-200 pb-3">
+          <div class="flex items-center gap-3">
+            <div class="flex size-10 items-center justify-center rounded-xl bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300">
+              <svg lucidePencil class="h-5 w-5"></svg>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-base-content">Edit Vehicle Profile</h3>
+              <p class="text-xs opacity-70">Modify fleet specifications in database</p>
+            </div>
+          </div>
+          <button type="button" (click)="closeEditModal()" class="btn btn-sm btn-ghost btn-circle">
+            <svg lucideX class="h-5 w-5"></svg>
+          </button>
+        </div>
+
+        <!-- Modal Form -->
+        <form (ngSubmit)="onUpdateVehicle()" class="space-y-3 text-xs">
+
+          <!-- Vehicle Name -->
+          <div class="form-control">
+            <label class="label font-semibold pb-1">
+              <span class="label-text text-xs font-semibold text-base-content">Vehicle / Transport Name</span>
+            </label>
+            <input
+              type="text"
+              [(ngModel)]="editVehicle.vehicle_name"
+              name="edit_vehicle_name"
+              class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
+              required
+            />
+          </div>
+
+          <!-- Fuel Type -->
+          <div class="form-control">
+            <label class="label font-semibold pb-1">
+              <span class="label-text text-xs font-semibold text-base-content">Fuel Type</span>
+            </label>
+            <select
+              [(ngModel)]="editVehicle.fuel_type"
+              name="edit_fuel_type"
+              class="select select-bordered select-sm w-full text-xs bg-base-100 text-base-content"
+              required
+            >
+              <option>Gasoline (Regular)</option>
+              <option>Gasoline (Premium)</option>
+              <option>Diesel</option>
+              <option>Electric / Hybrid</option>
+              <option>LPG / Autogas</option>
+            </select>
+          </div>
+
+          <!-- Fuel Efficiency -->
+          <div class="form-control">
+            <label class="label font-semibold pb-1">
+              <span class="label-text text-xs font-semibold text-base-content">Fuel Efficiency (KM / Liter)</span>
+            </label>
+            <input
+              type="number"
+              step="0.1"
+              [(ngModel)]="editVehicle.fuel_efficiency_km_per_liter"
+              name="edit_fuel_efficiency_km_per_liter"
+              class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
+              required
+            />
+          </div>
+
+          <!-- Description -->
+          <div class="form-control">
+            <label class="label font-semibold pb-1">
+              <span class="label-text text-xs font-semibold text-base-content">Description / Notes</span>
+            </label>
+            <textarea
+              [(ngModel)]="editVehicle.description"
+              name="edit_description"
+              class="textarea textarea-bordered textarea-sm text-xs w-full bg-base-100 text-base-content h-20"
+            ></textarea>
+          </div>
+
+          <!-- Status -->
+          <div class="form-control">
+            <label class="label font-semibold pb-1">
+              <span class="label-text text-xs font-semibold text-base-content">Operational Status</span>
+            </label>
+            <select
+              [(ngModel)]="editVehicle.is_active"
+              name="edit_is_active"
+              class="select select-bordered select-sm w-full text-xs bg-base-100 text-base-content"
+            >
+              <option [ngValue]="true">Active</option>
+              <option [ngValue]="false">Inactive</option>
+            </select>
+          </div>
+
+          <!-- Modal Actions -->
+          <div class="modal-action pt-3 flex gap-2 border-t border-base-200 mt-4">
+            <button type="button" (click)="closeEditModal()" class="btn btn-sm btn-ghost" [disabled]="isEditing">Cancel</button>
+            <button type="submit" class="btn btn-sm bg-green-900 text-white hover:bg-green-950 border-0 px-5 gap-2" [disabled]="isEditing">
+              @if (isEditing) {
+                <svg lucideLoader class="h-4 w-4 animate-spin"></svg> Updating...
+              } @else {
+                Update Database
+              }
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  }
+
+  <!-- SUCCESS NOTIFICATION MODAL -->
+  @if (showSuccessModal) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+      <div class="bg-base-100 text-base-content rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-base-300 text-center space-y-4">
+        <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-success/20 text-success">
+          <svg lucideCheck class="h-6 w-6"></svg>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-base-content">{{ successModalTitle }}</h3>
+          <p class="text-xs opacity-70 mt-1">{{ successModalText }}</p>
+        </div>
+        <div class="pt-2">
+          <button
+            type="button"
+            (click)="closeSuccessModal()"
+            class="btn btn-sm bg-green-900 text-white hover:bg-green-950 border-0 w-full"
+          >
+            Okay, Got It
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODERN DELETE CONFIRMATION MODAL -->
+  @if (showDeleteModal) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+      <div class="bg-base-100 text-base-content rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-base-300 text-center space-y-4">
+        <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-error/20 text-error">
+          <svg lucideAlertCircle class="h-6 w-6"></svg>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-base-content">Delete Vehicle Profile?</h3>
+          <p class="text-xs opacity-70 mt-1">
+            Are you sure you want to delete <span class="font-semibold text-base-content">{{ vehicleToDeleteName }}</span>? This action cannot be undone.
+          </p>
+        </div>
+        <div class="modal-action pt-2 flex gap-2 justify-center">
+          <button
+            type="button"
+            (click)="closeDeleteModal()"
+            class="btn btn-sm btn-ghost flex-1"
+            [disabled]="isDeleting"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            (click)="confirmDelete()"
+            class="btn btn-sm btn-error text-white flex-1 gap-1.5"
+            [disabled]="isDeleting"
+          >
+            @if (isDeleting) {
+              <svg lucideLoader class="h-4 w-4 animate-spin"></svg> Deleting...
+            } @else {
+              Yes, Delete
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>
