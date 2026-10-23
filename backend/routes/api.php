@@ -35,6 +35,9 @@ Route::post('/testing_feedback', [TestingFeedbackController::class, 'store']); /
 // PROTECTED ADMIN-ONLY ROUTES (Middleware: role:admin)
 // ==========================================
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    // User profile updates
+    Route::put('/users/{id}', [UserController::class, 'update']);
+
     // Vehicle management
     Route::post('/vehicle', [VehicleController::class, 'store']);
     Route::put('/vehicle/{id}', [VehicleController::class, 'update']);

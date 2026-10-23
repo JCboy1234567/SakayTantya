@@ -118,4 +118,11 @@ export class FareService {
       headers: this.getAuthHeaders()
     });
   }
+
+  // User Profile
+  updateUserProfile(id: number, userData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/users/${id}`, userData, {
+      headers: this.getAuthHeaders()
+    });
+  }
 }

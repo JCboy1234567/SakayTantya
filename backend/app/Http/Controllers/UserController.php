@@ -39,6 +39,56 @@ class UserController extends Controller
         }
 
         /**
+         * Update the authenticated user's profile and/or password.
+         */
+        public function update(Request $request, int $id)
+        {
+            $user = User::find($id);
+
+            if (!$user) {
+                return response()->json([
+                    'message' => 'User not found.'
+                ], 404);
+            }
+
+            $validated = $request->validate([
+                'name' => 'sometimes|required|string|max:255',
+                'email' => 'sometimes|required|email|unique:users,email,' . $id,
+                'current_password' => 'required_with:password|string',
+                'password' => 'nullable|string|min:8',
+            ]);
+
+            if (isset($validated['password'])) {
+                if (!isset($validated['current_password']) || !Hash::check($validated['current_password'], $user->password)) {
+                    return response()->json([
+                        'message' => 'Current password is incorrect.'
+                    ], 422);
+                }
+                $user->password = Hash::make($validated['password']);
+            }
+
+            if (isset($validated['name'])) {
+                $user->name = $validated['name'];
+            }
+
+            if (isset($validated['email'])) {
+                $user->email = $validated['email'];
+            }
+
+            $user->save();
+
+            return response()->json([
+                'message' => 'Profile updated successfully',
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role
+                ]
+            ], 200);
+        }
+
+        /**
          * Authenticate user login.
          */
         public function login(Request $request)
