@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -32,23 +32,19 @@ import { AuthServices } from '../../core/services/auth.services';
   styleUrl: './login.css',
 })
 export class Login {
-  readonly Mail = LucideMail;
-  readonly LockKeyhole = LucideLockKeyhole;
-  readonly Eye = LucideEye;
-  readonly EyeOff = LucideEyeOff;
-  readonly ArrowRight = LucideArrowRight;
-  readonly ShieldCheck = LucideShieldCheck;
-  readonly MapPin = LucideMapPin;
-
   showPassword = false;
   rememberMe = true;
   email = '';
   password = '';
   errorMessage = '';
   isLoading = false;
-  showSuccessModal = false; // <--- Para sa Success Modal
+  showSuccessModal = false;
 
-  constructor(private router: Router, private authService: AuthServices) {}
+  constructor(
+    private router: Router,
+    private authService: AuthServices,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
@@ -59,10 +55,12 @@ export class Login {
 
     if (!this.email.trim() || !this.password) {
       this.errorMessage = 'Please enter your email and password.';
+      this.cdr.detectChanges();
       return;
     }
 
     this.isLoading = true;
+    this.cdr.detectChanges();
 
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: (response: any) => {
@@ -71,17 +69,18 @@ export class Login {
         localStorage.setItem('user', JSON.stringify(response.user));
 
         this.isLoading = false;
-        this.showSuccessModal = true; // Ipakita ang Success Modal
+        this.showSuccessModal = true;
+        this.cdr.detectChanges();
 
-        // Mag-redirect sa dashboard pagkatapos ng 2 segundo
         setTimeout(() => {
           this.router.navigate(['/dashboard']);
-        }, 2000);
+        }, 1800);
       },
       error: (err: any) => {
         this.isLoading = false;
         console.error('Login error:', err);
         this.errorMessage = err.error?.message || 'Invalid email or password or connection failed.';
+        this.cdr.detectChanges();
       }
     });
   }
