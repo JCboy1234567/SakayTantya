@@ -18,9 +18,15 @@
 
       <!-- Profile Card -->
       <div class="bg-base-100 rounded-2xl border border-base-300 shadow-sm overflow-hidden">
-        <div class="p-5 border-b border-base-300 flex items-center gap-2">
-          <svg lucideUser class="w-5 h-5 text-primary"></svg>
-          <h2 class="text-lg font-bold text-base-content">Account Profile</h2>
+        <div class="p-5 border-b border-base-300 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <svg lucideUser class="w-5 h-5 text-primary"></svg>
+            <h2 class="text-lg font-bold text-base-content">Account Profile</h2>
+          </div>
+          <button (click)="openEditProfileModal()" class="btn btn-sm btn-outline btn-primary gap-1.5">
+            <svg lucidePencil class="w-4 h-4"></svg>
+            Edit Profile
+          </button>
         </div>
         <div class="p-6">
           <div class="flex flex-col sm:flex-row items-center gap-6">
@@ -205,6 +211,55 @@
       </div>
     </div>
   </div>
+
+  <!-- EDIT PROFILE MODAL -->
+  @if (showEditProfileModal) {
+    <div class="modal modal-open backdrop-blur-sm bg-black/40">
+      <div class="modal-box bg-base-100 border border-base-300 max-w-md rounded-2xl shadow-2xl p-6">
+        <div class="flex items-center justify-between pb-4 border-b border-base-200">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-primary/10 text-primary rounded-xl">
+              <svg lucideUser class="w-6 h-6"></svg>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-base-content">Edit Account Profile</h3>
+              <p class="text-xs text-base-content/60">Update your name and email address.</p>
+            </div>
+          </div>
+          <button (click)="closeEditProfileModal()" class="btn btn-ghost btn-sm btn-circle">
+            <svg lucideX class="w-5 h-5"></svg>
+          </button>
+        </div>
+
+        @if (profileError) {
+          <div class="alert alert-error mt-4 text-sm">
+            <svg lucideAlertTriangle class="w-4 h-4"></svg>
+            <span>{{ profileError }}</span>
+          </div>
+        }
+
+        <div class="space-y-4 py-4">
+          <div class="form-control">
+            <label class="label"><span class="label-text font-semibold text-xs uppercase text-base-content/70">Full Name</span></label>
+            <input type="text" [(ngModel)]="editName" placeholder="Enter your full name" class="input input-bordered w-full bg-base-200 text-base-content" />
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text font-semibold text-xs uppercase text-base-content/70">Email Address</span></label>
+            <input type="email" [(ngModel)]="editEmail" placeholder="Enter your email address" class="input input-bordered w-full bg-base-200 text-base-content" />
+          </div>
+        </div>
+
+        <div class="modal-action border-t border-base-200 pt-4">
+          <button (click)="closeEditProfileModal()" class="btn btn-ghost">Cancel</button>
+          <button (click)="onUpdateProfile()" class="btn btn-primary gap-2 shadow-lg shadow-primary/20" [disabled]="isSavingProfile">
+            <svg lucideLoader class="w-4 h-4 animate-spin" *ngIf="isSavingProfile"></svg>
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 
   <!-- CHANGE PASSWORD MODAL -->
   @if (showPasswordModal) {

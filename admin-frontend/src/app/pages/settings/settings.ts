@@ -19,8 +19,10 @@ import {
   LucideEye,
   LucideEyeOff,
   LucideBell,
-  LucidePalette
+  LucidePalette,
+  LucidePencil
 } from '@lucide/angular';
+import { FareService } from '../../core/services/fare.service';
 
 @Component({
   selector: 'app-settings',
@@ -44,13 +46,15 @@ import {
     LucideEye,
     LucideEyeOff,
     LucideBell,
-    LucidePalette
+    LucidePalette,
+    LucidePencil
   ],
   templateUrl: './settings.html',
   styleUrl: './settings.css',
 })
 export class Settings implements OnInit {
   // Profile
+  userId: number | null = null;
   userName = '';
   userEmail = '';
   userRole = '';
@@ -84,8 +88,16 @@ export class Settings implements OnInit {
   // Logout Confirmation
   showLogoutModal = false;
 
+  // Edit Profile Modal
+  showEditProfileModal = false;
+  isSavingProfile = false;
+  profileError = '';
+  editName = '';
+  editEmail = '';
+
   constructor(
     private router: Router,
+    private fareService: FareService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -100,6 +112,7 @@ export class Settings implements OnInit {
     if (userJson) {
       try {
         const user = JSON.parse(userJson);
+        this.userId = user.id || null;
         this.userName = user.name || 'Admin';
         this.userEmail = user.email || 'admin@sakaytantya.com';
         this.userRole = user.role || 'admin';
@@ -191,23 +204,105 @@ export class Settings implements OnInit {
       return;
     }
 
+    if (!this.userId) {
+      this.passwordError = 'User ID not found. Please log in again.';
+      this.cdr.detectChanges();
+      return;
+    }
+
     this.isChangingPassword = true;
     this.cdr.detectChanges();
 
-    // Simulated - connect to backend later
-    setTimeout(() => {
-      this.isChangingPassword = false;
-      this.closePasswordModal();
-      this.successModalTitle = 'Password Changed!';
-      this.successModalText = 'Your account password has been updated successfully. Use your new password on your next login.';
-      this.showSuccessModal = true;
-      this.cdr.detectChanges();
-    }, 1200);
+    const payload = {
+      current_password: this.currentPassword,
+      password: this.newPassword
+    };
+
+    this.fareService.updateUserProfile(this.userId, payload).subscribe({
+      next: () => {
+        this.isChangingPassword = false;
+        this.closePasswordModal();
+        this.successModalTitle = 'Password Changed!';
+        this.successModalText = 'Your account password has been successfully updated in the database.';
+        this.showSuccessModal = true;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error updating password:', err);
+        this.isChangingPassword = false;
+        this.passwordError = err.error?.message || 'Failed to update password. Check your current password.';
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   closeSuccessModal(): void {
     this.showSuccessModal = false;
     this.cdr.detectChanges();
+  }
+
+  // Edit Profile Methods
+  openEditProfileModal(): void {
+    this.editName = this.userName;
+    this.editEmail = this.userEmail;
+    this.profileError = '';
+    this.showEditProfileModal = true;
+    this.cdr.detectChanges();
+  }
+
+  closeEditProfileModal(): void {
+    this.showEditProfileModal = false;
+    this.cdr.detectChanges();
+  }
+
+  onUpdateProfile(): void {
+    this.profileError = '';
+
+    if (!this.editName.trim() || !this.editEmail.trim()) {
+      this.profileError = 'Name and email are required.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (!this.userId) {
+      this.profileError = 'User ID not found. Please log in again.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.isSavingProfile = true;
+    this.cdr.detectChanges();
+
+    const payload = {
+      name: this.editName.trim(),
+      email: this.editEmail.trim()
+    };
+
+    this.fareService.updateUserProfile(this.userId, payload).subscribe({
+      next: (response: any) => {
+        this.isSavingProfile = false;
+        const updatedUser = response.user || { id: this.userId, name: this.editName, email: this.editEmail, role: this.userRole };
+
+        this.userName = updatedUser.name;
+        this.userEmail = updatedUser.email;
+        this.userInitial = this.userName.charAt(0).toUpperCase();
+
+        // Update localStorage user
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+
+        this.closeEditProfileModal();
+        this.successModalTitle = 'Profile Updated Successfully!';
+        this.successModalText = 'Your account name and email have been saved to the database.';
+        this.showSuccessModal = true;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error updating profile:', err);
+        this.isSavingProfile = false;
+        this.profileError = err.error?.message || 'Failed to update profile. Email might already be taken.';
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   // Logout
