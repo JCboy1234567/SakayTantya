@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class FareRule extends Model
 {
+    use HasFactory;
+
     protected $table = 'fare_rules';
 
     protected $fillable = [
@@ -29,5 +32,13 @@ class FareRule extends Model
             'valid_from' => 'date',
             'valid_until' => 'date',
         ];
+    }
+
+    /**
+     * Relationship with Vehicle model.
+     */
+    public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class, 'vehicle_id');
     }
 }

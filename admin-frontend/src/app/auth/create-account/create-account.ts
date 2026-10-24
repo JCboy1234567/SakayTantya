@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -12,7 +12,9 @@ import {
   LucideEye,
   LucideEyeOff,
   LucideArrowRight,
-  LucideShieldCheck
+  LucideShieldCheck,
+  LucideAlertCircle,
+  LucideX
 } from '@lucide/angular';
 
 @Component({
@@ -29,7 +31,9 @@ import {
     LucideEye,
     LucideEyeOff,
     LucideArrowRight,
-    LucideShieldCheck
+    LucideShieldCheck,
+    LucideAlertCircle,
+    LucideX
   ],
   templateUrl: './create-account.html',
   styleUrl: './create-account.css'
@@ -44,11 +48,20 @@ export class CreateAccount {
   showConfirmPassword = false;
 
   errorMessage = '';
-  passwordMismatchError = ''; // <--- Para sa error sa ilalim ng confirm password
+  passwordMismatchError = '';
   isLoading = false;
   showSuccessModal = false;
 
-  constructor(private router: Router, private authService: AuthServices) {}
+  // Error Modal State
+  showErrorModal = false;
+  errorModalTitle = 'Registration Error';
+  errorModalMessage = '';
+
+  constructor(
+    private router: Router,
+    private authService: AuthServices,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
@@ -58,12 +71,15 @@ export class CreateAccount {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
+  closeErrorModal(): void {
+    this.showErrorModal = false;
+    this.cdr.detectChanges();
+  }
+
   onSubmit(): void {
-    console.log('onSubmit clicked!');
     this.errorMessage = '';
     this.passwordMismatchError = '';
 
-    // Validate required fields
     if (
       !this.name.trim() ||
       !this.email.trim() ||
@@ -71,35 +87,31 @@ export class CreateAccount {
       !this.confirmPassword
     ) {
       this.errorMessage = 'Please complete all required fields.';
-      console.log('Validation failed: missing fields');
+      this.cdr.detectChanges();
       return;
     }
 
-    // Validate email format
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     if (!emailPattern.test(this.email.trim())) {
       this.errorMessage = 'Please enter a valid email address.';
-      console.log('Validation failed: invalid email');
+      this.cdr.detectChanges();
       return;
     }
 
-    // Validate password length
     if (this.password.length < 8) {
       this.errorMessage = 'Password must be at least 8 characters.';
-      console.log('Validation failed: short password');
+      this.cdr.detectChanges();
       return;
     }
 
-    // Validate password confirmation (ilagay sa baba ng input)
     if (this.password !== this.confirmPassword) {
       this.passwordMismatchError = 'Passwords do not match.';
-      console.log('Validation failed: passwords do not match');
+      this.cdr.detectChanges();
       return;
     }
 
-    console.log('All validations passed, calling authService.register...');
     this.isLoading = true;
+    this.cdr.detectChanges();
 
     this.authService.register({
       name: this.name.trim(),
@@ -107,19 +119,33 @@ export class CreateAccount {
       password: this.password,
       role: 'admin'
     }).subscribe({
-      next: (res: any) => {
-        console.log('API SUCCESS RESPONSE:', res);
+      next: () => {
         this.isLoading = false;
         this.showSuccessModal = true;
+        this.cdr.detectChanges();
 
         setTimeout(() => {
           this.router.navigate(['/login']);
         }, 2000);
       },
       error: (err: any) => {
-        console.error('API ERROR:', err);
         this.isLoading = false;
-        this.errorMessage = err.error?.message || err.message || 'Failed to create account. Please try again.';
+        console.error('API ERROR:', err);
+
+        let msg = 'Failed to create account. Please try again.';
+        if (err.error?.message) {
+          msg = err.error.message;
+        } else if (err.error?.errors) {
+          const firstKey = Object.keys(err.error.errors)[0];
+          if (firstKey && err.error.errors[firstKey][0]) {
+            msg = err.error.errors[firstKey][0];
+          }
+        }
+
+        this.errorModalTitle = 'Account Exists';
+        this.errorModalMessage = msg;
+        this.showErrorModal = true;
+        this.cdr.detectChanges();
       }
     });
   }

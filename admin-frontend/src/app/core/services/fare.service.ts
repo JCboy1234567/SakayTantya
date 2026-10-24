@@ -29,6 +29,18 @@ export class FareService {
     });
   }
 
+  updateFareRule(id: number, ruleData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/fare_rules/${id}`, ruleData, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  deleteFareRule(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/fare_rules/${id}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
   // Vehicles
   getVehicles(): Observable<any> {
     return this.http.get(`${this.apiUrl}/vehicle`);

@@ -135,26 +135,6 @@
               </label>
             </div>
 
-            <!-- Remember me -->
-            <div class="flex items-center justify-between gap-3 text-sm">
-              <label class="flex cursor-pointer items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="rememberMe"
-                  class="checkbox checkbox-sm checkbox-success"
-                  [(ngModel)]="rememberMe"
-                />
-                <span>Remember me</span>
-              </label>
-
-              <a
-                routerLink="/forgot-password"
-                class="font-semibold text-green-800 hover:text-green-950"
-              >
-                Forgot password?
-              </a>
-            </div>
-
             <!-- Submit -->
             <button
               type="submit"
@@ -195,8 +175,8 @@
 
 <!-- SUCCESS MODAL -->
 @if (showSuccessModal) {
-  <div class="modal modal-open">
-    <div class="modal-box text-center p-8 rounded-3xl max-w-sm">
+  <div class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/40">
+    <div class="bg-white border border-slate-100 text-slate-800 modal-box p-8 rounded-3xl max-w-sm shadow-2xl text-center">
       <div class="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-green-100 text-green-700">
         <svg lucideShieldCheck class="size-9"></svg>
       </div>

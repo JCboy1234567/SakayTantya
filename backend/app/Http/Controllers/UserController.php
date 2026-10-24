@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -22,10 +23,22 @@ class UserController extends Controller
         public function store(Request $request)
         {
             $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email',
+                'name' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('users', 'name'),
+                ],
+                'email' => [
+                    'required',
+                    'email',
+                    Rule::unique('users', 'email'),
+                ],
                 'password' => 'required|string|min:8',
                 'role' => 'nullable|string|in:admin,manager,user',
+            ], [
+                'name.unique' => 'This account name is already registered.',
+                'email.unique' => 'This email address is already registered.',
             ]);
 
             $user = User::create([
@@ -52,10 +65,24 @@ class UserController extends Controller
             }
 
             $validated = $request->validate([
-                'name' => 'sometimes|required|string|max:255',
-                'email' => 'sometimes|required|email|unique:users,email,' . $id,
+                'name' => [
+                    'sometimes',
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('users', 'name')->ignore($id),
+                ],
+                'email' => [
+                    'sometimes',
+                    'required',
+                    'email',
+                    Rule::unique('users', 'email')->ignore($id),
+                ],
                 'current_password' => 'required_with:password|string',
                 'password' => 'nullable|string|min:8',
+            ], [
+                'name.unique' => 'This account name is already taken.',
+                'email.unique' => 'This email address is already taken.',
             ]);
 
             if (isset($validated['password'])) {
