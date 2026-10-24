@@ -2,8 +2,8 @@
   <!-- Header Banner -->
   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-base-200/60 backdrop-blur-md p-6 rounded-2xl border border-base-300 shadow-sm">
     <div class="flex items-center gap-4">
-      <div class="p-3 bg-primary/10 text-primary rounded-xl border border-primary/20">
-        <svg lucideSettings class="w-8 h-8"></svg>
+      <div class="p-3 bg-green-900/10 text-green-900 rounded-xl border border-green-900/20">
+        <svg lucideSettings class="w-8 h-8 text-green-800"></svg>
       </div>
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-base-content">Settings</h1>
@@ -20,10 +20,10 @@
       <div class="bg-base-100 rounded-2xl border border-base-300 shadow-sm overflow-hidden">
         <div class="p-5 border-b border-base-300 flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <svg lucideUser class="w-5 h-5 text-primary"></svg>
+            <svg lucideUser class="w-5 h-5 text-green-800"></svg>
             <h2 class="text-lg font-bold text-base-content">Account Profile</h2>
           </div>
-          <button (click)="openEditProfileModal()" class="btn btn-sm btn-outline btn-primary gap-1.5">
+          <button (click)="openEditProfileModal()" class="btn btn-sm bg-green-900 text-white text-xs hover:bg-green-950 gap-1.5 border-0 shadow-md">
             <svg lucidePencil class="w-4 h-4"></svg>
             Edit Profile
           </button>
@@ -31,27 +31,27 @@
         <div class="p-6">
           <div class="flex flex-col sm:flex-row items-center gap-6">
             <!-- Avatar -->
-            <div class="w-20 h-20 rounded-full bg-primary/10 text-primary font-extrabold text-3xl flex items-center justify-center border-2 border-primary/20 shadow-md">
+            <div class="w-20 h-20 rounded-full bg-green-900/10 text-green-900 font-extrabold text-3xl flex items-center justify-center border-2 border-green-900/20 shadow-md">
               {{ userInitial }}
             </div>
             <!-- Info -->
             <div class="flex-1 space-y-3 w-full">
               <div class="flex items-center gap-3 bg-base-200/50 p-3.5 rounded-xl border border-base-300/60">
-                <svg lucideUser class="w-4.5 h-4.5 text-primary"></svg>
+                <svg lucideUser class="w-4.5 h-4.5 text-green-800"></svg>
                 <div>
                   <p class="text-xs uppercase tracking-wider font-semibold text-base-content/50">Full Name</p>
                   <p class="text-sm font-bold text-base-content">{{ userName }}</p>
                 </div>
               </div>
               <div class="flex items-center gap-3 bg-base-200/50 p-3.5 rounded-xl border border-base-300/60">
-                <svg lucideMail class="w-4.5 h-4.5 text-primary"></svg>
+                <svg lucideMail class="w-4.5 h-4.5 text-green-800"></svg>
                 <div>
                   <p class="text-xs uppercase tracking-wider font-semibold text-base-content/50">Email Address</p>
                   <p class="text-sm font-bold text-base-content">{{ userEmail }}</p>
                 </div>
               </div>
               <div class="flex items-center gap-3 bg-base-200/50 p-3.5 rounded-xl border border-base-300/60">
-                <svg lucideShield class="w-4.5 h-4.5 text-primary"></svg>
+                <svg lucideShield class="w-4.5 h-4.5 text-green-800"></svg>
                 <div>
                   <p class="text-xs uppercase tracking-wider font-semibold text-base-content/50">Role</p>
                   <p class="text-sm font-bold text-base-content capitalize">{{ userRole }}</p>
@@ -65,7 +65,7 @@
       <!-- Security Card -->
       <div class="bg-base-100 rounded-2xl border border-base-300 shadow-sm overflow-hidden">
         <div class="p-5 border-b border-base-300 flex items-center gap-2">
-          <svg lucideLock class="w-5 h-5 text-primary"></svg>
+          <svg lucideLock class="w-5 h-5 text-green-800"></svg>
           <h2 class="text-lg font-bold text-base-content">Security</h2>
         </div>
         <div class="p-6 space-y-4">
@@ -104,7 +104,7 @@
       <!-- Theme Preference -->
       <div class="bg-base-100 rounded-2xl border border-base-300 shadow-sm overflow-hidden">
         <div class="p-5 border-b border-base-300 flex items-center gap-2">
-          <svg lucidePalette class="w-5 h-5 text-primary"></svg>
+          <svg lucidePalette class="w-5 h-5 text-green-800"></svg>
           <h2 class="text-lg font-bold text-base-content">Appearance</h2>
         </div>
         <div class="p-6 space-y-3">
@@ -112,8 +112,8 @@
 
           <button (click)="setTheme('light')"
             class="w-full flex items-center gap-3 p-3.5 rounded-xl border transition-all"
-            [ngClass]="currentTheme === 'light' ? 'bg-primary/10 border-primary/30 shadow-sm' : 'bg-base-200/50 border-base-300/60 hover:bg-base-200'">
-            <div class="p-2 rounded-lg" [ngClass]="currentTheme === 'light' ? 'bg-primary/20 text-primary' : 'bg-base-300 text-base-content/50'">
+            [ngClass]="currentTheme === 'light' ? 'bg-green-900/10 border-green-900/30 shadow-sm' : 'bg-base-200/50 border-base-300/60 hover:bg-base-200'">
+            <div class="p-2 rounded-lg" [ngClass]="currentTheme === 'light' ? 'bg-green-900/20 text-green-900' : 'bg-base-300 text-base-content/50'">
               <svg lucideSun class="w-5 h-5"></svg>
             </div>
             <div class="text-left">
@@ -121,14 +121,14 @@
               <p class="text-xs text-base-content/60">Bright and clean interface.</p>
             </div>
             @if (currentTheme === 'light') {
-              <svg lucideCheckCircle2 class="w-5 h-5 text-primary ml-auto"></svg>
+              <svg lucideCheckCircle2 class="w-5 h-5 text-green-800 ml-auto"></svg>
             }
           </button>
 
           <button (click)="setTheme('dark')"
             class="w-full flex items-center gap-3 p-3.5 rounded-xl border transition-all"
-            [ngClass]="currentTheme === 'dark' ? 'bg-primary/10 border-primary/30 shadow-sm' : 'bg-base-200/50 border-base-300/60 hover:bg-base-200'">
-            <div class="p-2 rounded-lg" [ngClass]="currentTheme === 'dark' ? 'bg-primary/20 text-primary' : 'bg-base-300 text-base-content/50'">
+            [ngClass]="currentTheme === 'dark' ? 'bg-green-900/10 border-green-900/30 shadow-sm' : 'bg-base-200/50 border-base-300/60 hover:bg-base-200'">
+            <div class="p-2 rounded-lg" [ngClass]="currentTheme === 'dark' ? 'bg-green-900/20 text-green-900' : 'bg-base-300 text-base-content/50'">
               <svg lucideMoon class="w-5 h-5"></svg>
             </div>
             <div class="text-left">
@@ -136,7 +136,7 @@
               <p class="text-xs text-base-content/60">Easy on the eyes at night.</p>
             </div>
             @if (currentTheme === 'dark') {
-              <svg lucideCheckCircle2 class="w-5 h-5 text-primary ml-auto"></svg>
+              <svg lucideCheckCircle2 class="w-5 h-5 text-green-800 ml-auto"></svg>
             }
           </button>
         </div>
@@ -145,7 +145,7 @@
       <!-- Notification Preferences -->
       <div class="bg-base-100 rounded-2xl border border-base-300 shadow-sm overflow-hidden">
         <div class="p-5 border-b border-base-300 flex items-center gap-2">
-          <svg lucideBell class="w-5 h-5 text-primary"></svg>
+          <svg lucideBell class="w-5 h-5 text-green-800"></svg>
           <h2 class="text-lg font-bold text-base-content">Notifications</h2>
         </div>
         <div class="p-6 space-y-4">
@@ -155,7 +155,7 @@
               <p class="text-sm font-bold text-base-content">Email Notifications</p>
               <p class="text-xs text-base-content/60">Receive updates via email.</p>
             </div>
-            <input type="checkbox" [(ngModel)]="emailNotifications" class="toggle toggle-primary" />
+            <input type="checkbox" [(ngModel)]="emailNotifications" class="toggle toggle-success" />
           </label>
 
           <!-- System Alerts -->
@@ -164,7 +164,7 @@
               <p class="text-sm font-bold text-base-content">System Alerts</p>
               <p class="text-xs text-base-content/60">Critical system status changes.</p>
             </div>
-            <input type="checkbox" [(ngModel)]="systemAlerts" class="toggle toggle-primary" />
+            <input type="checkbox" [(ngModel)]="systemAlerts" class="toggle toggle-success" />
           </label>
 
           <!-- Feedback Alerts -->
@@ -173,10 +173,10 @@
               <p class="text-sm font-bold text-base-content">Feedback Alerts</p>
               <p class="text-xs text-base-content/60">New testing feedback submissions.</p>
             </div>
-            <input type="checkbox" [(ngModel)]="feedbackAlerts" class="toggle toggle-primary" />
+            <input type="checkbox" [(ngModel)]="feedbackAlerts" class="toggle toggle-success" />
           </label>
 
-          <button (click)="saveNotificationPreferences()" class="btn btn-primary w-full gap-2 shadow-lg shadow-primary/20 mt-2" [disabled]="isSaving">
+          <button (click)="saveNotificationPreferences()" class="btn btn-sm bg-green-900 text-white text-xs hover:bg-green-950 w-full gap-1.5 border-0 shadow-md mt-2" [disabled]="isSaving">
             <svg lucideLoader class="w-4 h-4 animate-spin" *ngIf="isSaving"></svg>
             <svg lucideSave class="w-4 h-4" *ngIf="!isSaving"></svg>
             Save Preferences
@@ -187,7 +187,7 @@
       <!-- System Info -->
       <div class="bg-base-100 rounded-2xl border border-base-300 shadow-sm overflow-hidden">
         <div class="p-5 border-b border-base-300 flex items-center gap-2">
-          <svg lucideSettings class="w-5 h-5 text-primary"></svg>
+          <svg lucideSettings class="w-5 h-5 text-green-800"></svg>
           <h2 class="text-lg font-bold text-base-content">System Info</h2>
         </div>
         <div class="p-6 space-y-2">
@@ -218,8 +218,8 @@
       <div class="modal-box bg-base-100 border border-base-300 max-w-md rounded-2xl shadow-2xl p-6">
         <div class="flex items-center justify-between pb-4 border-b border-base-200">
           <div class="flex items-center gap-3">
-            <div class="p-2.5 bg-primary/10 text-primary rounded-xl">
-              <svg lucideUser class="w-6 h-6"></svg>
+            <div class="p-2.5 bg-green-900/10 text-green-900 rounded-xl border border-green-900/20">
+              <svg lucideUser class="w-6 h-6 text-green-800"></svg>
             </div>
             <div>
               <h3 class="font-bold text-lg text-base-content">Edit Account Profile</h3>
@@ -252,7 +252,7 @@
 
         <div class="modal-action border-t border-base-200 pt-4">
           <button (click)="closeEditProfileModal()" class="btn btn-ghost">Cancel</button>
-          <button (click)="onUpdateProfile()" class="btn btn-primary gap-2 shadow-lg shadow-primary/20" [disabled]="isSavingProfile">
+          <button (click)="onUpdateProfile()" class="btn btn-sm bg-green-900 text-white text-xs hover:bg-green-950 gap-1.5 border-0 shadow-md" [disabled]="isSavingProfile">
             <svg lucideLoader class="w-4 h-4 animate-spin" *ngIf="isSavingProfile"></svg>
             Save Changes
           </button>
