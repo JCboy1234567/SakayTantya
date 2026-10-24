@@ -45,6 +45,8 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 
     // Fare Rules management
     Route::post('/fare_rules', [FareruleController::class, 'store']);
+    Route::put('/fare_rules/{id}', [FareruleController::class, 'update']);
+    Route::delete('/fare_rules/{id}', [FareruleController::class, 'destroy']);
 
     // Fuel Prices management
     Route::post('/fuel_prices', [FuelpriceController::class, 'store']);

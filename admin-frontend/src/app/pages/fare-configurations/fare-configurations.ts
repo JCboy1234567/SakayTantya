@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -9,8 +9,10 @@ import {
   LucideRefreshCw,
   LucidePencil,
   LucideTrash2,
-  LucideX
+  LucideX,
+  LucideLoader
 } from '@lucide/angular';
+import { FareService } from '../../core/services/fare.service';
 
 @Component({
   selector: 'app-fare-configurations',
@@ -25,108 +27,179 @@ import {
     LucideRefreshCw,
     LucidePencil,
     LucideTrash2,
-    LucideX
+    LucideX,
+    LucideLoader
   ],
   templateUrl: './fare-configurations.html',
   styleUrl: './fare-configurations.css',
 })
-export class FareConfigurations {
-  // Static sample data para sa Tagum City transport
-  fareRules = [
-    {
-      id: 1,
-      vehicle: 'Motorized Tricycle',
-      fuel: 'Gasoline (Regular)',
-      baseFare: '₱15.00',
-      includedDistance: 'First 2.0 km',
-      ratePerKm: '₱2.00 / km',
-      minimumFare: '₱15.00',
-      validFrom: '2026-01-01',
-      validUntil: 'Indefinite',
-      status: 'Enabled',
-      source: 'Tagum City Ordinance #2025-04'
-    },
-    {
-      id: 2,
-      vehicle: 'Multicab / Jeepney',
-      fuel: 'Diesel',
-      baseFare: '₱12.00',
-      includedDistance: 'First 3.0 km',
-      ratePerKm: '₱1.50 / km',
-      minimumFare: '₱12.00',
-      validFrom: '2026-01-01',
-      validUntil: 'Indefinite',
-      status: 'Enabled',
-      source: 'LTFRB Regional Memo'
-    },
-    {
-      id: 3,
-      vehicle: 'Modern PUV',
-      fuel: 'Electric / Diesel',
-      baseFare: '₱20.00',
-      includedDistance: 'First 4.0 km',
-      ratePerKm: '₱2.50 / km',
-      minimumFare: '₱20.00',
-      validFrom: '2026-06-01',
-      validUntil: '2026-12-31',
-      status: 'Draft',
-      source: 'Proposed Tariff 2026'
-    }
-  ];
-
+export class FareConfigurations implements OnInit {
+  fareRules: any[] = [];
+  availableVehicles: any[] = [];
+  isLoading = false;
+  isSubmitting = false;
   successMessage = '';
+  errorMessage = '';
   showAddModal = false;
+  isEditMode = false;
+  editingRuleId: number | null = null;
 
-  // New rule form model
+  readonly Number = Number;
+
   newRule = {
-    vehicle: 'Motorized Tricycle',
-    baseFare: 15.00,
-    includedDistance: 2.00,
-    ratePerKm: 2.00,
-    minimumFare: 15.00,
-    validFrom: '2026-10-19',
-    validUntil: '',
-    source: 'Tagum City Admin'
+    vehicle_id: '',
+    base_fare: 15.00,
+    included_distance_km: 2.00,
+    rate_per_km: 2.00,
+    minimum_fare: 15.00,
+    valid_from: '2026-10-21',
+    valid_until: '',
+    source_reference: 'Tagum City LGU'
   };
 
+  constructor(
+    private fareService: FareService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.loadVehicles();
+    this.loadFareRules();
+  }
+
+  loadVehicles(): void {
+    this.fareService.getVehicles().subscribe({
+      next: (response: any) => {
+        this.availableVehicles = response.data || response || [];
+        if (this.availableVehicles.length > 0 && !this.newRule.vehicle_id) {
+          this.newRule.vehicle_id = this.availableVehicles[0].id;
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error loading vehicles for fare rules:', err);
+      }
+    });
+  }
+
+  loadFareRules(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.cdr.detectChanges();
+
+    this.fareService.getFareRules().subscribe({
+      next: (response: any) => {
+        this.fareRules = response.data || response || [];
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error fetching fare rules:', err);
+        this.errorMessage = 'Failed to load fare rules from database.';
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
   openAddModal(): void {
+    this.loadVehicles();
+    this.isEditMode = false;
+    this.editingRuleId = null;
+    this.newRule = {
+      vehicle_id: this.availableVehicles.length > 0 ? this.availableVehicles[0].id : '',
+      base_fare: 15.00,
+      included_distance_km: 2.00,
+      rate_per_km: 2.00,
+      minimum_fare: 15.00,
+      valid_from: '2026-10-21',
+      valid_until: '',
+      source_reference: 'Tagum City LGU'
+    };
     this.showAddModal = true;
     this.successMessage = '';
+    this.errorMessage = '';
+    this.cdr.detectChanges();
+  }
+
+  openEditModal(rule: any): void {
+    this.loadVehicles();
+    this.isEditMode = true;
+    this.editingRuleId = rule.id;
+    this.newRule = {
+      vehicle_id: rule.vehicle_id,
+      base_fare: rule.base_fare,
+      included_distance_km: rule.included_distance_km,
+      rate_per_km: rule.rate_per_km,
+      minimum_fare: rule.minimum_fare,
+      valid_from: rule.valid_from ? rule.valid_from.substring(0, 10) : '2026-10-21',
+      valid_until: rule.valid_until ? rule.valid_until.substring(0, 10) : '',
+      source_reference: rule.source_reference
+    };
+    this.showAddModal = true;
+    this.successMessage = '';
+    this.errorMessage = '';
+    this.cdr.detectChanges();
   }
 
   closeAddModal(): void {
     this.showAddModal = false;
+    this.cdr.detectChanges();
   }
 
   onSubmitRule(): void {
-    // Static simulation of adding a rule
-    this.fareRules.unshift({
-      id: this.fareRules.length + 1,
-      vehicle: this.newRule.vehicle,
-      fuel: 'Gasoline',
-      baseFare: `₱${Number(this.newRule.baseFare).toFixed(2)}`,
-      includedDistance: `First ${this.newRule.includedDistance} km`,
-      ratePerKm: `₱${Number(this.newRule.ratePerKm).toFixed(2)} / km`,
-      minimumFare: `₱${Number(this.newRule.minimumFare).toFixed(2)}`,
-      validFrom: this.newRule.validFrom,
-      validUntil: this.newRule.validUntil || 'Indefinite',
-      status: 'Enabled',
-      source: this.newRule.source
+    if (!this.newRule.vehicle_id) {
+      this.errorMessage = 'Please select a valid vehicle type.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.errorMessage = '';
+    this.cdr.detectChanges();
+
+    const request$ = this.isEditMode && this.editingRuleId
+      ? this.fareService.updateFareRule(this.editingRuleId, this.newRule)
+      : this.fareService.createFareRule(this.newRule);
+
+    request$.subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.closeAddModal();
+        this.loadFareRules();
+        this.successMessage = this.isEditMode
+          ? 'Fare rule configuration updated successfully!'
+          : 'New fare rule configuration saved to database successfully!';
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error saving fare rule:', err);
+        this.isSubmitting = false;
+        this.errorMessage = err.error?.message || 'Failed to save fare rule. Ensure you are logged in as Admin.';
+        this.cdr.detectChanges();
+      }
     });
-
-    this.successMessage = 'New fare configuration added successfully!';
-    this.closeAddModal();
-
-    setTimeout(() => {
-      this.successMessage = '';
-    }, 4000);
   }
 
   deleteRule(id: number): void {
     if (confirm('Are you sure you want to delete this fare rule?')) {
-      this.fareRules = this.fareRules.filter(r => r.id !== id);
-      this.successMessage = 'Fare rule deleted successfully.';
-      setTimeout(() => this.successMessage = '', 4000);
+      this.fareService.deleteFareRule(id).subscribe({
+        next: () => {
+          this.fareRules = this.fareRules.filter(r => r.id !== id);
+          this.successMessage = 'Fare rule removed successfully from database.';
+          this.cdr.detectChanges();
+
+          setTimeout(() => {
+            this.successMessage = '';
+            this.cdr.detectChanges();
+          }, 4000);
+        },
+        error: (err) => {
+          console.error('Error deleting fare rule:', err);
+          this.errorMessage = err.error?.message || 'Failed to delete fare rule record.';
+          this.cdr.detectChanges();
+        }
+      });
     }
   }
 }
