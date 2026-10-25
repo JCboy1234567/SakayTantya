@@ -179,14 +179,13 @@ export class Overview implements OnInit {
     const values = slice.map((p: any) => Number(p.price_per_liter) || 60);
     const minVal = Math.min(...values);
     const maxVal = Math.max(...values);
-    const range = (maxVal - minVal) || 10;
+    const range = (maxVal - minVal) || 1;
 
     return slice
       .map((point: any, index: number) => {
-        const x = 20 + index * (520 / Math.max(1, slice.length - 1));
+        const x = slice.length === 1 ? 284 : 20 + index * (528 / (slice.length - 1));
         const val = Number(point.price_per_liter) || 60;
-        // Normalize y between 20 and 110 based on min/max of current data
-        const y = 110 - ((val - minVal) / range) * 80;
+        const y = slice.length === 1 ? 70 : (maxVal === minVal ? 70 : 110 - ((val - minVal) / range) * 80);
         return `${isNaN(x) ? 20 : x},${isNaN(y) ? 100 : y}`;
       })
       .join(' ');
@@ -196,7 +195,7 @@ export class Overview implements OnInit {
     const list = this.activeList.slice(-7);
     if (list.length === 0) return '20,112 548,112';
     const firstX = 20;
-    const lastX = 20 + (list.length - 1) * (520 / Math.max(1, list.length - 1));
+    const lastX = list.length === 1 ? 284 : 20 + (list.length - 1) * (528 / (list.length - 1));
     return `${firstX},120 ${this.chartPoints} ${lastX},120`;
   }
 
@@ -204,19 +203,19 @@ export class Overview implements OnInit {
     const list = this.activeList;
     if (list.length === 0) {
       return [
-        { day: 'Recent', value: this.latestFuelPrice }
+        { day: 'Recent', value: this.latestFuelPrice, cx: 284, cy: 70 }
       ];
     }
     const slice = list.slice(-7);
     const values = slice.map((p: any) => Number(p.price_per_liter) || 60);
     const minVal = Math.min(...values);
     const maxVal = Math.max(...values);
-    const range = (maxVal - minVal) || 10;
+    const range = (maxVal - minVal) || 1;
 
     return slice.map((item: any, index: number) => {
       const val = Number(item.price_per_liter) || 60;
-      const x = 20 + index * (520 / Math.max(1, slice.length - 1));
-      const y = 110 - ((val - minVal) / range) * 80;
+      const x = slice.length === 1 ? 284 : 20 + index * (528 / (slice.length - 1));
+      const y = slice.length === 1 ? 70 : (maxVal === minVal ? 70 : 110 - ((val - minVal) / range) * 80);
       return {
         day: item.effective_date ? item.effective_date : (item.created_at ? item.created_at.substring(0, 10) : 'Recent'),
         value: val,
