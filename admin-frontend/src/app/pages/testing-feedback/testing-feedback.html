@@ -37,35 +37,35 @@
   }
 
   <!-- Stats & Filters Toolbar -->
-  <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 max-w-5xl">
     <!-- Total Feedback -->
-    <div class="bg-base-100 p-5 rounded-2xl border border-base-300 shadow-sm flex items-center justify-between">
+    <div class="bg-base-100 p-4 rounded-xl border border-base-300 shadow-sm flex items-center justify-between">
       <div>
-        <p class="text-xs uppercase tracking-wider font-semibold text-base-content/60">Total Reports</p>
-        <h3 class="text-3xl font-extrabold text-green-900 mt-1">{{ feedbacks.length }}</h3>
+        <p class="text-[11px] uppercase tracking-wider font-semibold text-base-content/60">Total Reports</p>
+        <h3 class="text-2xl font-extrabold text-green-900 mt-0.5">{{ feedbacks.length }}</h3>
       </div>
-      <div class="p-3 bg-green-900/10 text-green-900 rounded-xl">
-        <svg lucideMessageSquare class="w-6 h-6 text-green-800"></svg>
+      <div class="p-2.5 bg-green-900/10 text-green-900 rounded-lg">
+        <svg lucideMessageSquare class="w-5 h-5 text-green-800"></svg>
       </div>
     </div>
 
     <!-- Bugs Reported -->
-    <div class="bg-base-100 p-5 rounded-2xl border border-base-300 shadow-sm flex items-center justify-between">
+    <div class="bg-base-100 p-4 rounded-xl border border-base-300 shadow-sm flex items-center justify-between">
       <div>
-        <p class="text-xs uppercase tracking-wider font-semibold text-base-content/60">Bug Reports</p>
-        <h3 class="text-3xl font-extrabold text-rose-500 mt-1">
+        <p class="text-[11px] uppercase tracking-wider font-semibold text-base-content/60">Bug Reports</p>
+        <h3 class="text-2xl font-extrabold text-rose-500 mt-0.5">
           {{ (feedbacks | json) !== '[]' ? (feedbacks.filter(f => f.rating === 'Bug / Issue').length) : 0 }}
         </h3>
       </div>
-      <div class="p-3 bg-rose-500/10 text-rose-500 rounded-xl">
-        <svg lucideShieldAlert class="w-6 h-6"></svg>
+      <div class="p-2.5 bg-rose-500/10 text-rose-500 rounded-lg">
+        <svg lucideShieldAlert class="w-5 h-5"></svg>
       </div>
     </div>
 
     <!-- Module Filter -->
-    <div class="bg-base-100 p-4 rounded-2xl border border-base-300 shadow-sm flex flex-col justify-center">
-      <label class="text-xs uppercase tracking-wider font-semibold text-base-content/60 mb-1">Filter by Module</label>
-      <select [(ngModel)]="selectedModuleFilter" class="select select-bordered select-sm w-full bg-base-200">
+    <div class="bg-base-100 p-3 rounded-xl border border-base-300 shadow-sm flex flex-col justify-center">
+      <label class="text-[11px] uppercase tracking-wider font-semibold text-base-content/60 mb-0.5">Filter by Module</label>
+      <select [(ngModel)]="selectedModuleFilter" class="select select-bordered select-xs w-full bg-base-200">
         <option value="All">All Modules</option>
         <option value="Fare Estimator">Fare Estimator</option>
         <option value="Fuel Price Reference">Fuel Price Reference</option>
@@ -76,9 +76,9 @@
     </div>
 
     <!-- Rating Filter -->
-    <div class="bg-base-100 p-4 rounded-2xl border border-base-300 shadow-sm flex flex-col justify-center">
-      <label class="text-xs uppercase tracking-wider font-semibold text-base-content/60 mb-1">Filter by Rating / Type</label>
-      <select [(ngModel)]="selectedRatingFilter" class="select select-bordered select-sm w-full bg-base-200">
+    <div class="bg-base-100 p-3 rounded-xl border border-base-300 shadow-sm flex flex-col justify-center">
+      <label class="text-[11px] uppercase tracking-wider font-semibold text-base-content/60 mb-0.5">Filter by Rating / Type</label>
+      <select [(ngModel)]="selectedRatingFilter" class="select select-bordered select-xs w-full bg-base-200">
         <option value="All">All Ratings</option>
         <option value="Excellent">Excellent</option>
         <option value="Good">Good</option>
