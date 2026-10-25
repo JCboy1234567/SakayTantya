@@ -5,7 +5,6 @@ import { DashboardLayout } from './layout/dashboard-layout/dashboard-layout';
 import { roleGuardGuard } from './core/guards/role.guard-guard';
 
 import { Overview } from './pages/overview/overview';
-import { RoutesEstimates } from './pages/routes-estimates/routes-estimates';
 import { FareConfigurations } from './pages/fare-configurations/fare-configurations';
 import { FuelpriceReference } from './pages/fuelprice-reference/fuelprice-reference';
 import { VehiclesEfficiency } from './pages/vehicles-efficiency/vehicles-efficiency';
@@ -40,10 +39,6 @@ export const routes: Routes = [
             {
                 path: 'overview',
                 component: Overview
-            },
-            {
-                path: 'routes-estimates',
-                component: RoutesEstimates
             },
             {
                 path: 'fare-configurations',
