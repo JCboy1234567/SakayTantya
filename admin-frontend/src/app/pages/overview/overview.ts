@@ -216,8 +216,24 @@ export class Overview implements OnInit {
       const val = Number(item.price_per_liter) || 60;
       const x = slice.length === 1 ? 284 : 20 + index * (528 / (slice.length - 1));
       const y = slice.length === 1 ? 70 : (maxVal === minVal ? 70 : 110 - ((val - minVal) / range) * 80);
+
+      let formattedDate = 'Recent';
+      const rawDate = item.effective_date || item.created_at;
+      if (rawDate) {
+        try {
+          const d = new Date(rawDate);
+          if (!isNaN(d.getTime())) {
+            formattedDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          } else {
+            formattedDate = String(rawDate).substring(0, 10);
+          }
+        } catch {
+          formattedDate = String(rawDate).substring(0, 10);
+        }
+      }
+
       return {
-        day: item.effective_date ? item.effective_date : (item.created_at ? item.created_at.substring(0, 10) : 'Recent'),
+        day: formattedDate,
         value: val,
         cx: isNaN(x) ? 20 : x,
         cy: isNaN(y) ? 100 : y
