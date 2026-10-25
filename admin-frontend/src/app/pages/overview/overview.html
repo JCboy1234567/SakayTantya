@@ -3,7 +3,8 @@
   <!-- Page heading -->
   <section class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
-      <h1 class="text-xl font-bold tracking-tight text-base-content sm:text-2xl">
+      <h1 class="text-xl font-bold tracking-tight text-base-content sm:text-2xl flex items-center gap-2">
+        <svg lucideLayoutDashboard class="h-6 w-6 text-green-800"></svg>
         Operations overview
       </h1>
 
@@ -306,7 +307,7 @@
       </article>
 
       <!-- Bottom cards -->
-      <div class="grid grid-cols-2">
+      <div class="grid grid-cols-3">
 
         <!-- Testing and feedback -->
         <article class="card border border-base-300 bg-base-100 shadow-sm">
@@ -320,7 +321,7 @@
               User bug reports & feedback submissions center
             </p>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-3 gap-4">
               <div>
                 <p class="text-xl font-bold">{{ feedbacks.length }}</p>
                 <p class="text-[9px] text-base-content/60">Total Reports</p>

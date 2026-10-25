@@ -17,7 +17,8 @@ import {
   LucideClock,
   LucideFlaskConical,
   LucideArrowRight,
-  LucideLoader
+  LucideLoader,
+  LucideLayoutDashboard
 } from '@lucide/angular';
 import { FareService } from '../../core/services/fare.service';
 
@@ -42,7 +43,8 @@ import { FareService } from '../../core/services/fare.service';
     LucideClock,
     LucideFlaskConical,
     LucideArrowRight,
-    LucideLoader
+    LucideLoader,
+    LucideLayoutDashboard
   ],
   templateUrl: './overview.html'
 })
