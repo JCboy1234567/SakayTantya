@@ -181,15 +181,15 @@
 
               @for (point of fuelPrices; track point.day; let i = $index) {
                 <circle
-                  [attr.cx]="20 + i * 88"
-                  [attr.cy]="100 - (point.value - 54) * 5"
-                  r="2.8"
+                  [attr.cx]="point.cx"
+                  [attr.cy]="point.cy"
+                  r="3.2"
                   fill="#166534"
                 />
 
                 <text
-                  [attr.x]="20 + i * 88"
-                  y="130"
+                  [attr.x]="point.cx"
+                  y="132"
                   text-anchor="middle"
                   font-size="9"
                   fill="currentColor"

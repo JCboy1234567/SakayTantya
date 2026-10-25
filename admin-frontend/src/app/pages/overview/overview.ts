@@ -166,37 +166,63 @@ export class Overview implements OnInit {
     return (5 / 25) * this.selectedScenario;
   }
 
+  get activeList(): any[] {
+    return this.selectedFuelType === 'All'
+      ? this.fuelPricesList
+      : this.fuelPricesList.filter(item => item.fuel_type === this.selectedFuelType);
+  }
+
   get chartPoints(): string {
-    if (this.fuelPricesList.length === 0) return '20,100 548,100';
-    return this.fuelPricesList
-      .slice(-7)
+    const list = this.activeList;
+    if (list.length === 0) return '20,100 548,100';
+    const slice = list.slice(-7);
+    const values = slice.map((p: any) => Number(p.price_per_liter) || 60);
+    const minVal = Math.min(...values);
+    const maxVal = Math.max(...values);
+    const range = (maxVal - minVal) || 10;
+
+    return slice
       .map((point: any, index: number) => {
-        const x = 20 + index * 88;
+        const x = 20 + index * (520 / Math.max(1, slice.length - 1));
         const val = Number(point.price_per_liter) || 60;
-        const y = Math.max(20, Math.min(120, 100 - (val - 54) * 5));
-        return `${x},${y}`;
+        // Normalize y between 20 and 110 based on min/max of current data
+        const y = 110 - ((val - minVal) / range) * 80;
+        return `${isNaN(x) ? 20 : x},${isNaN(y) ? 100 : y}`;
       })
       .join(' ');
   }
 
   get chartArea(): string {
-    return `20,112 ${this.chartPoints} 548,112`;
+    const list = this.activeList.slice(-7);
+    if (list.length === 0) return '20,112 548,112';
+    const firstX = 20;
+    const lastX = 20 + (list.length - 1) * (520 / Math.max(1, list.length - 1));
+    return `${firstX},120 ${this.chartPoints} ${lastX},120`;
   }
 
   get fuelPrices(): any[] {
-    const list = this.selectedFuelType === 'All'
-      ? this.fuelPricesList
-      : this.fuelPricesList.filter(item => item.fuel_type === this.selectedFuelType);
-
+    const list = this.activeList;
     if (list.length === 0) {
       return [
-        { day: 'Day 1', value: this.latestFuelPrice },
-        { day: 'Day 2', value: this.latestFuelPrice }
+        { day: 'Recent', value: this.latestFuelPrice }
       ];
     }
-    return list.slice(-7).map((item: any) => ({
-      day: item.effective_date ? item.effective_date : (item.created_at ? item.created_at.substring(0, 10) : 'Recent'),
-      value: Number(item.price_per_liter) || 60
-    }));
+    const slice = list.slice(-7);
+    const values = slice.map((p: any) => Number(p.price_per_liter) || 60);
+    const minVal = Math.min(...values);
+    const maxVal = Math.max(...values);
+    const range = (maxVal - minVal) || 10;
+
+    return slice.map((item: any, index: number) => {
+      const val = Number(item.price_per_liter) || 60;
+      const x = 20 + index * (520 / Math.max(1, slice.length - 1));
+      const y = 110 - ((val - minVal) / range) * 80;
+      return {
+        day: item.effective_date ? item.effective_date : (item.created_at ? item.created_at.substring(0, 10) : 'Recent'),
+        value: val,
+        cx: isNaN(x) ? 20 : x,
+        cy: isNaN(y) ? 100 : y
+      };
+    });
   }
 }
