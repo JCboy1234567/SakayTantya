@@ -133,13 +133,11 @@
             <!-- Fuel Type Filter Selector -->
             <div class="flex items-center gap-2">
               <span class="text-[10px] uppercase font-semibold text-base-content/60">Fuel Type:</span>
-              <select [(ngModel)]="selectedFuelType" class="select select-bordered select-xs w-auto max-w-full text-xs bg-base-100">
+              <select [(ngModel)]="selectedFuelType" (ngModelChange)="onFuelTypeChange()" class="select select-bordered select-xs w-auto max-w-full text-xs bg-base-100">
                 <option value="All">All Types</option>
-                <option value="Gasoline (Regular)">Gasoline (Regular)</option>
-                <option value="Gasoline (Premium)">Gasoline (Premium)</option>
-                <option value="Diesel">Diesel</option>
-                <option value="Kerosene">Kerosene</option>
-                <option value="LPG / Autogas">LPG / Autogas</option>
+                @for (type of availableFuelTypes; track type) {
+                  <option [value]="type">{{ type }}</option>
+                }
               </select>
             </div>
           </div>

@@ -148,8 +148,18 @@ export class Overview implements OnInit {
     });
   }
 
-  selectScenario(price: number): void {
-    this.selectedScenario = price;
+  onFuelTypeChange(): void {
+    const filtered = this.selectedFuelType === 'All'
+      ? this.fuelPricesList
+      : this.fuelPricesList.filter((p: any) => p.fuel_type === this.selectedFuelType);
+
+    if (filtered.length > 0) {
+      const latest = filtered[filtered.length - 1];
+      this.latestFuelPrice = Number(latest.price_per_liter) || 60.00;
+      this.selectedScenario = this.latestFuelPrice;
+      this.latestFuelDate = latest.effective_date || latest.created_at || 'Today';
+    }
+    this.cdr.detectChanges();
   }
 
   get selectedFuelExpense(): number {
