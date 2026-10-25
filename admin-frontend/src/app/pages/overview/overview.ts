@@ -1,4 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import {
   LucideFuel,
   LucideSlidersHorizontal,
@@ -13,13 +16,19 @@ import {
   LucideCircleCheck,
   LucideClock,
   LucideFlaskConical,
-  LucideArrowRight
+  LucideArrowRight,
+  LucideLoader,
+  LucideLayoutDashboard
 } from '@lucide/angular';
+import { FareService } from '../../core/services/fare.service';
 
 @Component({
   selector: 'app-overview',
   standalone: true,
   imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
     LucideFuel,
     LucideSlidersHorizontal,
     LucideBike,
@@ -33,50 +42,20 @@ import {
     LucideCircleCheck,
     LucideClock,
     LucideFlaskConical,
-    LucideArrowRight
+    LucideArrowRight,
+    LucideLoader,
+    LucideLayoutDashboard
   ],
   templateUrl: './overview.html'
 })
-export class Overview {
-  readonly fuelPrices = [
-    { day: '11 Oct', value: 57.5 },
-    { day: '12 Oct', value: 58.5 },
-    { day: '13 Oct', value: 57.5 },
-    { day: '14 Oct', value: 60.5 },
-    { day: '15 Oct', value: 62 },
-    { day: '16 Oct', value: 60.5 },
-    { day: '17 Oct', value: 59.5 }
-  ];
-
-  readonly fareRules = [
-    {
-      vehicle: 'Motorized tricycle',
-      fuel: 'TRI · Gasoline',
-      baseFare: '₱15.00',
-      included: 'First 2 km',
-      rate: '₱2.00 / km',
-      efficiency: '25 km/L',
-      status: 'Enabled'
-    },
-    {
-      vehicle: 'Motorcycle',
-      fuel: 'MOTO · Gasoline',
-      baseFare: '₱15.00',
-      included: 'First 2 km',
-      rate: '₱2.00 / km',
-      efficiency: '35 km/L',
-      status: 'Enabled'
-    },
-    {
-      vehicle: 'Multicab',
-      fuel: 'MULTI · Pending setup',
-      baseFare: 'Not set',
-      included: '—',
-      rate: '—',
-      efficiency: 'Not set',
-      status: 'Draft'
-    }
-  ];
+export class Overview implements OnInit {
+  isLoading = false;
+  latestFuelPrice: number = 60.00;
+  latestFuelDate: string = 'Today';
+  fuelPricesList: any[] = [];
+  fareRules: any[] = [];
+  vehicles: any[] = [];
+  feedbacks: any[] = [];
 
   readonly scenarios = [
     { price: 55, expense: 11 },
@@ -84,25 +63,186 @@ export class Overview {
     { price: 65, expense: 13 }
   ];
 
-  readonly chartPoints = this.fuelPrices
-    .map((point, index) => {
-      const x = 20 + index * 88;
-      const y = 100 - (point.value - 54) * 5;
-
-      return `${x},${y}`;
-    })
-    .join(' ');
-
-  readonly chartArea =
-    `20,112 ${this.chartPoints} 548,112`;
-
+  selectedFuelType = 'All';
   selectedScenario = 60;
+  get availableFuelTypes(): string[] {
+    const types = this.fuelPricesList.map(item => item.fuel_type).filter(Boolean);
+    return Array.from(new Set(types));
+  }
 
-  selectScenario(price: number): void {
-    this.selectedScenario = price;
+  get filteredFuelPrices(): any[] {
+    if (this.selectedFuelType === 'All') {
+      return this.fuelPricesList;
+    }
+    return this.fuelPricesList.filter(item => item.fuel_type === this.selectedFuelType);
+  }
+
+  constructor(
+    private fareService: FareService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.loadDashboardData();
+  }
+
+  loadDashboardData(): void {
+    this.isLoading = true;
+    this.cdr.detectChanges();
+
+    // Fetch live fuel prices
+    this.fareService.getFuelPrices().subscribe({
+      next: (res: any) => {
+        const prices = res.data || res || [];
+        this.fuelPricesList = prices;
+        if (prices.length > 0) {
+          const filtered = this.selectedFuelType === 'All' ? prices : prices.filter((p: any) => p.fuel_type === this.selectedFuelType);
+          const targetList = filtered.length > 0 ? filtered : prices;
+          const latest = targetList[targetList.length - 1];
+          this.latestFuelPrice = Number(latest.price_per_liter) || 60.00;
+          this.selectedScenario = this.latestFuelPrice;
+          this.latestFuelDate = latest.effective_date || latest.created_at || 'Today';
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error loading fuel prices for overview:', err)
+    });
+
+    // Fetch live fare rules
+    this.fareService.getFareRules().subscribe({
+      next: (res: any) => {
+        const rules = res.data || res || [];
+        this.fareRules = rules.map((r: any) => ({
+          vehicle: r.vehicle ? r.vehicle.vehicle_name : `Vehicle #${r.vehicle_id}`,
+          fuel: r.vehicle ? `${r.vehicle.fuel_type}` : 'Gasoline',
+          baseFare: `₱${Number(r.base_fare).toFixed(2)}`,
+          included: `First ${r.included_distance_km} km`,
+          rate: `₱${Number(r.rate_per_km).toFixed(2)} / km`,
+          efficiency: r.vehicle ? `${r.vehicle.fuel_efficiency_km_per_liter} km/L` : 'N/A',
+          status: 'Enabled'
+        }));
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error loading fare rules for overview:', err)
+    });
+
+    // Fetch live vehicles
+    this.fareService.getVehicles().subscribe({
+      next: (res: any) => {
+        this.vehicles = res.data || res || [];
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error loading vehicles for overview:', err)
+    });
+
+    // Fetch live testing feedback / bugs
+    this.fareService.getTestingFeedback().subscribe({
+      next: (res: any) => {
+        this.feedbacks = res.data || res || [];
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error loading feedbacks for overview:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  onFuelTypeChange(): void {
+    const filtered = this.selectedFuelType === 'All'
+      ? this.fuelPricesList
+      : this.fuelPricesList.filter((p: any) => p.fuel_type === this.selectedFuelType);
+
+    if (filtered.length > 0) {
+      const latest = filtered[filtered.length - 1];
+      this.latestFuelPrice = Number(latest.price_per_liter) || 60.00;
+      this.selectedScenario = this.latestFuelPrice;
+      this.latestFuelDate = latest.effective_date || latest.created_at || 'Today';
+    }
+    this.cdr.detectChanges();
   }
 
   get selectedFuelExpense(): number {
     return (5 / 25) * this.selectedScenario;
+  }
+
+  get activeList(): any[] {
+    return this.selectedFuelType === 'All'
+      ? this.fuelPricesList
+      : this.fuelPricesList.filter(item => item.fuel_type === this.selectedFuelType);
+  }
+
+  get chartPoints(): string {
+    const list = this.activeList;
+    if (list.length === 0) return '20,100 548,100';
+    const slice = list.slice(-7);
+
+    // Fixed scale 50 to 100 for y-axis
+    const minVal = 50;
+    const maxVal = 100;
+    const range = maxVal - minVal; // 50
+
+    return slice
+      .map((point: any, index: number) => {
+        const x = slice.length === 1 ? 284 : 20 + index * (528 / (slice.length - 1));
+        const val = Number(point.price_per_liter) || 60;
+        // Map 50-100 to y position between 115 (for 50) and 20 (for 100)
+        const clampedVal = Math.max(50, Math.min(100, val));
+        const y = 115 - ((clampedVal - minVal) / range) * 95;
+        return `${isNaN(x) ? 20 : x},${isNaN(y) ? 100 : y}`;
+      })
+      .join(' ');
+  }
+
+  get chartArea(): string {
+    const list = this.activeList.slice(-7);
+    if (list.length === 0) return '20,112 548,112';
+    const firstX = 20;
+    const lastX = list.length === 1 ? 284 : 20 + (list.length - 1) * (528 / (list.length - 1));
+    return `${firstX},120 ${this.chartPoints} ${lastX},120`;
+  }
+
+  get fuelPrices(): any[] {
+    const list = this.activeList;
+    if (list.length === 0) {
+      return [
+        { day: 'Recent', value: this.latestFuelPrice, cx: 284, cy: 70 }
+      ];
+    }
+    const slice = list.slice(-7);
+    const minVal = 50;
+    const maxVal = 100;
+    const range = maxVal - minVal;
+
+    return slice.map((item: any, index: number) => {
+      const val = Number(item.price_per_liter) || 60;
+      const x = slice.length === 1 ? 284 : 20 + index * (528 / (list.length - 1));
+      const clampedVal = Math.max(50, Math.min(100, val));
+      const y = 115 - ((clampedVal - minVal) / range) * 95;
+
+      let formattedDate = 'Recent';
+      const rawDate = item.effective_date || item.created_at;
+      if (rawDate) {
+        try {
+          const d = new Date(rawDate);
+          if (!isNaN(d.getTime())) {
+            formattedDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          } else {
+            formattedDate = String(rawDate).substring(0, 10);
+          }
+        } catch {
+          formattedDate = String(rawDate).substring(0, 10);
+        }
+      }
+
+      return {
+        day: formattedDate,
+        value: val,
+        cx: isNaN(x) ? 20 : x,
+        cy: isNaN(y) ? 100 : y
+      };
+    });
   }
 }
