@@ -273,27 +273,27 @@ export class TestingFeedback implements OnInit {
   getRatingBadgeClass(rating: string): string {
     switch (rating) {
       case 'Excellent':
-        return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+        return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20';
       case 'Good':
-        return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+        return 'bg-green-500/10 text-green-800 dark:text-green-400 border-green-500/20';
       case 'Needs Improvement':
-        return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+        return 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20';
       case 'Bug / Issue':
-        return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+        return 'bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20';
       default:
-        return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+        return 'bg-slate-500/10 text-slate-700 dark:text-slate-400 border-slate-500/20';
     }
   }
 
   getStatusBadgeClass(status: string): string {
     switch (status) {
       case 'Resolved':
-        return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+        return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20';
       case 'In Progress':
-        return 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+        return 'bg-green-900/10 text-green-900 dark:text-green-300 border-green-900/20';
       case 'Pending Review':
       default:
-        return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+        return 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20';
     }
   }
 }
