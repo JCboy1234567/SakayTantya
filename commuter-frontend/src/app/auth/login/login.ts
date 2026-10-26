@@ -1,7 +1,7 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import {
   LucideBus,
@@ -38,7 +38,6 @@ export class Login {
 
   constructor(
     private http: HttpClient,
-    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -65,17 +64,8 @@ export class Login {
           if (response.user) {
             localStorage.setItem('user', JSON.stringify(response.user));
           }
-          this.successMessage = 'Login successful! Redirecting...';
+          this.successMessage = 'Login successful!';
           this.cdr.detectChanges();
-
-          setTimeout(() => {
-            const user = response.user;
-            if (user && user.role === 'admin') {
-              window.location.href = 'http://localhost:4200/admin/overview';
-            } else {
-              this.router.navigate(['/dashboard']);
-            }
-          }, 1000);
         } else {
           this.errorMessage = 'Invalid login response from server.';
           this.cdr.detectChanges();
