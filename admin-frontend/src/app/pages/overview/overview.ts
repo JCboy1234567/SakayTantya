@@ -18,7 +18,9 @@ import {
   LucideFlaskConical,
   LucideArrowRight,
   LucideLoader,
-  LucideLayoutDashboard
+  LucideLayoutDashboard,
+  LucideTrash,
+  LucideX
 } from '@lucide/angular';
 import { FareService } from '../../core/services/fare.service';
 
@@ -44,7 +46,9 @@ import { FareService } from '../../core/services/fare.service';
     LucideFlaskConical,
     LucideArrowRight,
     LucideLoader,
-    LucideLayoutDashboard
+    LucideLayoutDashboard,
+    LucideTrash,
+    LucideX
   ],
   templateUrl: './overview.html'
 })
@@ -54,6 +58,21 @@ export class Overview implements OnInit {
   latestFuelDate: string = 'Today';
   fuelPricesList: any[] = [];
   fareRules: any[] = [];
+  rawFareRules: any[] = [];
+  showEditRuleModal = false;
+  showDeleteRuleModal = false;
+  ruleToDelete: any = null;
+  isSavingRule = false;
+  isDeletingRule = false;
+  editRule = {
+    id: null,
+    vehicle_id: '',
+    base_fare: 15,
+    included_distance_km: 2,
+    rate_per_km: 2,
+    minimum_fare: 15,
+    source_reference: 'Tagum City LGU'
+  };
   vehicles: any[] = [];
   feedbacks: any[] = [];
 
@@ -112,12 +131,20 @@ export class Overview implements OnInit {
     this.fareService.getFareRules().subscribe({
       next: (res: any) => {
         const rules = res.data || res || [];
+        this.rawFareRules = rules;
         this.fareRules = rules.map((r: any) => ({
+          id: r.id,
+          vehicle_id: r.vehicle_id,
           vehicle: r.vehicle ? r.vehicle.vehicle_name : `Vehicle #${r.vehicle_id}`,
           fuel: r.vehicle ? `${r.vehicle.fuel_type}` : 'Gasoline',
           baseFare: `₱${Number(r.base_fare).toFixed(2)}`,
+          base_fare: r.base_fare,
+          included_distance_km: r.included_distance_km,
           included: `First ${r.included_distance_km} km`,
           rate: `₱${Number(r.rate_per_km).toFixed(2)} / km`,
+          rate_per_km: r.rate_per_km,
+          minimum_fare: r.minimum_fare,
+          source_reference: r.source_reference || 'Tagum City LGU',
           efficiency: r.vehicle ? `${r.vehicle.fuel_efficiency_km_per_liter} km/L` : 'N/A',
           status: 'Enabled'
         }));
@@ -204,6 +231,78 @@ export class Overview implements OnInit {
     return `${firstX},120 ${this.chartPoints} ${lastX},120`;
   }
 
+  openEditRuleModal(rule: any): void {
+    this.editRule = {
+      id: rule.id,
+      vehicle_id: rule.vehicle_id,
+      base_fare: rule.base_fare,
+      included_distance_km: rule.included_distance_km,
+      rate_per_km: rule.rate_per_km,
+      minimum_fare: rule.minimum_fare,
+      source_reference: rule.source_reference
+    };
+    this.showEditRuleModal = true;
+    this.cdr.detectChanges();
+  }
+
+  closeEditRuleModal(): void {
+    this.showEditRuleModal = false;
+    this.cdr.detectChanges();
+  }
+
+  saveFareRule(): void {
+    if (!this.editRule.id) return;
+    this.isSavingRule = true;
+    this.cdr.detectChanges();
+
+    this.fareService.updateFareRule(this.editRule.id, this.editRule).subscribe({
+      next: () => {
+        this.isSavingRule = false;
+        this.closeEditRuleModal();
+        this.loadDashboardData();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error updating fare rule:', err);
+        this.isSavingRule = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  openDeleteRuleModal(rule: any): void {
+    this.ruleToDelete = rule;
+    this.showDeleteRuleModal = true;
+    this.cdr.detectChanges();
+  }
+
+  closeDeleteRuleModal(): void {
+    this.showDeleteRuleModal = false;
+    this.ruleToDelete = null;
+    this.cdr.detectChanges();
+  }
+
+  confirmDeleteRule(): void {
+    if (!this.ruleToDelete) return;
+    this.isDeletingRule = true;
+    this.cdr.detectChanges();
+
+    this.fareService.deleteFareRule(this.ruleToDelete.id).subscribe({
+      next: () => {
+        this.isDeletingRule = false;
+        this.closeDeleteRuleModal();
+        this.loadDashboardData();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error deleting fare rule:', err);
+        this.isDeletingRule = false;
+        this.closeDeleteRuleModal();
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
   get fuelPrices(): any[] {
     const list = this.activeList;
     if (list.length === 0) {
@@ -218,7 +317,7 @@ export class Overview implements OnInit {
 
     return slice.map((item: any, index: number) => {
       const val = Number(item.price_per_liter) || 60;
-      const x = slice.length === 1 ? 284 : 20 + index * (528 / (list.length - 1));
+      const x = slice.length === 1 ? 284 : 20 + index * (528 / (slice.length - 1));
       const clampedVal = Math.max(50, Math.min(100, val));
       const y = 115 - ((clampedVal - minVal) / range) * 95;
 

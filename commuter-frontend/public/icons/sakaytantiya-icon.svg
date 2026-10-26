@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 120 120">
+<title>SakayTantiya app icon</title>
+<rect width="120" height="120" rx="28" fill="#14532D"/>
+<rect x="14" y="24" width="92" height="20" rx="10" fill="#FFFFFF"/>
+<rect x="50" y="24" width="20" height="76" rx="10" fill="#FFFFFF"/>
+<line x1="26" y1="34" x2="94" y2="34" stroke="#14532D" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 9"/>
+<circle cx="88" cy="82" r="22" fill="#A3E635" stroke="#14532D" stroke-width="4"/>
+<text x="88" y="91" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#14532D">₱</text>
+</svg>
