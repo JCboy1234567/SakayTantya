@@ -14,13 +14,11 @@
       <!-- Success / Error Alerts -->
       @if (successMessage) {
         <div class="alert alert-success text-xs py-3 shadow-sm">
-          <svg lucideCheckCircle2 class="w-4 h-4 text-success-content shrink-0"></svg>
           <span>{{ successMessage }}</span>
         </div>
       }
       @if (errorMessage) {
         <div class="alert alert-error text-xs py-3 shadow-sm text-white">
-          <svg lucideAlertCircle class="w-4 h-4 shrink-0"></svg>
           <span>{{ errorMessage }}</span>
         </div>
       }

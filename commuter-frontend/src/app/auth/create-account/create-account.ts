@@ -9,8 +9,6 @@ import {
   LucideLock,
   LucideUser,
   LucideLoader,
-  LucideCheckCircle2,
-  LucideAlertCircle,
   LucideArrowRight
 } from '@lucide/angular';
 
@@ -26,8 +24,6 @@ import {
     LucideLock,
     LucideUser,
     LucideLoader,
-    LucideCheckCircle2,
-    LucideAlertCircle,
     LucideArrowRight
   ],
   templateUrl: './create-account.html',
