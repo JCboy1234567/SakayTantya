@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Vehicle extends Model
 {
@@ -12,6 +13,7 @@ class Vehicle extends Model
         'vehicle_name',
         'fuel_type',
         'fuel_efficiency_km_per_liter',
+        'image',
         'description',
         'is_active',
     ];
@@ -20,4 +22,17 @@ class Vehicle extends Model
         'fuel_efficiency_km_per_liter' => 'decimal:2',
         'is_active' => 'boolean',
     ];
+
+    public function getImageAttribute($value)
+    {
+        if (!$value) {
+            return null;
+        }
+
+        if (filter_var($value, FILTER_VALIDATE_URL) || str_starts_with($value, 'http')) {
+            return $value;
+        }
+
+        return asset('storage/' . $value);
+    }
 }

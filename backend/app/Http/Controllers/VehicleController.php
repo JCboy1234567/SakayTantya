@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 
 class VehicleController extends Controller
 {
@@ -14,6 +15,7 @@ class VehicleController extends Controller
     public function index(): JsonResponse
     {
         $vehicles = Vehicle::all();
+
         return response()->json([
             'success' => true,
             'data' => $vehicles
@@ -29,11 +31,26 @@ class VehicleController extends Controller
             'vehicle_name' => 'required|string|max:255',
             'fuel_type' => 'required|string|max:50',
             'fuel_efficiency_km_per_liter' => 'required|numeric|min:0',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'description' => 'nullable|string',
-            'is_active' => 'required|boolean',
+            'is_active' => 'required',
         ]);
 
-        $vehicle = Vehicle::create($validated);
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('vehicles', 'public');
+        }
+
+        $isActive = filter_var($validated['is_active'], FILTER_VALIDATE_BOOLEAN);
+
+        $vehicle = Vehicle::create([
+            'vehicle_name' => $validated['vehicle_name'],
+            'fuel_type' => $validated['fuel_type'],
+            'fuel_efficiency_km_per_liter' => $validated['fuel_efficiency_km_per_liter'],
+            'image' => $imagePath,
+            'description' => $validated['description'] ?? null,
+            'is_active' => $isActive,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -60,11 +77,29 @@ class VehicleController extends Controller
             'vehicle_name' => 'required|string|max:255',
             'fuel_type' => 'required|string|max:50',
             'fuel_efficiency_km_per_liter' => 'required|numeric|min:0',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'description' => 'nullable|string',
-            'is_active' => 'required|boolean',
+            'is_active' => 'required',
         ]);
 
-        $vehicle->update($validated);
+        $imagePath = $vehicle->getRawOriginal('image');
+        if ($request->hasFile('image')) {
+            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            $imagePath = $request->file('image')->store('vehicles', 'public');
+        }
+
+        $isActive = filter_var($validated['is_active'], FILTER_VALIDATE_BOOLEAN);
+
+        $vehicle->update([
+            'vehicle_name' => $validated['vehicle_name'],
+            'fuel_type' => $validated['fuel_type'],
+            'fuel_efficiency_km_per_liter' => $validated['fuel_efficiency_km_per_liter'],
+            'image' => $imagePath,
+            'description' => $validated['description'] ?? null,
+            'is_active' => $isActive,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -74,7 +109,7 @@ class VehicleController extends Controller
     }
 
     /**
-     * Remove the specified vehicle.
+     * Delete the specified vehicle.
      */
     public function destroy(int $id): JsonResponse
     {
@@ -85,6 +120,11 @@ class VehicleController extends Controller
                 'success' => false,
                 'message' => 'Vehicle record not found.'
             ], 404);
+        }
+
+        $imagePath = $vehicle->getRawOriginal('image');
+        if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+            Storage::disk('public')->delete($imagePath);
         }
 
         $vehicle->delete();

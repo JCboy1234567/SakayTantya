@@ -8,7 +8,7 @@
         Vehicles & Efficiency Reference
       </h1>
       <p class="mt-1 text-xs text-base-content/60">
-        Manage vehicle profiles, fuel types, and kilometer-per-liter efficiency coefficients for route cost estimation.
+        Manage vehicle profiles, device photo uploads, fuel types, and kilometer-per-liter efficiency coefficients for route cost estimation.
       </p>
     </div>
 
@@ -74,6 +74,7 @@
           <thead class="bg-base-200/70 text-[10px] uppercase tracking-wider">
             <tr>
               <th>ID</th>
+              <th>Photo</th>
               <th>Vehicle Name</th>
               <th>Fuel Type</th>
               <th>Efficiency (KM/L)</th>
@@ -85,13 +86,13 @@
           <tbody>
             @if (isLoading) {
               <tr>
-                <td colspan="7" class="text-center py-8 text-base-content/60 text-xs">
+                <td colspan="8" class="text-center py-8 text-base-content/60 text-xs">
                   Fetching vehicle records from Laravel API...
                 </td>
               </tr>
             } @else if (vehicles.length === 0) {
               <tr>
-                <td colspan="7" class="text-center py-8 text-base-content/60 text-xs">
+                <td colspan="8" class="text-center py-8 text-base-content/60 text-xs">
                   No vehicle profiles found in the database. Click "Add Vehicle Profile" to create one.
                 </td>
               </tr>
@@ -99,6 +100,19 @@
               @for (vehicle of vehicles; track vehicle.id) {
                 <tr class="hover:bg-base-200/40">
                   <td class="font-mono text-xs opacity-60">#{{ vehicle.id }}</td>
+                  <td>
+                    @if (vehicle.image) {
+                      <div class="avatar">
+                        <div class="w-10 h-10 rounded-xl overflow-hidden border border-base-300 shadow-sm bg-base-200">
+                          <img [src]="vehicle.image" [alt]="vehicle.vehicle_name" class="object-cover w-full h-full" onerror="this.src='https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=100&auto=format&fit=crop&q=60'" />
+                        </div>
+                      </div>
+                    } @else {
+                      <div class="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 flex items-center justify-center border border-green-200 dark:border-green-800 shadow-sm">
+                        <svg lucideTruck class="h-5 w-5"></svg>
+                      </div>
+                    }
+                  </td>
                   <td>
                     <p class="font-bold text-base-content">{{ vehicle.vehicle_name }}</p>
                   </td>
@@ -138,7 +152,7 @@
   <!-- MODERN MODAL: Add New Vehicle Profile -->
   @if (showAddModal) {
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-      <div class="bg-base-100 text-base-content rounded-2xl max-w-md w-full p-6 shadow-2xl border border-base-300 space-y-4">
+      <div class="bg-base-100 text-base-content rounded-2xl max-w-md w-full p-6 shadow-2xl border border-base-300 space-y-4 max-h-[90vh] overflow-y-auto">
 
         <!-- Modal Header -->
         <div class="flex items-center justify-between border-b border-base-200 pb-3">
@@ -148,7 +162,7 @@
             </div>
             <div>
               <h3 class="text-base font-bold text-base-content">Add Vehicle Profile</h3>
-              <p class="text-xs opacity-70">Register fleet type and fuel efficiency in database</p>
+              <p class="text-xs opacity-70">Register fleet type, upload photo and efficiency in database</p>
             </div>
           </div>
           <button type="button" (click)="closeAddModal()" class="btn btn-sm btn-ghost btn-circle">
@@ -174,10 +188,10 @@
             />
           </div>
 
-          <!-- Fuel Type -->
+          <!-- Dynamic Fuel Type -->
           <div class="form-control">
             <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Fuel Type</span>
+              <span class="label-text text-xs font-semibold text-base-content">Fuel Type (Fetched Live from Database)</span>
             </label>
             <select
               [(ngModel)]="newVehicle.fuel_type"
@@ -185,11 +199,12 @@
               class="select select-bordered select-sm w-full text-xs bg-base-100 text-base-content"
               required
             >
-              <option>Gasoline (Regular)</option>
-              <option>Gasoline (Premium)</option>
-              <option>Diesel</option>
-              <option>Electric / Hybrid</option>
-              <option>LPG / Autogas</option>
+              @if (fuelPrices.length === 0) {
+                <option value="" disabled>Loading fuel prices from database...</option>
+              }
+              @for (fp of fuelPrices; track fp.id) {
+                <option [value]="fp.fuel_type || fp.name">{{ fp.fuel_type || fp.name }} (₱{{ fp.price }})</option>
+              }
             </select>
           </div>
 
@@ -207,6 +222,31 @@
               required
             />
           </div>
+
+          <!-- Vehicle Photo File Upload -->
+          <div class="form-control">
+            <label class="label font-semibold pb-1">
+              <span class="label-text text-xs font-semibold text-base-content">Vehicle Photo (from device)</span>
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              (change)="onFileSelected($event, 'new')"
+              class="file-input file-input-bordered file-input-sm w-full text-xs bg-base-100 text-base-content"
+            />
+            <label class="label pt-1">
+              <span class="label-text-alt text-[10px] opacity-60">Upload JPEG, PNG, WEBP or GIF image from your device.</span>
+            </label>
+          </div>
+
+          @if (newImagePreview) {
+            <div class="form-control">
+              <span class="text-[10px] opacity-70 mb-1">Selected Photo Preview:</span>
+              <div class="w-20 h-20 rounded-xl overflow-hidden border border-base-300 shadow-sm bg-base-200">
+                <img [src]="newImagePreview" alt="Preview" class="w-full h-full object-cover" />
+              </div>
+            </div>
+          }
 
           <!-- Description -->
           <div class="form-control">
@@ -256,7 +296,7 @@
   <!-- MODERN MODAL: Edit Vehicle Profile -->
   @if (showEditModal) {
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-      <div class="bg-base-100 text-base-content rounded-2xl max-w-md w-full p-6 shadow-2xl border border-base-300 space-y-4">
+      <div class="bg-base-100 text-base-content rounded-2xl max-w-md w-full p-6 shadow-2xl border border-base-300 space-y-4 max-h-[90vh] overflow-y-auto">
 
         <!-- Modal Header -->
         <div class="flex items-center justify-between border-b border-base-200 pb-3">
@@ -266,7 +306,7 @@
             </div>
             <div>
               <h3 class="text-base font-bold text-base-content">Edit Vehicle Profile</h3>
-              <p class="text-xs opacity-70">Modify fleet specifications in database</p>
+              <p class="text-xs opacity-70">Modify specifications and update photo in database</p>
             </div>
           </div>
           <button type="button" (click)="closeEditModal()" class="btn btn-sm btn-ghost btn-circle">
@@ -291,10 +331,10 @@
             />
           </div>
 
-          <!-- Fuel Type -->
+          <!-- Dynamic Fuel Type -->
           <div class="form-control">
             <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Fuel Type</span>
+              <span class="label-text text-xs font-semibold text-base-content">Fuel Type (Fetched Live from Database)</span>
             </label>
             <select
               [(ngModel)]="editVehicle.fuel_type"
@@ -302,11 +342,12 @@
               class="select select-bordered select-sm w-full text-xs bg-base-100 text-base-content"
               required
             >
-              <option>Gasoline (Regular)</option>
-              <option>Gasoline (Premium)</option>
-              <option>Diesel</option>
-              <option>Electric / Hybrid</option>
-              <option>LPG / Autogas</option>
+              @if (fuelPrices.length === 0) {
+                <option value="" disabled>Loading fuel prices from database...</option>
+              }
+              @for (fp of fuelPrices; track fp.id) {
+                <option [value]="fp.fuel_type || fp.name">{{ fp.fuel_type || fp.name }} (₱{{ fp.price }})</option>
+              }
             </select>
           </div>
 
@@ -324,6 +365,28 @@
               required
             />
           </div>
+
+          <!-- Vehicle Photo File Upload -->
+          <div class="form-control">
+            <label class="label font-semibold pb-1">
+              <span class="label-text text-xs font-semibold text-base-content">Change Vehicle Photo (from device)</span>
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              (change)="onFileSelected($event, 'edit')"
+              class="file-input file-input-bordered file-input-sm w-full text-xs bg-base-100 text-base-content"
+            />
+          </div>
+
+          @if (editImagePreview) {
+            <div class="form-control">
+              <span class="text-[10px] opacity-70 mb-1">Current / New Photo Preview:</span>
+              <div class="w-20 h-20 rounded-xl overflow-hidden border border-base-300 shadow-sm bg-base-200">
+                <img [src]="editImagePreview" alt="Preview" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=100&auto=format&fit=crop&q=60'" />
+              </div>
+            </div>
+          }
 
           <!-- Description -->
           <div class="form-control">

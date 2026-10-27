@@ -30,4 +30,29 @@ export class AuthServices {
   submitFeedback(data: { name: string; email: string; rating: number; comments: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/testing_feedback`, data);
   }
+
+  // Dynamic Fuel Prices API
+  getFuelPrices(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/fuel_prices`);
+  }
+
+  // Dynamic Vehicles API
+  getVehicles(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/vehicle`);
+  }
+
+  // Dynamic Fare Rules API
+  getFareRules(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/fare_rules`);
+  }
+
+  // Dynamic Tagum Locations API
+  getLocations(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/locations`);
+  }
+
+  // Calculate Fare Estimate API
+  calculateFare(data: { vehicle_id: number; distance_km: number; passengers?: number }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/fare_estimates`, data);
+  }
 }
