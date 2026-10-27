@@ -1,38 +1,124 @@
-<div class="space-y-6 pb-20">
-  <div class="flex justify-between items-center border-b border-gray-800 pb-4">
-    <div>
-      <h2 class="text-lg font-bold text-white tracking-wide">Commuter Guide & FAQ</h2>
-      <p class="text-xs text-gray-400">Essential commuter information, discount policies, and tariff guidelines.</p>
-    </div>
-    <span class="text-[10px] bg-green-950 border border-green-800 text-green-300 px-3 py-1 rounded-full font-mono">
-      Help Center
-    </span>
-  </div>
+<div [ngClass]="isDarkMode ? 'bg-gray-950 text-gray-100' : 'bg-[#f7f8f2] text-[#1d3025]'" class="min-h-screen transition-colors duration-300">
+  <div class="max-w-md mx-auto space-y-6 pb-32 pt-4 px-4">
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl space-y-2">
-      <div class="text-green-400 font-bold text-sm">🎫 Discount Privileges</div>
-      <p class="text-xs text-gray-400 leading-relaxed">Students, senior citizens, and PWDs are entitled to a 20% fare discount under LTFRB regulations.</p>
+    <!-- Header -->
+    <div [ngClass]="isDarkMode ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-[#e1e7dc] text-[#1d3025]'" class="border rounded-2xl p-4 md:p-6 shadow-sm flex justify-between items-center transition-colors duration-300">
+      <div>
+        <h2 class="text-base font-bold tracking-wide">Commuter Guide & Support</h2>
+        <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-xs">Policies, FAQs & Live Help Center Ticket System.</p>
+      </div>
+      <span [ngClass]="isDarkMode ? 'bg-green-950 border-green-800 text-green-300' : 'bg-[#eaf2e4] border-[#d3e2c7] text-green-800'" class="text-[10px] border px-3 py-1 rounded-full font-mono font-semibold">
+        Help Center
+      </span>
     </div>
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl space-y-2">
-      <div class="text-green-400 font-bold text-sm">🚌 Transport Safety</div>
-      <p class="text-xs text-gray-400 leading-relaxed">Always ride designated public utility vehicles and inspect official fare matrices displayed inside.</p>
-    </div>
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-xl space-y-2">
-      <div class="text-green-400 font-bold text-sm">⚡ Live Assistance</div>
-      <p class="text-xs text-gray-400 leading-relaxed">Encountered an overcharging issue or faulty route estimate? Report it immediately to support.</p>
-    </div>
-  </div>
 
-  <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-4">
-    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-300">Frequently Asked Questions</h3>
-    <div class="space-y-3">
-      @for (faq of faqs; track faq.q) {
-        <div class="bg-gray-950 border border-gray-800 p-4 rounded-xl space-y-1">
-          <p class="text-xs font-bold text-white">{{ faq.q }}</p>
-          <p class="text-xs text-gray-400">{{ faq.a }}</p>
+    <!-- Quick Cards Grid -->
+    <div class="grid grid-cols-1 gap-3">
+      <div [ngClass]="isDarkMode ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-[#e1e7dc] text-[#1d3025]'" class="border rounded-2xl p-5 shadow-sm space-y-2 transition-colors duration-300">
+        <div class="text-green-600 dark:text-green-400 font-bold text-xs uppercase tracking-wider">🎫 Discount Privileges</div>
+        <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-xs leading-relaxed">Students, senior citizens, and PWDs are entitled to a 20% fare discount under LTFRB regulations.</p>
+      </div>
+
+      <div [ngClass]="isDarkMode ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-[#e1e7dc] text-[#1d3025]'" class="border rounded-2xl p-5 shadow-sm space-y-2 transition-colors duration-300">
+        <div class="text-green-600 dark:text-green-400 font-bold text-xs uppercase tracking-wider">🚌 Transport Safety</div>
+        <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-xs leading-relaxed">Always ride designated public utility vehicles and inspect official fare matrices displayed inside.</p>
+      </div>
+    </div>
+
+    <!-- HELP CENTER TICKET / SUPPORT FORM -->
+    <div [ngClass]="isDarkMode ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-[#e1e7dc] text-[#1d3025]'" class="border rounded-2xl p-6 shadow-sm space-y-4 transition-colors duration-300">
+      <div class="flex items-center space-x-3 border-b pb-3" [ngClass]="isDarkMode ? 'border-gray-800' : 'border-gray-100'">
+        <div [ngClass]="isDarkMode ? 'bg-gray-950 text-green-400 border-gray-800' : 'bg-green-50 text-green-800 border-green-100'" class="w-9 h-9 rounded-xl flex items-center justify-center border shrink-0">
+          <svg lucideLifeBuoy class="w-4 h-4"></svg>
+        </div>
+        <div>
+          <h3 class="text-xs md:text-sm font-bold">Help Center Support Ticket</h3>
+          <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-[10px] md:text-[11px]">Report transit issues, disputes, or inquiries</p>
+        </div>
+      </div>
+
+      @if (errorMessage) {
+        <div class="p-2.5 text-xs bg-red-950/80 border border-red-800 text-red-300 rounded-xl flex items-center space-x-2">
+          <span>{{ errorMessage }}</span>
         </div>
       }
+
+      <div class="space-y-3.5">
+        <div>
+          <label [ngClass]="isDarkMode ? 'text-gray-300' : 'text-gray-600'" class="block text-[10px] md:text-xs font-semibold uppercase mb-1 tracking-wider">Issue Category</label>
+          <select
+            [(ngModel)]="issueType"
+            name="issueType"
+            [ngClass]="isDarkMode ? 'bg-gray-950 border-gray-800 text-white focus:ring-green-600' : 'bg-gray-50 border-gray-200 text-[#1d3025] focus:ring-green-700'"
+            class="w-full px-3 py-2.5 border rounded-xl text-xs focus:outline-none focus:ring-2 transition"
+          >
+            <option value="Overcharging / Fare Dispute">Overcharging / Fare Dispute</option>
+            <option value="Route Estimate Inaccuracy">Route Estimate Inaccuracy</option>
+            <option value="Driver / Operator Conduct">Driver / Operator Conduct</option>
+            <option value="General Inquiry / App Bug">General Inquiry / App Bug</option>
+          </select>
+        </div>
+
+        <div>
+          <label [ngClass]="isDarkMode ? 'text-gray-300' : 'text-gray-600'" class="block text-[10px] md:text-xs font-semibold uppercase mb-1 tracking-wider">Describe Your Concern</label>
+          <textarea
+            [(ngModel)]="message"
+            name="message"
+            rows="3"
+            placeholder="Provide details about your trip, route, or concern..."
+            [ngClass]="isDarkMode ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-600 focus:ring-green-600' : 'bg-gray-50 border-gray-200 text-[#1d3025] placeholder-gray-400 focus:ring-green-700'"
+            class="w-full px-3 py-2.5 border rounded-xl text-xs focus:outline-none focus:ring-2 transition resize-none"
+            required
+          ></textarea>
+        </div>
+
+        <button
+          type="button"
+          (click)="submitSupportTicket()"
+          class="w-full py-3 bg-[#155b32] hover:bg-[#104927] text-white font-semibold text-xs rounded-xl shadow-lg transition duration-200 flex items-center justify-center space-x-2 cursor-pointer"
+        >
+          <svg lucideSend class="w-4 h-4"></svg>
+          <span>Submit Support Ticket</span>
+        </button>
+      </div>
     </div>
+
+    <!-- FAQ Accordion Section -->
+    <div [ngClass]="isDarkMode ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-[#e1e7dc] text-[#1d3025]'" class="border rounded-2xl p-6 shadow-sm space-y-4 transition-colors duration-300">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-green-800 dark:text-green-400">Frequently Asked Questions</h3>
+      <div class="space-y-3">
+        @for (faq of faqs; track faq.q) {
+          <div [ngClass]="isDarkMode ? 'bg-gray-950 border-gray-800' : 'bg-[#f7f8f2] border-gray-200'" class="border p-4 rounded-xl space-y-1 transition-colors duration-300">
+            <p class="text-xs font-bold">{{ faq.q }}</p>
+            <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-600'" class="text-xs leading-relaxed">{{ faq.a }}</p>
+          </div>
+        }
+      </div>
+    </div>
+
   </div>
+
+  <!-- SUCCESS MODAL -->
+  @if (successModal) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in p-4">
+      <div [ngClass]="isDarkMode ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-[#e1e7dc] text-[#1d3025]'" class="w-full max-w-sm border rounded-2xl shadow-2xl p-6 text-center space-y-4">
+        <div class="w-16 h-16 bg-green-950 text-green-400 rounded-full flex items-center justify-center mx-auto border border-green-800 shadow-inner">
+          <svg lucideCheckCircle2 class="w-10 h-10 text-green-400 animate-bounce"></svg>
+        </div>
+        <div class="space-y-1">
+          <h3 class="text-lg font-bold">Ticket Submitted!</h3>
+          <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-xs">Your support inquiry has been successfully sent to our dispatch & admin team.</p>
+        </div>
+        <div class="pt-2">
+          <button
+            type="button"
+            (click)="closeModal()"
+            class="w-full py-3 bg-[#155b32] hover:bg-[#104927] text-white font-semibold text-xs rounded-xl shadow-lg transition cursor-pointer"
+          >
+            Okay
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

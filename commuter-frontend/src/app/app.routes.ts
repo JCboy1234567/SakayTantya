@@ -4,6 +4,7 @@ import { MainLayout } from './layout/main-layout/main-layout';
 import { Plan } from './pages/plan/plan';
 import { Fuel } from './pages/fuel/fuel';
 import { Guide } from './pages/guide/guide';
+import { Profile } from './pages/profile/profile';
 
 export class AppRoutes {}
 
@@ -37,6 +38,10 @@ export const routes: Routes = [
       {
         path: 'guide',
         component: Guide
+      },
+      {
+        path: 'profile',
+        component: Profile
       }
     ]
   },

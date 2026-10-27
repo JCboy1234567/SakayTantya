@@ -1,1 +1,43 @@
-<p>sidebar works!</p>
+<footer class="bg-gray-900 border-t border-gray-800 px-6 py-3 fixed bottom-0 inset-x-0 z-30 shadow-2xl backdrop-blur-md bg-opacity-95 pointer-events-auto">
+    <div class="max-w-md mx-auto flex items-center justify-around">
+      <!-- Plan / Trip -->
+      <a
+        routerLink="/main-dashboard/plan"
+        routerLinkActive="text-green-400 bg-green-950/60 border-green-800/60"
+        class="flex flex-col items-center space-y-1 px-3.5 py-2 rounded-xl text-gray-400 hover:text-white transition border border-transparent text-[10px] font-semibold uppercase tracking-wider cursor-pointer"
+      >
+        <svg lucideMap class="w-5 h-5 pointer-events-none"></svg>
+        <span>Plan</span>
+      </a>
+
+      <!-- Fuels -->
+      <a
+        routerLink="/main-dashboard/fuels"
+        routerLinkActive="text-green-400 bg-green-950/60 border-green-800/60"
+        class="flex flex-col items-center space-y-1 px-3.5 py-2 rounded-xl text-gray-400 hover:text-white transition border border-transparent text-[10px] font-semibold uppercase tracking-wider cursor-pointer"
+      >
+        <svg lucideFuel class="w-5 h-5 pointer-events-none"></svg>
+        <span>Fuels</span>
+      </a>
+
+      <!-- Guide -->
+      <a
+        routerLink="/main-dashboard/guide"
+        routerLinkActive="text-green-400 bg-green-950/60 border-green-800/60"
+        class="flex flex-col items-center space-y-1 px-3.5 py-2 rounded-xl text-gray-400 hover:text-white transition border border-transparent text-[10px] font-semibold uppercase tracking-wider cursor-pointer"
+      >
+        <svg lucideBookOpen class="w-5 h-5 pointer-events-none"></svg>
+        <span>Guide</span>
+      </a>
+
+      <!-- Profile -->
+      <a
+        routerLink="/main-dashboard/profile"
+        routerLinkActive="text-green-400 bg-green-950/60 border-green-800/60"
+        class="flex flex-col items-center space-y-1 px-3.5 py-2 rounded-xl text-gray-400 hover:text-white transition border border-transparent text-[10px] font-semibold uppercase tracking-wider cursor-pointer"
+      >
+        <svg lucideUser class="w-5 h-5 pointer-events-none"></svg>
+        <span>Profile</span>
+      </a>
+    </div>
+  </footer>

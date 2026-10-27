@@ -19,7 +19,7 @@ Route::get('/user', function (Request $request) {
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/users', [UserController::class, 'store']); // Register account
 
-// Public or General Get Routes (Kung kailangan makita ng users/admin ang lists)
+// Public or General Get Routes
 Route::get('/vehicle', [VehicleController::class, 'index']);
 Route::get('/users', [UserController::class, 'index']);
 Route::get('/fare_rules', [FareruleController::class, 'index']);
@@ -28,16 +28,21 @@ Route::get('/fare_estimates', [FareestimateController::class, 'index']);
 Route::get('/fuel_cost_estimates', [FuelcostestimateController::class, 'index']);
 Route::get('/service_availability', [ServiceAvailabilityController::class, 'index']);
 Route::get('/testing_feedback', [TestingFeedbackController::class, 'index']);
-Route::post('/testing_feedback', [TestingFeedbackController::class, 'store']); // Allow public/testers to submit feedback
+Route::post('/testing_feedback', [TestingFeedbackController::class, 'store']);
 
 
 // ==========================================
-// PROTECTED ADMIN-ONLY ROUTES (Middleware: role:admin)
+// PROTECTED USER ROUTES (Middleware: auth:sanctum, role:user)
+// ==========================================
+Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
+    Route::put('/users/{id}', [UserController::class, 'update']);
+});
+
+
+// ==========================================
+// PROTECTED ADMIN-ONLY ROUTES (Middleware: auth:sanctum, role:admin)
 // ==========================================
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
-    // User profile updates
-    Route::put('/users/{id}', [UserController::class, 'update']);
-
     // Vehicle management
     Route::post('/vehicle', [VehicleController::class, 'store']);
     Route::put('/vehicle/{id}', [VehicleController::class, 'update']);
@@ -62,7 +67,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::put('/testing_feedback/{id}', [TestingFeedbackController::class, 'update']);
     Route::delete('/testing_feedback/{id}', [TestingFeedbackController::class, 'destroy']);
 
-    // Fare & Fuel Cost Estimates (kung admin lang ang pwede mag-save)
+    // Fare & Fuel Cost Estimates
     Route::post('/fare_estimates', [FareestimateController::class, 'store']);
     Route::post('/fuel_cost_estimates', [FuelcostestimateController::class, 'store']);
 });

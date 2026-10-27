@@ -1,0 +1,217 @@
+<div [ngClass]="isDarkMode ? 'bg-gray-950 text-gray-100' : 'bg-[#f7f8f2] text-[#1d3025]'" class="min-h-screen transition-colors duration-300">
+  <div class="max-w-md mx-auto space-y-4 pb-32 pt-4 px-4">
+
+    <!-- iPhone 16 App Frame Header & Theme Toggle -->
+    <div [ngClass]="isDarkMode ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-[#e1e7dc] text-[#1d3025]'" class="border rounded-2xl p-4 md:p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition-colors duration-300">
+      <div class="flex items-center space-x-3.5">
+        <div class="w-12 h-12 md:w-16 md:h-16 bg-green-900 text-white rounded-2xl flex items-center justify-center border border-green-800/60 shadow-inner font-bold text-lg md:text-2xl shrink-0">
+          {{ name ? name.charAt(0).toUpperCase() : 'C' }}
+        </div>
+        <div>
+          <h1 class="text-base md:text-xl font-bold tracking-tight">{{ name ? name : 'User' }}</h1>
+          <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-[11px] md:text-xs">Manage your commuter personal info & security</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 self-start sm:self-auto">
+        <!-- Appearance Toggle Button -->
+        <button
+          type="button"
+          (click)="toggleTheme()"
+          [ngClass]="isDarkMode ? 'bg-gray-800 border-gray-700 text-amber-400 hover:bg-gray-700' : 'bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200'"
+          class="px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer shadow-sm"
+          title="Toggle Dark / Light Mode"
+        >
+          @if (isDarkMode) {
+            <svg lucideSun class="w-4 h-4"></svg>
+            <span>Light</span>
+          } @else {
+            <svg lucideMoon class="w-4 h-4"></svg>
+            <span>Dark</span>
+          }
+        </button>
+
+        <div [ngClass]="isDarkMode ? 'bg-green-950/80 border-green-800 text-green-400' : 'bg-[#eaf2e4] border-[#d3e2c7] text-green-800'" class="px-3 py-1.5 rounded-full text-[10px] md:text-xs font-semibold uppercase tracking-wider flex items-center space-x-1.5 border">
+          <svg lucideShield class="w-3.5 h-3.5"></svg>
+          <span>{{ role }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- EDIT PERSONAL INFO -->
+      <div [ngClass]="isDarkMode ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-[#e1e7dc] text-[#1d3025]'" class="border rounded-2xl p-4 md:p-6 shadow-sm space-y-4 transition-colors duration-300">
+        <div [ngClass]="isDarkMode ? 'border-gray-800' : 'border-gray-100'" class="flex items-center space-x-3 border-b pb-3">
+          <div [ngClass]="isDarkMode ? 'bg-gray-950 text-green-400 border-gray-800' : 'bg-green-50 text-green-800 border-green-100'" class="w-9 h-9 rounded-xl flex items-center justify-center border shrink-0">
+            <svg lucideUser class="w-4 h-4"></svg>
+          </div>
+          <div>
+            <h2 class="text-xs md:text-sm font-bold">Personal Information</h2>
+            <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-[10px] md:text-[11px]">Update your name and email address</p>
+          </div>
+        </div>
+
+        @if (errorMessage) {
+          <div class="p-2.5 text-xs bg-red-950/80 border border-red-800 text-red-300 rounded-xl flex items-center space-x-2">
+            <svg lucideUserCheck class="w-4 h-4 text-red-400 shrink-0"></svg>
+            <span>{{ errorMessage }}</span>
+          </div>
+        }
+
+        <div class="space-y-3.5">
+          <div>
+            <label [ngClass]="isDarkMode ? 'text-gray-300' : 'text-gray-600'" class="block text-[10px] md:text-xs font-semibold uppercase mb-1 tracking-wider">Full Name</label>
+            <div class="relative">
+              <span [ngClass]="isDarkMode ? 'text-gray-500' : 'text-gray-400'" class="absolute inset-y-0 left-0 flex items-center pl-3.5">
+                <svg lucideUser class="w-4 h-4"></svg>
+              </span>
+              <input
+                type="text"
+                [(ngModel)]="name"
+                name="name"
+                [ngClass]="isDarkMode ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-600 focus:ring-green-600' : 'bg-gray-50 border-gray-200 text-[#1d3025] placeholder-gray-400 focus:ring-green-700'"
+                class="w-full pl-10 pr-4 py-2.5 border rounded-xl text-xs focus:outline-none focus:ring-2 transition"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label [ngClass]="isDarkMode ? 'text-gray-300' : 'text-gray-600'" class="block text-[10px] md:text-xs font-semibold uppercase mb-1 tracking-wider">Email Address</label>
+            <div class="relative">
+              <span [ngClass]="isDarkMode ? 'text-gray-500' : 'text-gray-400'" class="absolute inset-y-0 left-0 flex items-center pl-3.5">
+                <svg lucideMail class="w-4 h-4"></svg>
+              </span>
+              <input
+                type="email"
+                [(ngModel)]="email"
+                name="email"
+                [ngClass]="isDarkMode ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-600 focus:ring-green-600' : 'bg-gray-50 border-gray-200 text-[#1d3025] placeholder-gray-400 focus:ring-green-700'"
+                class="w-full pl-10 pr-4 py-2.5 border rounded-xl text-xs focus:outline-none focus:ring-2 transition"
+                required
+              />
+            </div>
+          </div>
+
+          <button
+            type="button"
+            (click)="updateProfile()"
+            class="w-full py-3 bg-[#155b32] hover:bg-[#104927] text-white font-semibold text-xs rounded-xl shadow-sm transition duration-200 flex items-center justify-center space-x-2 cursor-pointer"
+          >
+            <svg lucideSave class="w-4 h-4"></svg>
+            <span>Save Changes</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CHANGE PASSWORD -->
+      <div [ngClass]="isDarkMode ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-[#e1e7dc] text-[#1d3025]'" class="border rounded-2xl p-4 md:p-6 shadow-sm space-y-4 transition-colors duration-300">
+        <div [ngClass]="isDarkMode ? 'border-gray-800' : 'border-gray-100'" class="flex items-center space-x-3 border-b pb-3">
+          <div [ngClass]="isDarkMode ? 'bg-gray-950 text-green-400 border-gray-800' : 'bg-green-50 text-green-800 border-green-100'" class="w-9 h-9 rounded-xl flex items-center justify-center border shrink-0">
+            <svg lucideKey class="w-4 h-4"></svg>
+          </div>
+          <div>
+            <h2 class="text-xs md:text-sm font-bold">Security & Password</h2>
+            <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-[10px] md:text-[11px]">Update your account password</p>
+          </div>
+        </div>
+
+        @if (passwordError) {
+          <div class="p-2.5 text-xs bg-red-950/80 border border-red-800 text-red-300 rounded-xl flex items-center space-x-2">
+            <svg lucideUserCheck class="w-4 h-4 text-red-400 shrink-0"></svg>
+            <span>{{ passwordError }}</span>
+          </div>
+        }
+
+        <div class="space-y-3.5">
+          <div>
+            <label [ngClass]="isDarkMode ? 'text-gray-300' : 'text-gray-600'" class="block text-[10px] md:text-xs font-semibold uppercase mb-1 tracking-wider">Current Password</label>
+            <div class="relative">
+              <span [ngClass]="isDarkMode ? 'text-gray-500' : 'text-gray-400'" class="absolute inset-y-0 left-0 flex items-center pl-3.5">
+                <svg lucideKey class="w-4 h-4"></svg>
+              </span>
+              <input
+                type="password"
+                [(ngModel)]="currentPassword"
+                name="currentPassword"
+                placeholder="••••••••"
+                [ngClass]="isDarkMode ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-600 focus:ring-green-600' : 'bg-gray-50 border-gray-200 text-[#1d3025] placeholder-gray-400 focus:ring-green-700'"
+                class="w-full pl-10 pr-4 py-2.5 border rounded-xl text-xs focus:outline-none focus:ring-2 transition"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label [ngClass]="isDarkMode ? 'text-gray-300' : 'text-gray-600'" class="block text-[10px] md:text-xs font-semibold uppercase mb-1 tracking-wider">New Password</label>
+            <div class="relative">
+              <span [ngClass]="isDarkMode ? 'text-gray-500' : 'text-gray-400'" class="absolute inset-y-0 left-0 flex items-center pl-3.5">
+                <svg lucideKey class="w-4 h-4"></svg>
+              </span>
+              <input
+                type="password"
+                [(ngModel)]="newPassword"
+                name="newPassword"
+                placeholder="••••••••"
+                [ngClass]="isDarkMode ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-600 focus:ring-green-600' : 'bg-gray-50 border-gray-200 text-[#1d3025] placeholder-gray-400 focus:ring-green-700'"
+                class="w-full pl-10 pr-4 py-2.5 border rounded-xl text-xs focus:outline-none focus:ring-2 transition"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label [ngClass]="isDarkMode ? 'text-gray-300' : 'text-gray-600'" class="block text-[10px] md:text-xs font-semibold uppercase mb-1 tracking-wider">Confirm New Password</label>
+            <div class="relative">
+              <span [ngClass]="isDarkMode ? 'text-gray-500' : 'text-gray-400'" class="absolute inset-y-0 left-0 flex items-center pl-3.5">
+                <svg lucideKey class="w-4 h-4"></svg>
+              </span>
+              <input
+                type="password"
+                [(ngModel)]="confirmPassword"
+                name="confirmPassword"
+                placeholder="••••••••"
+                [ngClass]="isDarkMode ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-600 focus:ring-green-600' : 'bg-gray-50 border-gray-200 text-[#1d3025] placeholder-gray-400 focus:ring-green-700'"
+                class="w-full pl-10 pr-4 py-2.5 border rounded-xl text-xs focus:outline-none focus:ring-2 transition"
+                required
+              />
+            </div>
+          </div>
+
+          <button
+            type="button"
+            (click)="updatePassword()"
+            class="w-full py-3 bg-[#155b32] hover:bg-[#104927] text-white font-semibold text-xs rounded-xl shadow-lg transition duration-200 flex items-center justify-center space-x-2 cursor-pointer"
+          >
+            <svg lucideKey class="w-4 h-4"></svg>
+            <span>Update Password</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODERN SUCCESS MODAL -->
+    @if (showModal) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in p-4">
+        <div [ngClass]="isDarkMode ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-[#e1e7dc] text-[#1d3025]'" class="w-full max-w-sm border rounded-2xl shadow-2xl p-6 text-center space-y-4">
+          <div class="w-16 h-16 bg-green-950 text-green-400 rounded-full flex items-center justify-center mx-auto border border-green-800 shadow-inner">
+            <svg lucideCheckCircle2 class="w-10 h-10 text-green-400 animate-bounce"></svg>
+          </div>
+          <div class="space-y-1">
+            <h3 class="text-lg font-bold">{{ modalTitle }}</h3>
+            <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-xs">{{ modalMessage }}</p>
+          </div>
+          <div class="pt-2">
+            <button
+              type="button"
+              (click)="closeModal()"
+              class="w-full py-3 bg-[#155b32] hover:bg-[#104927] text-white font-semibold text-xs rounded-xl shadow-lg transition cursor-pointer"
+            >
+              Okay
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

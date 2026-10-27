@@ -1,1 +1,160 @@
-<p>plan works!</p>
+<div [ngClass]="isDarkMode ? 'bg-gray-950 text-gray-100' : 'bg-[#f7f8f2] text-[#1d3025]'" class="min-h-screen transition-colors duration-300">
+
+  <div class="mx-auto max-w-md space-y-5 px-4 pb-28 pt-4">
+
+    <!-- Location -->
+    <div class="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-green-800">
+      <svg lucideMapPin class="h-3.5 w-3.5"></svg>
+      <span>Tagum City</span>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="space-y-2">
+      <h1 class="text-[26px] font-extrabold leading-[1.08] tracking-tight">
+        Know your fare.<br />
+        Plan your day.
+      </h1>
+
+      <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-xs leading-relaxed">
+        A clearer estimate before you head out.
+      </p>
+    </section>
+
+    <!-- Trip Selection -->
+    <section class="space-y-2">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xs font-bold">Where are you going?</h2>
+
+        <span [ngClass]="isDarkMode ? 'bg-green-950 text-green-300 border border-green-800' : 'bg-[#eaf2e4] text-green-800'" class="rounded-md px-2 py-1 text-[8px] font-bold uppercase tracking-wide">
+          Example Trip
+        </span>
+      </div>
+
+      <div [ngClass]="isDarkMode ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-[#e1e7dc] text-[#1d3025]'" class="rounded-2xl border p-3 transition-colors duration-300">
+
+        <!-- Pickup -->
+        <button
+          type="button"
+          [ngClass]="isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-green-50'"
+          class="flex w-full items-center gap-3 rounded-lg px-1 py-2 text-left transition cursor-pointer"
+          (click)="selectLocation('pickup')"
+        >
+          <svg lucideCircleDot class="h-4 w-4 shrink-0 text-green-800"></svg>
+
+          <div class="min-w-0 flex-1">
+            <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-[9px]">Pickup</p>
+            <p class="truncate text-xs font-semibold">
+              {{ pickupLocation || 'Choose pickup location' }}
+            </p>
+          </div>
+
+          <svg lucideChevronRight class="h-4 w-4 shrink-0 text-gray-400"></svg>
+        </button>
+
+        <div [ngClass]="isDarkMode ? 'border-gray-700' : 'border-gray-300'" class="ml-1.75 h-3 border-l border-dashed"></div>
+
+        <!-- Destination -->
+        <button
+          type="button"
+          [ngClass]="isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-green-50'"
+          class="flex w-full items-center gap-3 rounded-lg px-1 py-2 text-left transition cursor-pointer"
+          (click)="selectLocation('destination')"
+        >
+          <svg lucideMapPin class="h-4 w-4 shrink-0 text-green-800"></svg>
+
+          <div class="min-w-0 flex-1">
+            <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-[9px]">Destination</p>
+            <p class="truncate text-xs font-semibold">
+              {{ destinationLocation || 'Choose destination' }}
+            </p>
+          </div>
+
+          <svg lucideChevronRight class="h-4 w-4 shrink-0 text-gray-400"></svg>
+        </button>
+
+      </div>
+
+      <!-- Map Navigation -->
+      <button
+        type="button"
+        class="flex items-center gap-2 py-1 text-[10px] font-semibold text-green-800 hover:text-green-950 cursor-pointer"
+        (click)="openMap()"
+      >
+        <svg lucideMap class="h-3.5 w-3.5"></svg>
+        Choose pickup &amp; destination on map
+      </button>
+    </section>
+
+    <!-- Estimate Fare Button -->
+    <button
+      type="button"
+      class="btn h-12 min-h-12 w-full justify-between rounded-lg border-0 bg-[#155b32] px-4 text-xs font-bold text-white shadow-none hover:bg-[#104927] cursor-pointer"
+      (click)="estimateFare()"
+    >
+      <span>Estimate fare</span>
+      <svg lucideArrowRight class="h-5 w-5"></svg>
+    </button>
+
+    <!-- Quick Information -->
+    <section class="space-y-3 pt-1">
+      <h2 class="text-sm font-extrabold">
+        A little clarity goes a long way
+      </h2>
+
+      <!-- Fuel Costs Card -->
+      <button
+        type="button"
+        [ngClass]="isDarkMode ? 'bg-gray-900 border border-gray-800 text-white hover:bg-gray-800' : 'bg-[#edf3e6] text-[#1d3025] hover:bg-[#e3edd9]' "
+        class="flex w-full items-center gap-3 rounded-2xl p-3 text-left transition cursor-pointer"
+        (click)="openFuelCosts()"
+      >
+        <div [ngClass]="isDarkMode ? 'bg-gray-800 text-green-400' : 'bg-white/85 text-green-800'" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+          <svg lucideFuel class="h-5 w-5"></svg>
+        </div>
+
+        <div class="min-w-0 flex-1">
+          <p class="text-xs font-bold">Explore fuel costs</p>
+          <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="mt-0.5 text-[9px]">
+            {{ fuelPriceLabel }} · Illustrative reference
+          </p>
+        </div>
+
+        <svg lucideArrowUpRight class="h-4 w-4 shrink-0"></svg>
+      </button>
+
+      <!-- Example Route Card -->
+      <button
+        type="button"
+        [ngClass]="isDarkMode ? 'bg-gray-900 border-gray-800 text-white hover:bg-gray-800' : 'bg-white border-[#e1e7dc] text-[#1d3025] hover:bg-green-50'"
+        class="flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition cursor-pointer"
+        (click)="useExampleTrip()"
+      >
+        <svg lucideClock class="h-4 w-4 shrink-0 text-green-800"></svg>
+
+        <div class="min-w-0 flex-1">
+          <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-[9px] uppercase tracking-wide">
+            Try this demo route
+          </p>
+          <p class="mt-1 truncate text-[10px] font-semibold">
+            City Hall → Public Market
+          </p>
+        </div>
+
+        <span class="shrink-0 text-[10px] font-bold text-green-600">
+          5.0 km
+        </span>
+      </button>
+    </section>
+
+    <!-- Disclaimer -->
+    <div [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="flex items-start gap-2 pt-1 text-[9px] leading-relaxed">
+      <svg lucideInfo class="mt-0.5 h-3.5 w-3.5 shrink-0"></svg>
+
+      <p>
+        For planning, not booking. Fare and fuel expense are separate estimates.
+        Demo rules are not official Tagum tariffs.
+      </p>
+    </div>
+
+  </div>
+</div>

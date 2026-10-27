@@ -10,7 +10,8 @@ import {
   LucideLock,
   LucideUser,
   LucideArrowRight,
-  LucideLoader
+  LucideLoader,
+  LucideCheckCircle2
 } from '@lucide/angular';
 
 @Component({
@@ -24,7 +25,8 @@ import {
     LucideLock,
     LucideUser,
     LucideArrowRight,
-    LucideLoader
+    LucideLoader,
+    LucideCheckCircle2
   ],
   templateUrl: './login-user.html',
   styleUrl: './login-user.css',
@@ -47,6 +49,10 @@ export class LoginUser {
   isRegLoading = false;
   regSuccessMessage = '';
   regErrorMessage = '';
+
+  // Modern Modal State
+  showSuccessModal = false;
+  loggedInUserName = 'Commuter';
 
   constructor(
     private authService: AuthServices,
@@ -83,13 +89,16 @@ export class LoginUser {
           localStorage.setItem('token', response.token);
           if (response.user) {
             localStorage.setItem('user', JSON.stringify(response.user));
+            this.loggedInUserName = response.user.name || 'Commuter';
           }
-          this.successMessage = 'Login successful! Redirecting to main dashboard...';
+
+          // Trigger Modern Success Modal
+          this.showSuccessModal = true;
           this.cdr.detectChanges();
 
           setTimeout(() => {
             this.router.navigate(['/main-dashboard']);
-          }, 1000);
+          }, 1500);
         } else {
           this.errorMessage = 'Invalid login response from server.';
           this.cdr.detectChanges();
