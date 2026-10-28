@@ -1,5 +1,60 @@
 <div class="min-h-screen bg-gray-950 flex items-center justify-center p-4 relative overflow-hidden">
-  <div class="w-full max-w-md bg-gray-900 rounded-2xl shadow-2xl p-8 space-y-6 border border-gray-800 text-gray-100 relative z-10">
+  <!-- Animated Vehicles & Motorcycles Background -->
+  <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="road-lane" style="top: 15%;"></div>
+    <div class="road-lane" style="top: 32%;"></div>
+    <div class="road-lane" style="top: 50%;"></div>
+    <div class="road-lane" style="top: 68%;"></div>
+    <div class="road-lane" style="top: 85%;"></div>
+
+    <!-- Jeepney 1 moving right -->
+    <div class="vehicle-lane" style="top: 12%;">
+      <svg class="vehicle-svg vehicle-jeepney-1 w-24 h-12 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10l-2-4H8L6 10l-2.5 1.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2"></path>
+        <circle cx="7" cy="17" r="2.5"></circle>
+        <circle cx="17" cy="17" r="2.5"></circle>
+      </svg>
+    </div>
+
+    <!-- Motorcycle 1 moving right -->
+    <div class="vehicle-lane" style="top: 29%;">
+      <svg class="vehicle-svg vehicle-motorcycle-1 w-14 h-7 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <circle cx="5" cy="17" r="3"></circle>
+        <circle cx="19" cy="17" r="3"></circle>
+        <path d="M2.5 9h5l3 4h4l3-4h3.5"></path>
+      </svg>
+    </div>
+
+    <!-- Jeepney 2 moving left -->
+    <div class="vehicle-lane" style="top: 47%;">
+      <svg class="vehicle-svg vehicle-jeepney-2 w-24 h-12 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10l-2-4H8L6 10l-2.5 1.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2"></path>
+        <circle cx="7" cy="17" r="2.5"></circle>
+        <circle cx="17" cy="17" r="2.5"></circle>
+      </svg>
+    </div>
+
+    <!-- Motorcycle 2 moving left -->
+    <div class="vehicle-lane" style="top: 65%;">
+      <svg class="vehicle-svg vehicle-motorcycle-2 w-14 h-7 text-green-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <circle cx="5" cy="17" r="3"></circle>
+        <circle cx="19" cy="17" r="3"></circle>
+        <path d="M2.5 9h5l3 4h4l3-4h3.5"></path>
+      </svg>
+    </div>
+
+    <!-- Tricycle moving right -->
+    <div class="vehicle-lane" style="top: 82%;">
+      <svg class="vehicle-svg vehicle-tricycle-1 w-20 h-10 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="17" r="3"></circle>
+        <circle cx="19" cy="17" r="2.5"></circle>
+        <path d="M5 11h9l3 6H5z"></path>
+        <path d="M5 11V7h5l2 4"></path>
+      </svg>
+    </div>
+  </div>
+
+  <div class="w-full max-w-md bg-gray-900/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 space-y-6 border border-gray-800 text-gray-100 relative z-10">
 
     <!-- Header -->
     <div class="text-center space-y-2">
