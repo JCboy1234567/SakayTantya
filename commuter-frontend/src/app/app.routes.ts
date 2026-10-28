@@ -5,6 +5,7 @@ import { Plan } from './pages/plan/plan';
 import { Fuel } from './pages/fuel/fuel';
 import { Guide } from './pages/guide/guide';
 import { Profile } from './pages/profile/profile';
+import { authGuard } from './core/guards/role.guards';
 
 export class AppRoutes {}
 
@@ -21,6 +22,7 @@ export const routes: Routes = [
   {
     path: 'main-dashboard',
     component: MainLayout,
+    canActivate: [authGuard],
     children: [
       {
         path: '',

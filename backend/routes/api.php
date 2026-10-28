@@ -47,7 +47,7 @@ Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     // Vehicle management
     Route::post('/vehicle', [VehicleController::class, 'store']);
-    Route::post('/vehicle/{id}', [VehicleController::class, 'update']); // Multipart update with _method=PUT support
+    Route::put('/vehicle/{id}', [VehicleController::class, 'update']); // Multipart update with _method=PUT support
     Route::delete('/vehicle/{id}', [VehicleController::class, 'destroy']);
 
     // Fare Rules management
