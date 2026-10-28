@@ -45,12 +45,15 @@ export class Fuel implements OnInit {
     this.authService.getFuelPrices().subscribe({
       next: (res: any) => {
         this.isLoading = false;
-        if (Array.isArray(res) && res.length > 0) {
-          this.fuelPrices = res.map((item: any) => ({
+        const rawPrices = res?.data || res;
+        if (Array.isArray(rawPrices) && rawPrices.length > 0) {
+          this.fuelPrices = rawPrices.map((item: any) => ({
             type: item.fuel_type || item.type || 'Fuel',
-            price: Number(item.price || 0),
+            price: Number(item.price_per_liter || item.price || 0),
             change: item.price_change || item.change || '0.00',
-            updated: item.updated_at ? new Date(item.updated_at).toLocaleDateString() : 'Today'
+            updated: item.effective_date
+              ? new Date(item.effective_date).toLocaleDateString()
+              : (item.updated_at ? new Date(item.updated_at).toLocaleDateString() : 'Today')
           }));
         }
         this.cdr.detectChanges();

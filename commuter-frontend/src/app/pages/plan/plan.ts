@@ -1014,68 +1014,92 @@ getCurrentLocation(): void {
     this.fetchRouteDistance();
   }
 
-  estimateFare(): void {
-    if (!this.selectedVehicle) {
-      this.routeError = 'Pumili muna ng transport vehicle.';
-      return;
-    }
-
-    if (
-      this.routeLoading ||
-      this.distanceKm === null ||
-      !Number.isFinite(this.distanceKm)
-    ) {
-      this.routeError =
-        'Hintayin munang makuha ang valid road distance bago mag-estimate ng fare.';
-      return;
-    }
-
-    const baseFare = this.toNumber(this.selectedVehicle.base_fare);
-    const includedDistance = this.toNumber(
-      this.selectedVehicle.included_distance_km
-    );
-    const ratePerKm = this.toNumber(
-      this.selectedVehicle.per_km_rate
-    );
-    const minimumFare = this.toNumber(
-      this.selectedVehicle.minimum_fare
-    );
-
-    const extraDistance = Math.max(
-      0,
-      this.distanceKm - includedDistance
-    );
-
-    const fare = Math.max(
-      minimumFare,
-      baseFare + extraDistance * ratePerKm
-    );
-
-    this.estimatedFareAmount = Math.round(fare * 100) / 100;
-
-    // Fuel expense is separate from passenger fare.
-    const efficiency = this.toNumber(
-      this.selectedVehicle.fuel_efficiency_km_per_liter
-    );
-
-    const fuelType = String(
-      this.selectedVehicle.fuel_type || ''
-    ).toLowerCase();
-
-    if (efficiency > 0 && !fuelType.includes('electric')) {
-      const fuelExpense =
-        (this.distanceKm / efficiency) * this.fuelPricePerLiter;
-
-      this.estimatedFuelExpense =
-        Math.round(fuelExpense * 100) / 100;
-    } else {
-      this.estimatedFuelExpense = null;
-    }
-
-    this.routeError = null;
-    this.successModal = true;
-    this.cdr.detectChanges();
+  
+estimateFare(): void {
+  if (!this.selectedVehicle) {
+    this.routeError = 'Pumili muna ng transport vehicle.';
+    return;
   }
+
+  if (
+    this.routeLoading ||
+    this.distanceKm === null ||
+    !Number.isFinite(this.distanceKm) ||
+    this.distanceKm <= 0
+  ) {
+    this.routeError =
+      'Hintayin munang makuha ang valid road distance bago mag-estimate ng fare.';
+    return;
+  }
+
+  const vehicleId = Number(this.selectedVehicle.id);
+  const rule = this.fareRulesMap[vehicleId];
+
+  // Siguraduhing may fare rule para sa vehicle.
+  if (!rule) {
+    this.routeError =
+      'Walang fare rule para sa napiling vehicle. Tingnan ang admin fare rules.';
+    return;
+  }
+
+  // Kunin ang values mula sa fare rule na galing sa Laravel API.
+  const baseFare = this.toNumber(rule.base_fare);
+  const includedDistance = this.toNumber(
+    rule.included_distance_km
+  );
+  const ratePerKm = this.toNumber(rule.rate_per_km);
+  const minimumFare = this.toNumber(rule.minimum_fare);
+
+  const extraDistance = Math.max(
+    0,
+    this.distanceKm - includedDistance
+  );
+
+  const fare = Math.max(
+    minimumFare,
+    baseFare + extraDistance * ratePerKm
+  );
+
+  this.estimatedFareAmount =
+    Math.round((fare + Number.EPSILON) * 100) / 100;
+
+  // Separate calculation para sa fuel expense.
+  const efficiency = this.toNumber(
+    this.selectedVehicle.fuel_efficiency_km_per_liter
+  );
+
+  const fuelType = String(
+    this.selectedVehicle.fuel_type || ''
+  ).toLowerCase();
+
+  if (efficiency > 0 && !fuelType.includes('electric')) {
+    const fuelExpense =
+      (this.distanceKm / efficiency) * this.fuelPricePerLiter;
+
+    this.estimatedFuelExpense =
+      Math.round((fuelExpense + Number.EPSILON) * 100) / 100;
+  } else {
+    this.estimatedFuelExpense = null;
+  }
+
+  console.log('Fare calculation details:', {
+    vehicleId,
+    vehicleName: this.selectedVehicle.name,
+    distanceKm: this.distanceKm,
+    baseFare,
+    includedDistance,
+    ratePerKm,
+    minimumFare,
+    extraDistance,
+    estimatedFare: this.estimatedFareAmount,
+    source: 'fareRulesMap / Laravel API'
+  });
+
+  this.routeError = null;
+  this.successModal = true;
+  this.cdr.detectChanges();
+}
+
 
   closeModal(): void {
     this.successModal = false;
