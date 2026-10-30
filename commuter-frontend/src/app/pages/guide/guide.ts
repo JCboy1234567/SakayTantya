@@ -30,10 +30,6 @@ export class Guide {
     {
       q: 'How do I submit bug reports or feedback?',
       a: 'You can report any transit issues or app bugs directly through the Help Center support form below.'
-    },
-    {
-      q: 'Are discounts applicable for students and seniors?',
-      a: 'Yes! Authorized 20% discount rules apply for students, senior citizens, and PWDs upon presenting valid IDs to transport operators.'
     }
   ];
 
