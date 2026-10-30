@@ -27,8 +27,16 @@ export class AuthServices {
     return this.http.put(`${this.apiUrl}/users/${id}`, data, { headers });
   }
 
-  submitFeedback(data: { name: string; email: string; rating: number; comments: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/testing_feedback`, data);
+  submitFeedback(data: { name: string; email: string; rating: string; module_tested?: string; vehicle_plate?: string; comments: string }): Observable<any> {
+    const payload = {
+      tester_name: data.name,
+      email: data.email,
+      module_tested: data.module_tested || 'Help Center Ticket',
+      vehicle_plate: data.vehicle_plate || null,
+      rating: data.rating || 'Bug / Issue',
+      feedback_comments: data.comments
+    };
+    return this.http.post(`${this.apiUrl}/testing_feedback`, payload);
   }
 
   // Dynamic Fuel Prices API

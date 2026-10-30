@@ -1,4 +1,75 @@
-/* Login Custom Styles & Animations */
+/* Animated vehicles background */
+@keyframes driveRight {
+  0% { transform: translateX(-150px); }
+  100% { transform: translateX(110vw); }
+}
+
+@keyframes driveLeft {
+  0% { transform: translateX(110vw) scaleX(-1); }
+  100% { transform: translateX(-150px) scaleX(-1); }
+}
+
+.vehicle-lane {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  pointer-events: none;
+}
+
+.vehicle-svg {
+  position: absolute;
+  opacity: 0.35;
+  filter: drop-shadow(0 0 6px rgba(74, 222, 128, 0.4));
+}
+
+.vehicle-jeepney-1 {
+  animation: driveRight 10s linear infinite;
+}
+
+.vehicle-motorcycle-1 {
+  animation: driveRight 6s linear infinite;
+  animation-delay: 1.5s;
+}
+
+.vehicle-jeepney-2 {
+  animation: driveLeft 12s linear infinite;
+  animation-delay: 0.5s;
+}
+
+.vehicle-motorcycle-2 {
+  animation: driveLeft 7s linear infinite;
+  animation-delay: 3s;
+}
+
+.vehicle-tricycle-1 {
+  animation: driveRight 14s linear infinite;
+  animation-delay: 4s;
+}
+
+/* Road broken lane lines */
+.road-lane {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+.road-lane::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(74, 222, 128, 0.3) 0px,
+    rgba(74, 222, 128, 0.3) 20px,
+    transparent 20px,
+    transparent 45px
+  );
+}
+
 .modal-box {
   animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

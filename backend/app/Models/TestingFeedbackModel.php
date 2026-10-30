@@ -15,6 +15,7 @@ class TestingFeedbackModel extends Model
         'tester_name',
         'email',
         'module_tested',
+        'vehicle_plate',
         'rating',
         'feedback_comments',
         'status',

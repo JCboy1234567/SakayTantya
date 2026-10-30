@@ -1,7 +1,62 @@
 <div class="relative min-h-screen overflow-hidden bg-slate-50 text-slate-800">
+  <!-- Animated Vehicles & Motorcycles Background -->
+  <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="road-lane" style="top: 15%;"></div>
+    <div class="road-lane" style="top: 32%;"></div>
+    <div class="road-lane" style="top: 50%;"></div>
+    <div class="road-lane" style="top: 68%;"></div>
+    <div class="road-lane" style="top: 85%;"></div>
+
+    <!-- Jeepney 1 moving right -->
+    <div class="vehicle-lane" style="top: 12%;">
+      <svg class="vehicle-svg vehicle-jeepney-1 w-24 h-12 text-green-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10l-2-4H8L6 10l-2.5 1.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2"></path>
+        <circle cx="7" cy="17" r="2.5"></circle>
+        <circle cx="17" cy="17" r="2.5"></circle>
+      </svg>
+    </div>
+
+    <!-- Motorcycle 1 moving right -->
+    <div class="vehicle-lane" style="top: 29%;">
+      <svg class="vehicle-svg vehicle-motorcycle-1 w-14 h-7 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <circle cx="5" cy="17" r="3"></circle>
+        <circle cx="19" cy="17" r="3"></circle>
+        <path d="M2.5 9h5l3 4h4l3-4h3.5"></path>
+      </svg>
+    </div>
+
+    <!-- Jeepney 2 moving left -->
+    <div class="vehicle-lane" style="top: 47%;">
+      <svg class="vehicle-svg vehicle-jeepney-2 w-24 h-12 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10l-2-4H8L6 10l-2.5 1.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2"></path>
+        <circle cx="7" cy="17" r="2.5"></circle>
+        <circle cx="17" cy="17" r="2.5"></circle>
+      </svg>
+    </div>
+
+    <!-- Motorcycle 2 moving left -->
+    <div class="vehicle-lane" style="top: 65%;">
+      <svg class="vehicle-svg vehicle-motorcycle-2 w-14 h-7 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <circle cx="5" cy="17" r="3"></circle>
+        <circle cx="19" cy="17" r="3"></circle>
+        <path d="M2.5 9h5l3 4h4l3-4h3.5"></path>
+      </svg>
+    </div>
+
+    <!-- Tricycle moving right -->
+    <div class="vehicle-lane" style="top: 82%;">
+      <svg class="vehicle-svg vehicle-tricycle-1 w-20 h-10 text-emerald-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="17" r="3"></circle>
+        <circle cx="19" cy="17" r="2.5"></circle>
+        <path d="M5 11h9l3 6H5z"></path>
+        <path d="M5 11V7h5l2 4"></path>
+      </svg>
+    </div>
+  </div>
+
   <!-- Background decorations -->
-  <div class="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-green-200/30 blur-3xl"></div>
-  <div class="pointer-events-none absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-lime-200/20 blur-3xl"></div>
+  <div class="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-green-200/30 blur-3xl z-0"></div>
+  <div class="pointer-events-none absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-lime-200/20 blur-3xl z-0"></div>
 
   <!-- Header -->
   <header class="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-7 lg:px-12">
@@ -51,7 +106,7 @@
 
       <!-- Create Account Card -->
       <div class="w-full max-w-md justify-self-center">
-        <div class="rounded-3xl border border-slate-100 bg-white p-7 shadow-xl shadow-green-950/5 sm:p-10">
+        <div class="rounded-3xl border border-slate-200/80 bg-white/95 backdrop-blur-md p-7 shadow-xl shadow-green-950/5 sm:p-10">
 
           <!-- Card header -->
           <div class="mb-6 text-center">

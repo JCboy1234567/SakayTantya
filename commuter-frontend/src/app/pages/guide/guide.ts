@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideHelpCircle, LucideSend, LucideCheckCircle2, LucideLifeBuoy } from '@lucide/angular';
+import { LucideSend, LucideLifeBuoy, LucideShieldAlert, LucideLoader } from '@lucide/angular';
 import { AuthServices } from '../../core/services/auth.services';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -11,15 +11,15 @@ import { HttpErrorResponse } from '@angular/common/http';
   imports: [
     CommonModule,
     FormsModule,
-    LucideHelpCircle,
     LucideSend,
-    LucideCheckCircle2,
-    LucideLifeBuoy
+    LucideLifeBuoy,
+    LucideShieldAlert,
+    LucideLoader
   ],
   templateUrl: './guide.html',
   styleUrl: './guide.css',
 })
-export class Guide {
+export class Guide implements OnInit {
   isDarkMode = false;
 
   faqs = [
@@ -28,21 +28,22 @@ export class Guide {
       a: 'Fares are calculated using official LTFRB base rates plus distance-based tariff increments adjusted live for current fuel commodity prices.'
     },
     {
-      q: 'How do I submit bug reports or feedback?',
-      a: 'You can report any transit issues or app bugs directly through the Help Center support form below.'
+      q: 'How do I report a vehicle or driver?',
+      a: 'Use the Help Center support ticket form below. Enter the vehicle plate number or body number, select the violation type, and provide details for rapid admin review.'
     }
   ];
 
   // Help Center Support Form State
   userName = '';
   userEmail = '';
+  plateNumber = '';
   issueType = 'Overcharging / Fare Dispute';
   message = '';
   isSubmitting = false;
   successModal = false;
   errorMessage = '';
 
-  constructor(private authService: AuthServices) {}
+  constructor(private authService: AuthServices, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     const savedTheme = localStorage.getItem('theme');
@@ -67,36 +68,43 @@ export class Guide {
 
   submitSupportTicket() {
     this.errorMessage = '';
-    if (!this.userName || !this.userEmail || !this.message) {
-      this.errorMessage = 'Please fill in all support details before submitting.';
+    if (!this.message) {
+      this.errorMessage = 'Please describe your concern or report details.';
+      this.cdr.detectChanges();
       return;
     }
 
     this.isSubmitting = true;
+    this.cdr.detectChanges();
 
-    // Submit as testing feedback or support ticket to Laravel backend
     this.authService.submitFeedback({
-      name: this.userName,
-      email: this.userEmail,
-      rating: 5,
+      name: this.userName || 'Commuter',
+      email: this.userEmail || 'commuter@sakaytanya.test',
+      rating: 'Bug / Issue',
+      module_tested: 'Help Center Ticket',
+      vehicle_plate: this.plateNumber.trim() || undefined,
       comments: `[${this.issueType}] ${this.message}`
-    }).subscribe({
+    } as any).subscribe({
       next: () => {
         this.isSubmitting = false;
         this.successModal = true;
         this.message = '';
+        this.plateNumber = '';
+        this.cdr.detectChanges();
       },
       error: (err: HttpErrorResponse) => {
-        console.error('Support ticket submission error:', err);
-        // Even if offline or mock, show success modal for seamless UX
+        console.error('Support ticket submission or offline fallback:', err);
         this.isSubmitting = false;
         this.successModal = true;
         this.message = '';
+        this.plateNumber = '';
+        this.cdr.detectChanges();
       }
     });
   }
 
   closeModal() {
     this.successModal = false;
+    this.cdr.detectChanges();
   }
 }

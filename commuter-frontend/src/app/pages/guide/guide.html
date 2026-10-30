@@ -14,7 +14,7 @@
 
     <!-- Quick Cards Grid -->
     <div class="grid grid-cols-1">
-      
+
       <div [ngClass]="isDarkMode ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-[#e1e7dc] text-[#1d3025]'" class="border rounded-2xl p-5 shadow-sm space-y-2 transition-colors duration-300">
         <div class="text-green-600 dark:text-green-400 font-bold text-xs uppercase tracking-wider">🚌 Transport Safety</div>
         <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-xs leading-relaxed">Always ride designated public utility vehicles and inspect official fare matrices displayed inside.</p>
@@ -29,7 +29,7 @@
         </div>
         <div>
           <h3 class="text-xs md:text-sm font-bold">Help Center Support Ticket</h3>
-          <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-[10px] md:text-[11px]">Report transit issues, disputes, or inquiries</p>
+          <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-[10px] md:text-[11px]">Report transit issues, vehicle violations, or inquiries</p>
         </div>
       </div>
 
@@ -49,10 +49,28 @@
             class="w-full px-3 py-2.5 border rounded-xl text-xs focus:outline-none focus:ring-2 transition"
           >
             <option value="Overcharging / Fare Dispute">Overcharging / Fare Dispute</option>
+            <option value="Reckless Driving / Violation">Reckless Driving / Violation</option>
             <option value="Route Estimate Inaccuracy">Route Estimate Inaccuracy</option>
             <option value="Driver / Operator Conduct">Driver / Operator Conduct</option>
             <option value="General Inquiry / App Bug">General Inquiry / App Bug</option>
           </select>
+        </div>
+
+        <div>
+          <label [ngClass]="isDarkMode ? 'text-gray-300' : 'text-gray-600'" class="block text-[10px] md:text-xs font-semibold uppercase mb-1 tracking-wider">Vehicle Plate Number or Body Number (Optional)</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-500">
+              <svg lucideShieldAlert class="w-4 h-4"></svg>
+            </span>
+            <input
+              type="text"
+              [(ngModel)]="plateNumber"
+              name="plateNumber"
+              placeholder="e.g. ABC-1234 or Jeep #42"
+              [ngClass]="isDarkMode ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-600 focus:ring-green-600' : 'bg-gray-50 border-gray-200 text-[#1d3025] placeholder-gray-400 focus:ring-green-700'"
+              class="w-full pl-10 pr-4 py-2.5 border rounded-xl text-xs focus:outline-none focus:ring-2 transition"
+            />
+          </div>
         </div>
 
         <div>
@@ -71,10 +89,16 @@
         <button
           type="button"
           (click)="submitSupportTicket()"
-          class="w-full py-3 bg-[#155b32] hover:bg-[#104927] text-white font-semibold text-xs rounded-xl shadow-lg transition duration-200 flex items-center justify-center space-x-2 cursor-pointer"
+          [disabled]="isSubmitting"
+          class="w-full py-3 bg-[#155b32] hover:bg-[#104927] text-white font-semibold text-xs rounded-xl shadow-lg transition duration-200 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
         >
-          <svg lucideSend class="w-4 h-4"></svg>
-          <span>Submit Support Ticket</span>
+          @if (isSubmitting) {
+            <svg lucideLoader class="w-4 h-4 animate-spin text-white"></svg>
+            <span>Submitting Ticket & Notifying Admin...</span>
+          } @else {
+            <svg lucideSend class="w-4 h-4"></svg>
+            <span>Submit Support Ticket</span>
+          }
         </button>
       </div>
     </div>
@@ -99,11 +123,11 @@
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in p-4">
       <div [ngClass]="isDarkMode ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-[#e1e7dc] text-[#1d3025]'" class="w-full max-w-sm border rounded-2xl shadow-2xl p-6 text-center space-y-4">
         <div class="w-16 h-16 bg-green-950 text-green-400 rounded-full flex items-center justify-center mx-auto border border-green-800 shadow-inner">
-          <svg lucideCheckCircle2 class="w-10 h-10 text-green-400 animate-bounce"></svg>
+          <svg lucideLifeBuoy class="w-10 h-10 text-green-400 animate-bounce"></svg>
         </div>
         <div class="space-y-1">
-          <h3 class="text-lg font-bold">Ticket Submitted!</h3>
-          <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-xs">Your support inquiry has been successfully sent to our dispatch & admin team.</p>
+          <h3 class="text-lg font-bold">Ticket Submitted & Admin Notified!</h3>
+          <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="text-xs">Your support inquiry, vehicle report, and concern have been successfully dispatched to the admin dashboard.</p>
         </div>
         <div class="pt-2">
           <button
