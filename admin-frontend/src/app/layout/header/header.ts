@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import {
   LucideMenu,
@@ -7,7 +7,13 @@ import {
   LucideChevronDown,
   LucideSettings,
   LucideLogOut,
+  LucideShieldAlert,
+  LucideMessageSquare,
+  LucideClock
 } from '@lucide/angular';
+import { FareService } from '../../core/services/fare.service';
+import { Subscription, interval } from 'rxjs';
+import { startWith, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-header',
@@ -21,16 +27,23 @@ import {
     LucideChevronDown,
     LucideSettings,
     LucideLogOut,
+    LucideShieldAlert,
+    LucideMessageSquare,
+    LucideClock
   ],
   templateUrl: './header.html',
 })
-export class Header implements OnInit {
+export class Header implements OnInit, OnDestroy {
   today = new Date();
   userName = 'Admin';
   userInitial = 'A';
   showLogoutModal = false;
 
-  constructor(private router: Router) {}
+  recentFeedbacks: any[] = [];
+  unreadCount = 0;
+  private pollSub?: Subscription;
+
+  constructor(private router: Router, private fareService: FareService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     const userJson = localStorage.getItem('user');
@@ -45,6 +58,92 @@ export class Header implements OnInit {
         console.error('Failed to parse user from localStorage', e);
       }
     }
+
+    // Real-time polling every 5 seconds so notifications appear instantly without refreshing
+    this.pollSub = interval(5000).pipe(
+      startWith(0),
+      switchMap(() => this.fareService.getTestingFeedback())
+    ).subscribe({
+      next: (res: any) => {
+        const list = res.data || res || [];
+        const pending = list.filter((item: any) => !item.status || item.status === 'Pending Review');
+        this.unreadCount = pending.length;
+        this.recentFeedbacks = pending.slice(0, 5);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to poll feedback notifications', err);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.pollSub) {
+      this.pollSub.unsubscribe();
+    }
+  }
+
+  onNotificationClick(item: any): void {
+    if (!item.status || item.status === 'Pending Review') {
+      this.fareService.updateTestingFeedback(item.id, {
+        tester_name: item.tester_name,
+        email: item.email,
+        module_tested: item.module_tested,
+        vehicle_plate: item.vehicle_plate,
+        rating: item.rating,
+        feedback_comments: item.feedback_comments,
+        status: 'In Progress'
+      }).subscribe({
+        next: () => {
+          // Immediately reload notifications after update
+          this.fareService.getTestingFeedback().subscribe((res: any) => {
+            const list = res.data || res || [];
+            const pending = list.filter((i: any) => !i.status || i.status === 'Pending Review');
+            this.unreadCount = pending.length;
+            this.recentFeedbacks = pending.slice(0, 5);
+            this.cdr.detectChanges();
+          });
+          this.router.navigate(['/testing-feedback']);
+        },
+        error: (err) => {
+          console.error('Failed to update status', err);
+          this.router.navigate(['/testing-feedback']);
+        }
+      });
+    } else {
+      this.router.navigate(['/testing-feedback']);
+    }
+  }
+
+  markAllAsRead(): void {
+    this.recentFeedbacks.forEach(item => {
+      if (!item.status || item.status === 'Pending Review') {
+        this.fareService.updateTestingFeedback(item.id, {
+          tester_name: item.tester_name,
+          email: item.email,
+          module_tested: item.module_tested,
+          vehicle_plate: item.vehicle_plate,
+          rating: item.rating,
+          feedback_comments: item.feedback_comments,
+          status: 'In Progress'
+        }).subscribe({
+          next: () => {
+            this.fareService.getTestingFeedback().subscribe((res: any) => {
+              const list = res.data || res || [];
+              const pending = list.filter((i: any) => !i.status || i.status === 'Pending Review');
+              this.unreadCount = pending.length;
+              this.recentFeedbacks = pending.slice(0, 5);
+              this.cdr.detectChanges();
+            });
+          },
+          error: (e) => console.error('Failed to update status', e)
+        });
+      }
+    });
+    this.unreadCount = 0;
+    this.recentFeedbacks = [];
+    this.cdr.detectChanges();
+    this.router.navigate(['/testing-feedback']);
   }
 
   openLogoutModal(): void {
