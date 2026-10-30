@@ -590,27 +590,27 @@
     </div>
   }
 
-  <!-- FARE ESTIMATE MODAL -->
+  <!-- SIMPLE & FRIENDLY FARE ESTIMATE MODAL -->
   @if (successModal) {
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
       <div
         [ngClass]="isDarkMode
           ? 'border-gray-800 bg-gray-900 text-gray-100'
           : 'border-[#e1e7dc] bg-white text-[#1d3025]'"
-        class="w-full max-w-sm space-y-4 rounded-2xl border p-6 text-center shadow-2xl"
+        class="w-full max-w-sm space-y-4 rounded-2xl border p-5 text-center shadow-2xl max-h-[90vh] overflow-y-auto"
       >
         <div
-          class="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-green-800 bg-green-950 text-green-400"
+          class="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-green-800 bg-green-950 text-green-400"
         >
-          <svg lucideCheck class="h-8 w-8 text-green-400"></svg>
+          <svg lucideCheck class="h-7 w-7 text-green-400"></svg>
         </div>
 
         <div class="space-y-1">
-          <h3 class="text-lg font-bold">Fare Estimated!</h3>
+          <h3 class="text-base font-bold">Fare Estimation Summary</h3>
 
           <p
             [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'"
-            class="text-xs"
+            class="text-[11px]"
           >
             Vehicle:
             <span
@@ -627,18 +627,18 @@
           [ngClass]="isDarkMode
             ? 'border-green-800/60 bg-green-950/40'
             : 'border-green-200 bg-green-50'"
-          class="space-y-1 rounded-xl border p-4"
+          class="space-y-1 rounded-xl border p-3.5"
         >
           <p
             [ngClass]="isDarkMode ? 'text-green-400' : 'text-green-800'"
-            class="text-[10px] font-bold uppercase"
+            class="text-[9px] font-bold uppercase"
           >
             Total Calculated Fare
           </p>
 
           <p
             [ngClass]="isDarkMode ? 'text-green-300' : 'text-green-800'"
-            class="text-3xl font-extrabold"
+            class="text-2xl font-extrabold"
           >
             ₱{{ estimatedFareAmount?.toFixed(2) }}
           </p>
@@ -651,39 +651,34 @@
           </p>
         </div>
 
-        <!-- FUEL EXPENSE -->
+        <!-- USER-FRIENDLY EXPLANATION -->
         <div
-          [ngClass]="isDarkMode
-            ? 'border-gray-800'
-            : 'border-gray-200'"
-          class="space-y-2 rounded-xl border p-3 text-left"
+          [ngClass]="isDarkMode ? 'border-gray-800 bg-gray-950' : 'border-gray-200 bg-gray-50'"
+          class="space-y-2.5 rounded-xl border p-3 text-left text-[11px]"
         >
-          <div class="flex justify-between gap-3 text-xs">
-            <span
-              [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'"
-            >
-              Estimated fuel expense
-            </span>
-
-            <strong
-              [ngClass]="isDarkMode ? 'text-green-400' : 'text-green-700'"
-            >
-              @if (estimatedFuelExpense !== null) {
-                ₱{{ estimatedFuelExpense.toFixed(2) }}
-              } @else {
-                N/A for electric vehicle
-              }
-            </strong>
-          </div>
-
-          <p
-            [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'"
-            class="text-[9px] leading-relaxed"
-          >
-            Uses {{ fuelPriceLabel }} as a reference price and the selected
-            vehicle's km/L value. This is separate from the passenger fare
-            and is not a live fuel price.
+          <p class="font-bold text-xs border-b pb-1" [ngClass]="isDarkMode ? 'border-gray-800 text-green-400' : 'border-gray-200 text-green-800'">
+            How we computed this:
           </p>
+
+          <div class="space-y-1.5 leading-relaxed" [ngClass]="isDarkMode ? 'text-gray-300' : 'text-gray-600'">
+            <p>
+              • <strong>Standard Fare:</strong> ₱{{ calcDetails.standardFare.toFixed(2) }} (Based on base fare + distance).
+            </p>
+            @if (calcDetails.fuelAdjustment > 0) {
+              <p>
+                • <strong>Fuel Adjustment:</strong> +₱{{ calcDetails.fuelAdjustment.toFixed(2) }} added because current fuel (₱{{ fuelPricePerLiter }}/L) is higher than the baseline (₱{{ baselineFuelPrice }}/L).
+              </p>
+            } @else {
+              <p>
+                • <strong>Fuel Adjustment:</strong> None (Fuel prices are at or below baseline).
+              </p>
+            }
+            @if (estimatedFuelExpense !== null) {
+              <p>
+                • <strong>Estimated Fuel Cost:</strong> ₱{{ estimatedFuelExpense.toFixed(2) }} (Consumes ~{{ calcDetails.litersConsumed.toFixed(2) }} liters for this trip).
+              </p>
+            }
+          </div>
         </div>
 
         <button

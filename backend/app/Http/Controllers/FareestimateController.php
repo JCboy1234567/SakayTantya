@@ -24,7 +24,7 @@ class FareestimateController extends Controller
     }
 
     /**
-     * Calculate and store a fare estimate dynamically based on vehicle, distance, and live fuel prices.
+     * Calculate and store a fare estimate dynamically based on vehicle, distance, and weighted fuel index.
      */
     public function store(Request $request): JsonResponse
     {
@@ -47,6 +47,7 @@ class FareestimateController extends Controller
         $baseFare = $fareRule ? (float) $fareRule->base_fare : 13.00;
         $includedKm = $fareRule ? (float) $fareRule->included_distance_km : 4.00;
         $ratePerKm = $fareRule ? (float) $fareRule->rate_per_km : 2.20;
+        $minimumFare = $fareRule ? (float) ($fareRule->minimum_fare ?? $baseFare) : 13.00;
         $distance = (float) $validated['distance_km'];
 
         // Distance charge calculation
@@ -55,7 +56,9 @@ class FareestimateController extends Controller
             $distanceCharge = ($distance - $includedKm) * $ratePerKm;
         }
 
-        // 2. Get Fuel Price & Efficiency for precise gasoline/diesel dependent calculation
+        $standardFare = $baseFare + $distanceCharge;
+
+        // 2. Get Fuel Price & Efficiency
         $fuelPriceRecord = FuelPrice::where('fuel_type', 'like', '%' . $vehicle->fuel_type . '%')->latest()->first();
         $currentFuelPrice = $fuelPriceRecord ? (float) $fuelPriceRecord->price_per_liter : 60.00;
         $fuelEfficiency = (float) ($vehicle->fuel_efficiency_km_per_liter ?? 10.00);
@@ -64,18 +67,26 @@ class FareestimateController extends Controller
         $estimatedLiters = $fuelEfficiency > 0 ? round($distance / $fuelEfficiency, 4) : 0.00;
         $estimatedFuelCost = round($estimatedLiters * $currentFuelPrice, 2);
 
-        // Gasoline-dependent adjustment: Proportion of fuel cost factored into base/per-km fare
-        // (e.g. baseline fuel price assumed 60.00 PHP/L)
-        $baselineFuelPrice = 60.00;
+        // 3. Weighted Fuel-Indexed Calculation
+        // F_adjusted = max(MinimumFare, StandardFare * FuelFactor)
+        // FuelFactor = 1 + W_f * ((CurrentFuelPrice / BaselineFuelPrice) - 1)
+        $baselineFuelPrice = 50.00; // Baseline reference price
+        $fuelWeight = 0.35;         // 35% fuel component weight
+
+        $fuelFactor = 1.0;
+        $effectiveMultiplier = 1.0;
         $adjustmentAmount = 0.00;
-        if ($currentFuelPrice > $baselineFuelPrice && $fuelEfficiency > 0) {
-            $priceDiff = $currentFuelPrice - $baselineFuelPrice;
-            $adjustmentAmount = round(($priceDiff / $fuelEfficiency) * ($distance * 0.15), 2);
+
+        if ($currentFuelPrice > 0 && $baselineFuelPrice > 0) {
+            $fuelFactor = $currentFuelPrice / $baselineFuelPrice;
+            $effectiveMultiplier = 1.0 + $fuelWeight * ($fuelFactor - 1.0);
         }
 
-        $estimatedFare = round($baseFare + $distanceCharge + $adjustmentAmount, 2);
+        $rawAdjustedFare = $standardFare * $effectiveMultiplier;
+        $estimatedFare = max($minimumFare, round($rawAdjustedFare, 2));
+        $adjustmentAmount = round($estimatedFare - $standardFare, 2);
 
-        // 3. Save Fare Estimate
+        // 4. Save Fare Estimate
         $fareEstimate = FareEstimate::create([
             'user_id' => $validated['user_id'] ?? ($request->user() ? $request->user()->id : 1),
             'vehicle_id' => $vehicle->id,
@@ -93,7 +104,7 @@ class FareestimateController extends Controller
             'estimated_fare' => $estimatedFare,
         ]);
 
-        // 4. Save Fuel Cost Estimate Record (linking fare estimate and fuel price)
+        // 5. Save Fuel Cost Estimate Record
         if ($fuelPriceRecord) {
             FuelcostEstimate::create([
                 'fare_estimates_id' => $fareEstimate->id,
@@ -107,12 +118,15 @@ class FareestimateController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Fare calculated successfully with live gasoline/fuel pricing factors.',
+            'message' => 'Fare calculated successfully with weighted fuel-indexed pricing formula.',
             'data' => [
                 'estimate' => $fareEstimate,
                 'vehicle_name' => $vehicle->vehicle_name,
                 'fuel_type' => $vehicle->fuel_type,
                 'current_fuel_price_per_liter' => $currentFuelPrice,
+                'baseline_fuel_price' => $baselineFuelPrice,
+                'fuel_weight' => $fuelWeight,
+                'effective_multiplier' => round($effectiveMultiplier, 4),
                 'fuel_efficiency_km_per_liter' => $fuelEfficiency,
                 'base_fare' => $baseFare,
                 'distance_charge' => round($distanceCharge, 2),
