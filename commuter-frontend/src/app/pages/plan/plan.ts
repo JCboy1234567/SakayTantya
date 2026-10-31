@@ -77,17 +77,11 @@ interface PhotonFeature {
     CommonModule,
     FormsModule,
     LucideMapPin,
-    LucideCircleDot,
     LucideChevronRight,
-    LucideMap,
     LucideArrowRight,
     LucideFuel,
     LucideArrowUpRight,
-    LucideClock,
-    LucideInfo,
     LucideRotateCcw,
-    LucideBus,
-    LucideCar,
     LucideCheck,
     LucideSearch,
     LucideX,
@@ -156,6 +150,7 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
 
   mapLoading = true;
   routeLoading = false;
+  isCalculatingFare = false;
   routeError: string | null = null;
   distanceKm: number | null = null;
 
@@ -836,84 +831,94 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    const vehicleId = Number(this.selectedVehicle.id);
-    const rule = this.fareRulesMap[vehicleId];
-
-    if (!rule) {
-      this.routeError = 'Walang fare rule para sa napiling vehicle.';
-      return;
-    }
-
-    const baseFare = this.toNumber(rule.base_fare);
-    const includedDistance = this.toNumber(rule.included_distance_km);
-    const ratePerKm = this.toNumber(rule.rate_per_km);
-    const minimumFare = this.toNumber(rule.minimum_fare);
-
-    const extraDistance = Math.max(0, this.distanceKm - includedDistance);
-    const standardFare = baseFare + extraDistance * ratePerKm;
-
-    // Apply weighted fuel-indexed formula:
-    // FuelFactor = CurrentFuel / BaselineFuel
-    // EffectiveMultiplier = 1 + FuelWeight * (FuelFactor - 1)
-    const fuelFactor = this.fuelPricePerLiter / this.baselineFuelPrice;
-    const effectiveMultiplier = 1.0 + this.fuelWeight * (fuelFactor - 1.0);
-
-    const rawAdjustedFare = standardFare * effectiveMultiplier;
-    this.estimatedFareAmount = Math.max(
-      minimumFare,
-      Math.round((rawAdjustedFare + Number.EPSILON) * 100) / 100
-    );
-
-    // Save calculation metrics for display in the modal
-    const fuelAdjustment = Math.round((this.estimatedFareAmount - standardFare) * 100) / 100;
-    const efficiency = this.toNumber(this.selectedVehicle.fuel_efficiency_km_per_liter);
-    const liters = efficiency > 0 ? this.distanceKm / efficiency : 0;
-
-    this.calcDetails = {
-      standardFare: Math.round((standardFare + Number.EPSILON) * 100) / 100,
-      fuelFactor: Math.round((fuelFactor + Number.EPSILON) * 1000) / 1000,
-      effectiveMultiplier: Math.round((effectiveMultiplier + Number.EPSILON) * 1000) / 1000,
-      fuelAdjustment: fuelAdjustment,
-      litersConsumed: Math.round((liters + Number.EPSILON) * 1000) / 1000
-    };
-
-    // Also persist/send to backend API if needed
-    const token = localStorage.getItem('token');
-    const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
-
-    this.http.post('http://127.0.0.1:8000/api/fare_estimates', {
-      vehicle_id: vehicleId,
-      pickup_name: this.pickupLocation,
-      pickup_latitude: this.pickupCoords[0],
-      pickup_longitude: this.pickupCoords[1],
-      destination_name: this.destinationLocation,
-      destination_latitude: this.destinationCoords[0],
-      destination_longitude: this.destinationCoords[1],
-      distance_km: this.distanceKm
-    }, { headers }).subscribe({
-      next: (res: any) => {
-        if (res?.data?.total_fare) {
-          this.estimatedFareAmount = Number(res.data.total_fare);
-        }
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.warn('Backend fare estimate sync fallback used local calculation:', err);
-      }
-    });
-
-    const fuelType = String(this.selectedVehicle.fuel_type || '').toLowerCase();
-
-    if (efficiency > 0 && !fuelType.includes('electric')) {
-      const fuelExpense = liters * this.fuelPricePerLiter;
-      this.estimatedFuelExpense = Math.round((fuelExpense + Number.EPSILON) * 100) / 100;
-    } else {
-      this.estimatedFuelExpense = null;
-    }
-
+    this.isCalculatingFare = true;
     this.routeError = null;
-    this.successModal = true;
     this.cdr.detectChanges();
+
+    setTimeout(() => {
+      const vehicleId = Number(this.selectedVehicle.id);
+      const rule = this.fareRulesMap[vehicleId];
+
+      if (!rule) {
+        this.isCalculatingFare = false;
+        this.routeError = 'Walang fare rule para sa napiling vehicle.';
+        this.cdr.detectChanges();
+        return;
+      }
+
+      const baseFare = this.toNumber(rule.base_fare);
+      const includedDistance = this.toNumber(rule.included_distance_km);
+      const ratePerKm = this.toNumber(rule.rate_per_km);
+      const minimumFare = this.toNumber(rule.minimum_fare);
+
+      const currentDistance = this.distanceKm ?? 0;
+      const extraDistance = Math.max(0, currentDistance - includedDistance);
+      const standardFare = baseFare + extraDistance * ratePerKm;
+
+      // Apply weighted fuel-indexed formula:
+      // FuelFactor = CurrentFuel / BaselineFuel
+      // EffectiveMultiplier = 1 + FuelWeight * (FuelFactor - 1)
+      const fuelFactor = this.fuelPricePerLiter / this.baselineFuelPrice;
+      const effectiveMultiplier = 1.0 + this.fuelWeight * (fuelFactor - 1.0);
+
+      const rawAdjustedFare = standardFare * effectiveMultiplier;
+      this.estimatedFareAmount = Math.max(
+        minimumFare,
+        Math.round((rawAdjustedFare + Number.EPSILON) * 100) / 100
+      );
+
+      // Save calculation metrics for display in the modal
+      const fuelAdjustment = Math.round((this.estimatedFareAmount - standardFare) * 100) / 100;
+      const efficiency = this.toNumber(this.selectedVehicle.fuel_efficiency_km_per_liter);
+      const liters = efficiency > 0 ? currentDistance / efficiency : 0;
+
+      this.calcDetails = {
+        standardFare: Math.round((standardFare + Number.EPSILON) * 100) / 100,
+        fuelFactor: Math.round((fuelFactor + Number.EPSILON) * 1000) / 1000,
+        effectiveMultiplier: Math.round((effectiveMultiplier + Number.EPSILON) * 1000) / 1000,
+        fuelAdjustment: fuelAdjustment,
+        litersConsumed: Math.round((liters + Number.EPSILON) * 1000) / 1000
+      };
+
+      // Also persist/send to backend API if needed
+      const token = localStorage.getItem('token');
+      const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
+
+      this.http.post('http://127.0.0.1:8000/api/fare_estimates', {
+        vehicle_id: vehicleId,
+        pickup_name: this.pickupLocation,
+        pickup_latitude: this.pickupCoords[0],
+        pickup_longitude: this.pickupCoords[1],
+        destination_name: this.destinationLocation,
+        destination_latitude: this.destinationCoords[0],
+        destination_longitude: this.destinationCoords[1],
+        distance_km: this.distanceKm
+      }, { headers }).subscribe({
+        next: (res: any) => {
+          if (res?.data?.total_fare) {
+            this.estimatedFareAmount = Number(res.data.total_fare);
+          }
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.warn('Backend fare estimate sync fallback used local calculation:', err);
+        }
+      });
+
+      const fuelType = String(this.selectedVehicle.fuel_type || '').toLowerCase();
+
+      if (efficiency > 0 && !fuelType.includes('electric')) {
+        const fuelExpense = liters * this.fuelPricePerLiter;
+        this.estimatedFuelExpense = Math.round((fuelExpense + Number.EPSILON) * 100) / 100;
+      } else {
+        this.estimatedFuelExpense = null;
+      }
+
+      this.isCalculatingFare = false;
+      this.routeError = null;
+      this.successModal = true;
+      this.cdr.detectChanges();
+    }, 600);
   }
 
   closeModal(): void {
