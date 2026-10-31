@@ -206,10 +206,10 @@ export class Overview implements OnInit {
     if (list.length === 0) return '20,100 548,100';
     const slice = list.slice(-7);
 
-    // Fixed scale 50 to 100 for y-axis
-    const minVal = 50;
+    // Dynamic scale starting from 0 to 100 PHP
+    const minVal = 0;
     const maxVal = 100;
-    const range = maxVal - minVal; // 50
+    const range = maxVal - minVal;
 
     return slice
       .map((point: any, index: number) => {
@@ -311,14 +311,14 @@ export class Overview implements OnInit {
       ];
     }
     const slice = list.slice(-7);
-    const minVal = 50;
+    const minVal = 0;
     const maxVal = 100;
     const range = maxVal - minVal;
 
     return slice.map((item: any, index: number) => {
       const val = Number(item.price_per_liter) || 60;
       const x = slice.length === 1 ? 284 : 20 + index * (528 / (slice.length - 1));
-      const clampedVal = Math.max(50, Math.min(100, val));
+      const clampedVal = Math.max(0, Math.min(100, val));
       const y = 115 - ((clampedVal - minVal) / range) * 95;
 
       let formattedDate = 'Recent';

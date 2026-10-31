@@ -160,11 +160,34 @@
         Are you sure you want to sign out from your admin account? You will need to re-enter your credentials to access the dashboard.
       </p>
       <div class="flex items-center justify-center gap-3 mt-6">
-        <button (click)="closeLogoutModal()" class="btn btn-ghost px-6">Cancel</button>
-        <button (click)="confirmLogout()" class="btn btn-error text-white px-6 gap-2 shadow-lg shadow-error/20">
-          <svg lucideLogOut class="w-4 h-4"></svg>
-          Yes, Sign Out
+        <button (click)="closeLogoutModal()" [disabled]="isLoggingOut" class="btn btn-ghost px-6">Cancel</button>
+        <button (click)="confirmLogout()" [disabled]="isLoggingOut" class="btn btn-error text-white px-6 gap-2 shadow-lg shadow-error/20 flex items-center justify-center">
+          @if (isLoggingOut) {
+            <span class="loading loading-spinner loading-sm text-white"></span>
+            <span>Logging out...</span>
+          } @else {
+            <svg lucideLogOut class="w-4 h-4"></svg>
+            <span>Yes, Sign Out</span>
+          }
         </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- SUCCESS LOGOUT MODAL -->
+@if (showLogoutSuccessModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/60">
+    <div class="bg-white text-slate-800 border border-slate-200 max-w-sm w-full rounded-3xl shadow-2xl p-8 text-center animate-[modalPop_0.25s_cubic-bezier(0.16,1,0.3,1)_forwards]">
+      <div class="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-green-100 text-green-700">
+        <svg lucideShieldCheck class="size-9"></svg>
+      </div>
+      <h3 class="text-2xl font-bold text-green-950">Successfully Signed Out</h3>
+      <p class="py-3 text-sm text-base-content/60">
+        You have been signed out securely. Redirecting to login...
+      </p>
+      <div class="mt-4 flex justify-center">
+        <span class="loading loading-spinner loading-md text-green-700"></span>
       </div>
     </div>
   </div>
