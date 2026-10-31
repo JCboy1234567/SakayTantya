@@ -9,7 +9,8 @@ import {
   LucideLogOut,
   LucideShieldAlert,
   LucideMessageSquare,
-  LucideClock
+  LucideClock,
+  LucideShieldCheck
 } from '@lucide/angular';
 import { FareService } from '../../core/services/fare.service';
 import { Subscription, interval } from 'rxjs';
@@ -29,7 +30,8 @@ import { startWith, switchMap } from 'rxjs/operators';
     LucideLogOut,
     LucideShieldAlert,
     LucideMessageSquare,
-    LucideClock
+    LucideClock,
+    LucideShieldCheck
   ],
   templateUrl: './header.html',
 })
@@ -38,6 +40,8 @@ export class Header implements OnInit, OnDestroy {
   userName = 'Admin';
   userInitial = 'A';
   showLogoutModal = false;
+  isLoggingOut = false;
+  showLogoutSuccessModal = false;
 
   recentFeedbacks: any[] = [];
   unreadCount = 0;
@@ -155,8 +159,20 @@ export class Header implements OnInit, OnDestroy {
   }
 
   confirmLogout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    this.router.navigate(['/login']);
+    this.isLoggingOut = true;
+    this.showLogoutModal = false;
+    this.cdr.detectChanges();
+
+    setTimeout(() => {
+      this.isLoggingOut = false;
+      this.showLogoutSuccessModal = true;
+      this.cdr.detectChanges();
+
+      setTimeout(() => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        this.router.navigate(['/login']);
+      }, 1500);
+    }, 400);
   }
 }
