@@ -148,23 +148,49 @@ export class Settings implements OnInit {
   }
 
   saveNotificationPreferences(): void {
+    if (!this.userId) {
+      this.successModalTitle = 'Error';
+      this.successModalText = 'User ID not found. Please log in again.';
+      this.showSuccessModal = true;
+      this.cdr.detectChanges();
+      return;
+    }
+
     this.isSaving = true;
     this.cdr.detectChanges();
 
-    const prefs = {
-      emailNotifications: this.emailNotifications,
-      systemAlerts: this.systemAlerts,
-      feedbackAlerts: this.feedbackAlerts
+    const payload = {
+      email_notifications: this.emailNotifications,
+      system_alerts: this.systemAlerts,
+      feedback_alerts: this.feedbackAlerts
     };
-    localStorage.setItem('notification_prefs', JSON.stringify(prefs));
 
-    setTimeout(() => {
-      this.isSaving = false;
-      this.successModalTitle = 'Preferences Saved!';
-      this.successModalText = 'Your notification preferences have been updated successfully.';
-      this.showSuccessModal = true;
-      this.cdr.detectChanges();
-    }, 600);
+    // Call backend API to save preferences
+    this.fareService.updateNotificationPreferences(this.userId, payload).subscribe({
+      next: () => {
+        // Also save to localStorage for instant UI updates
+        const prefs = {
+          emailNotifications: this.emailNotifications,
+          systemAlerts: this.systemAlerts,
+          feedbackAlerts: this.feedbackAlerts
+        };
+        localStorage.setItem('notification_prefs', JSON.stringify(prefs));
+
+        this.isSaving = false;
+        this.successModalTitle = 'Preferences Saved!';
+        this.successModalText = 'Your notification preferences have been updated successfully.';
+        this.showSuccessModal = true;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error updating notification preferences:', err);
+        this.isSaving = false;
+        this.successModalTitle = 'Error';
+        this.successModalText = err.error?.message || 'Failed to save notification preferences.';
+        this.showSuccessModal = true;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   // Password Modal

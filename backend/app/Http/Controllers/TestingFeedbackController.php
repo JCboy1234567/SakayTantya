@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\TestingFeedbackModel;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class TestingFeedbackController extends Controller
 {
@@ -44,6 +47,9 @@ class TestingFeedbackController extends Controller
             'feedback_comments' => $validated['feedback_comments'],
             'status' => $validated['status'] ?? 'Pending Review',
         ]);
+
+        // Send email notification to admins with email_notifications enabled
+        $this->sendFeedbackEmail($feedback);
 
         return response()->json([
             'success' => true,
@@ -105,5 +111,47 @@ class TestingFeedbackController extends Controller
             'success' => true,
             'message' => 'Feedback deleted successfully'
         ], 200);
+    }
+
+    /**
+     * Send email notification to admins when new feedback is submitted.
+     */
+    protected function sendFeedbackEmail(TestingFeedbackModel $feedback): void
+    {
+        try {
+            // Get all admins with email_notifications enabled
+            $admins = User::where('role', 'admin')
+                ->where('email_notifications', true)
+                ->get();
+
+            if ($admins->isEmpty()) {
+                Log::info('No admins with email notifications enabled');
+                return;
+            }
+
+            foreach ($admins as $admin) {
+                Mail::raw(
+                    "Hello {$admin->name},\n\n" .
+                    "A new testing feedback has been submitted:\n\n" .
+                    "Tester: {$feedback->tester_name}\n" .
+                    "Email: {$feedback->email}\n" .
+                    "Module Tested: {$feedback->module_tested}\n" .
+                    "Vehicle Plate: " . ($feedback->vehicle_plate ?? 'N/A') . "\n" .
+                    "Rating: {$feedback->rating}\n" .
+                    "Comments: {$feedback->feedback_comments}\n\n" .
+                    "Please review it in the admin dashboard.\n\n" .
+                    "Best regards,\nSakayTantya Team",
+                    function ($message) use ($admin, $feedback) {
+                        $message->to($admin->email)
+                            ->subject('New Testing Feedback Submitted - SakayTantya')
+                            ->replyTo($feedback->email, $feedback->tester_name);
+                    }
+                );
+
+                Log::info("Feedback email sent to: {$admin->email}");
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send feedback email: ' . $e->getMessage());
+        }
     }
 }

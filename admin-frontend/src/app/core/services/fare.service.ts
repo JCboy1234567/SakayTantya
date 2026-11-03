@@ -145,4 +145,17 @@ export class FareService {
       headers: this.getAuthHeaders()
     });
   }
+
+  // Notification Preferences
+  updateNotificationPreferences(id: number, preferences: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/users/${id}/notification-preferences`, preferences, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  getNotificationPreferences(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/users/${id}/notification-preferences`, {
+      headers: this.getAuthHeaders()
+    });
+  }
 }
