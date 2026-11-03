@@ -45,7 +45,11 @@ export class Header implements OnInit, OnDestroy {
 
   recentFeedbacks: any[] = [];
   unreadCount = 0;
+  private previousUnreadCount = 0;
+  private isFirstLoad = true;
   private pollSub?: Subscription;
+  private soundInterval?: any;
+  private audioCtx?: AudioContext;
 
   constructor(private router: Router, private fareService: FareService, private cdr: ChangeDetectorRef) {}
 
@@ -73,6 +77,15 @@ export class Header implements OnInit, OnDestroy {
         const pending = list.filter((item: any) => !item.status || item.status === 'Pending Review');
         this.unreadCount = pending.length;
         this.recentFeedbacks = pending.slice(0, 5);
+
+        if (!this.isFirstLoad && this.unreadCount > this.previousUnreadCount) {
+          this.startBellLoop();
+        } else if (this.unreadCount === 0) {
+          this.stopBellLoop();
+        }
+
+        this.previousUnreadCount = this.unreadCount;
+        this.isFirstLoad = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -84,6 +97,52 @@ export class Header implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.pollSub) {
       this.pollSub.unsubscribe();
+    }
+    this.stopBellLoop();
+  }
+
+  private startBellLoop(): void {
+    if (this.soundInterval) {
+      return; // Already looping
+    }
+    this.playBellTone();
+    this.soundInterval = setInterval(() => {
+      this.playBellTone();
+    }, 1500); // Rings every 1.5 seconds
+  }
+
+  private stopBellLoop(): void {
+    if (this.soundInterval) {
+      clearInterval(this.soundInterval);
+      this.soundInterval = null;
+    }
+  }
+
+  private playBellTone(): void {
+    try {
+      if (!this.audioCtx) {
+        this.audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      if (this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume();
+      }
+      const osc = this.audioCtx.createOscillator();
+      const gain = this.audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, this.audioCtx.currentTime); // A5 note
+      osc.frequency.exponentialRampToValueAtTime(440, this.audioCtx.currentTime + 0.4);
+
+      gain.gain.setValueAtTime(0.3, this.audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.6);
+
+      osc.connect(gain);
+      gain.connect(this.audioCtx.destination);
+
+      osc.start();
+      osc.stop(this.audioCtx.currentTime + 0.6);
+    } catch (e) {
+      console.warn('AudioContext failed to play notification sound', e);
     }
   }
 
@@ -105,6 +164,11 @@ export class Header implements OnInit, OnDestroy {
             const pending = list.filter((i: any) => !i.status || i.status === 'Pending Review');
             this.unreadCount = pending.length;
             this.recentFeedbacks = pending.slice(0, 5);
+            
+            if (this.unreadCount === 0) {
+              this.stopBellLoop();
+            }
+            
             this.cdr.detectChanges();
           });
           this.router.navigate(['/testing-feedback']);
@@ -137,6 +201,9 @@ export class Header implements OnInit, OnDestroy {
               const pending = list.filter((i: any) => !i.status || i.status === 'Pending Review');
               this.unreadCount = pending.length;
               this.recentFeedbacks = pending.slice(0, 5);
+              if (this.unreadCount === 0) {
+                this.stopBellLoop();
+              }
               this.cdr.detectChanges();
             });
           },
@@ -146,6 +213,7 @@ export class Header implements OnInit, OnDestroy {
     });
     this.unreadCount = 0;
     this.recentFeedbacks = [];
+    this.stopBellLoop();
     this.cdr.detectChanges();
     this.router.navigate(['/testing-feedback']);
   }
