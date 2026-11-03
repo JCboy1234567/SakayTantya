@@ -88,26 +88,10 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('routeMap', { static: false })
   routeMapContainer!: ElementRef<HTMLDivElement>;
 
-  tagumLocations: TagumLocation[] = [
-    { name: 'Tagum City Hall', category: 'Government', coords: [7.4478, 125.8083] },
-    { name: 'Tagum City Public Market', category: 'Commercial', coords: [7.4400, 125.8115] },
-    { name: 'Gaisano Mall of Tagum', category: 'Shopping', coords: [7.4452, 125.8035] },
-    { name: 'NCCC Mall Tagum', category: 'Shopping', coords: [7.4431, 125.8090] },
-    { name: 'Robinsons Place Tagum', category: 'Shopping', coords: [7.4520, 125.7980] },
-    { name: 'Tagum City National High School', category: 'Education', coords: [7.4501, 125.8120] },
-    { name: 'UM Tagum College', category: 'Education', coords: [7.4420, 125.8075] },
-    { name: 'Davao Regional Medical Center', category: 'Healthcare', coords: [7.4610, 125.8150] },
-    { name: 'Christ the King Cathedral', category: 'Landmark', coords: [7.4445, 125.8050] },
-    { name: 'New Tagum Overland Transport Terminal', category: 'Transport', coords: [7.4320, 125.8180] },
-    { name: 'Energy Park, Apokon', category: 'Recreation', coords: [7.4260, 125.8250] },
-    { name: 'Brgy. Apokon Hall', category: 'Barangay', coords: [7.4300, 125.8200] },
-    { name: 'Brgy. Mankilam Gymnasium', category: 'Barangay', coords: [7.4650, 125.7950] },
-    { name: 'Brgy. Visayan Village Market', category: 'Barangay', coords: [7.4490, 125.8010] },
-    { name: 'Magugpo Poblacion', category: 'Barangay', coords: [7.4410, 125.8095] }
-  ];
+  tagumLocations: TagumLocation[] = [];
 
-  pickupLocation = 'Tagum City Hall';
-  destinationLocation = 'Tagum City Public Market';
+  pickupLocation = '';
+  destinationLocation = '';
 
   pickupCoords: [number, number] = [7.4478, 125.8083];
   destinationCoords: [number, number] = [7.4400, 125.8115];
@@ -151,7 +135,6 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
   isSearchingPlaces = false;
   placeSearchError: string | null = null;
   remoteLocations: TagumLocation[] = [];
-  databaseLocations: TagumLocation[] = [];
 
   vehicles: any[] = [];
   selectedVehicleId: number | null = null;
@@ -317,33 +300,11 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
   get filteredLocations(): TagumLocation[] {
     const query = this.searchQuery.trim().toLowerCase();
 
-    const combined = [
-      ...this.databaseLocations,
-      ...this.tagumLocations,
-      ...this.remoteLocations
-    ];
-
-    const unique = combined.filter(
-      (location, index, list) =>
-        list.findIndex(item =>
-          item.name.trim().toLowerCase() ===
-            location.name.trim().toLowerCase() &&
-          Math.abs(item.coords[0] - location.coords[0]) < 0.0001 &&
-          Math.abs(item.coords[1] - location.coords[1]) < 0.0001
-        ) === index
-    );
-
     if (!query) {
-      return unique.filter(location =>
-        this.tagumLocations.some(item =>
-          item.name === location.name &&
-          item.coords[0] === location.coords[0] &&
-          item.coords[1] === location.coords[1]
-        )
-      );
+      return [];
     }
 
-    return unique.filter(location => {
+    return this.remoteLocations.filter(location => {
       const searchableText = [
         location.name,
         location.category,
@@ -358,36 +319,6 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
   }
 
   fetchDynamicData(): void {
-    this.authService.getLocations().subscribe({
-      next: (response: any) => {
-        const rawLocations = response?.data ?? response;
-
-        if (Array.isArray(rawLocations)) {
-          const mapped = rawLocations
-            .map((location: any): TagumLocation => ({
-              name: String(location.name ?? location.location_name ?? ''),
-              category: String(location.category ?? 'Location'),
-              coords: [
-                Number(location.latitude ?? location.lat),
-                Number(location.longitude ?? location.lng ?? location.lon)
-              ]
-            }))
-            .filter(location =>
-              !!location.name &&
-              Number.isFinite(location.coords[0]) &&
-              Number.isFinite(location.coords[1])
-            );
-
-          this.databaseLocations = mapped;
-        }
-
-        this.cdr.detectChanges();
-      },
-      error: error => {
-        console.warn('Could not load saved locations; using built-in popular places.', error);
-      }
-    });
-
     this.authService.getVehicles().subscribe({
       next: (response: any) => {
         const rawVehicles = response?.data || response;
@@ -797,8 +728,8 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
   clearRoute(): void {
     this.pickupCoords = [7.4478, 125.8083];
     this.destinationCoords = [7.4400, 125.8115];
-    this.pickupLocation = 'Tagum City Hall';
-    this.destinationLocation = 'Tagum City Public Market';
+    this.pickupLocation = '';
+    this.destinationLocation = '';
     this.selectionMode = 'pickup';
     this.estimatedFareAmount = null;
     this.estimatedFuelExpense = null;
