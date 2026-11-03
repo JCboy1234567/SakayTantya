@@ -18,17 +18,11 @@ import * as L from 'leaflet';
 
 import {
   LucideMapPin,
-  LucideCircleDot,
   LucideChevronRight,
-  LucideMap,
   LucideArrowRight,
   LucideFuel,
   LucideArrowUpRight,
-  LucideClock,
-  LucideInfo,
   LucideRotateCcw,
-  LucideBus,
-  LucideCar,
   LucideCheck,
   LucideSearch,
   LucideX,
@@ -583,15 +577,8 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
         this.ngZone.run(() => {
           const coords: [number, number] = [event.latlng.lat, event.latlng.lng];
 
-          if (this.selectionMode === 'pickup') {
-            this.pickupCoords = coords;
-            this.pickupLocation = `Map pin (${coords[0].toFixed(5)}, ${coords[1].toFixed(5)})`;
-            this.selectionMode = 'destination';
-          } else {
-            this.destinationCoords = coords;
-            this.destinationLocation = `Map pin (${coords[0].toFixed(5)}, ${coords[1].toFixed(5)})`;
-            this.selectionMode = 'pickup';
-          }
+          this.destinationCoords = coords;
+          this.destinationLocation = `Map pin (${coords[0].toFixed(5)}, ${coords[1].toFixed(5)})`;
 
           this.estimatedFareAmount = null;
           this.estimatedFuelExpense = null;
@@ -686,7 +673,7 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
       iconAnchor: [8, 8]
     });
 
-    this.pickupMarker = L.marker(this.pickupCoords, { icon: pickupIcon }).addTo(this.map);
+    this.pickupMarker = L.marker(this.pickupCoords, { icon: pickupIcon, interactive: false }).addTo(this.map);
     this.destinationMarker = L.marker(this.destinationCoords, { icon: destinationIcon }).addTo(this.map);
 
     this.map.fitBounds(
