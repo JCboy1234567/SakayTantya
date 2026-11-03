@@ -32,12 +32,29 @@ Route::get('/testing_feedback', [TestingFeedbackController::class, 'index']);
 Route::post('/testing_feedback', [TestingFeedbackController::class, 'store']);
 Route::get('/locations', [LocationController::class, 'index']);
 
+// Test Route for Email Configuration
+Route::get('/test-mail', function () {
+    try {
+        \Illuminate\Support\Facades\Mail::raw('This is a test email from SakayTantya to verify SMTP configuration.', function ($message) {
+            $message->to('jessiegamulo1023@gmail.com')
+                    ->subject('Test Email - SakayTantya');
+        });
+        return 'Email sent!';
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage() . '<br>Trace: ' . $e->getTraceAsString();
+    }
+});
+
 
 // ==========================================
 // PROTECTED USER ROUTES (Middleware: auth:sanctum, role:user)
 // ==========================================
 Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
     Route::put('/users/{id}', [UserController::class, 'update']);
+    
+    // User notification preferences
+    Route::get('/users/{id}/notification-preferences', [UserController::class, 'getNotificationPreferences']);
+    Route::put('/users/{id}/notification-preferences', [UserController::class, 'updateNotificationPreferences']);
 });
 
 
@@ -45,6 +62,10 @@ Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
 // PROTECTED ADMIN-ONLY ROUTES (Middleware: auth:sanctum, role:admin)
 // ==========================================
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    // User notification preferences
+    Route::get('/users/{id}/notification-preferences', [UserController::class, 'getNotificationPreferences']);
+    Route::put('/users/{id}/notification-preferences', [UserController::class, 'updateNotificationPreferences']);
+    
     // Vehicle management
     Route::post('/vehicle', [VehicleController::class, 'store']);
     Route::put('/vehicle/{id}', [VehicleController::class, 'update']); // Multipart update with _method=PUT support

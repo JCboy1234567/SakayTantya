@@ -116,6 +116,71 @@ class UserController extends Controller
         }
 
         /**
+         * Update user notification preferences.
+         */
+        public function updateNotificationPreferences(Request $request, int $id)
+        {
+            $user = User::find($id);
+
+            if (!$user) {
+                return response()->json([
+                    'message' => 'User not found.'
+                ], 404);
+            }
+
+            $validated = $request->validate([
+                'email_notifications' => 'sometimes|boolean',
+                'system_alerts' => 'sometimes|boolean',
+                'feedback_alerts' => 'sometimes|boolean',
+            ]);
+
+            if (isset($validated['email_notifications'])) {
+                $user->email_notifications = $validated['email_notifications'];
+            }
+
+            if (isset($validated['system_alerts'])) {
+                $user->system_alerts = $validated['system_alerts'];
+            }
+
+            if (isset($validated['feedback_alerts'])) {
+                $user->feedback_alerts = $validated['feedback_alerts'];
+            }
+
+            $user->save();
+
+            return response()->json([
+                'message' => 'Notification preferences updated successfully',
+                'preferences' => [
+                    'email_notifications' => $user->email_notifications,
+                    'system_alerts' => $user->system_alerts,
+                    'feedback_alerts' => $user->feedback_alerts,
+                ]
+            ], 200);
+        }
+
+        /**
+         * Get user notification preferences.
+         */
+        public function getNotificationPreferences(int $id)
+        {
+            $user = User::find($id);
+
+            if (!$user) {
+                return response()->json([
+                    'message' => 'User not found.'
+                ], 404);
+            }
+
+            return response()->json([
+                'preferences' => [
+                    'email_notifications' => (bool) $user->email_notifications,
+                    'system_alerts' => (bool) $user->system_alerts,
+                    'feedback_alerts' => (bool) $user->feedback_alerts,
+                ]
+            ], 200);
+        }
+
+        /**
          * Authenticate user login.
          */
         public function login(Request $request)
