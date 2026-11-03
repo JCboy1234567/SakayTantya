@@ -10,7 +10,6 @@ import { FuelpriceReference } from './pages/fuelprice-reference/fuelprice-refere
 import { VehiclesEfficiency } from './pages/vehicles-efficiency/vehicles-efficiency';
 import { TestingFeedback } from './pages/testing-feedback/testing-feedback';
 import { Settings } from './pages/settings/settings';
-import { UnderWork } from './pages/under-work/under-work';
 
 export const routes: Routes = [
     {
@@ -59,10 +58,6 @@ export const routes: Routes = [
             {
                 path: 'settings',
                 component: Settings
-            },
-            {
-                path: 'under-work',
-                component: UnderWork
             }
         ]
     },

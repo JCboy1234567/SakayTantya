@@ -11,11 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('email_notifications')->default(true)->after('role');
-            $table->boolean('system_alerts')->default(true)->after('email_notifications');
-            $table->boolean('feedback_alerts')->default(true)->after('system_alerts');
-        });
+        // Already migrated
     }
 
     /**
@@ -23,8 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['email_notifications', 'system_alerts', 'feedback_alerts']);
-        });
+        // Already migrated
     }
 };

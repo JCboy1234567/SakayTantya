@@ -25,8 +25,7 @@ Route::get('/vehicle', [VehicleController::class, 'index']);
 Route::get('/users', [UserController::class, 'index']);
 Route::get('/fare_rules', [FareruleController::class, 'index']);
 Route::get('/fuel_prices', [FuelpriceController::class, 'index']);
-Route::get('/fare_estimates', [FareestimateController::class, 'index']);
-Route::get('/fuel_cost_estimates', [FuelcostestimateController::class, 'index']);
+
 Route::get('/service_availability', [ServiceAvailabilityController::class, 'index']);
 Route::get('/testing_feedback', [TestingFeedbackController::class, 'index']);
 Route::post('/testing_feedback', [TestingFeedbackController::class, 'store']);
@@ -93,7 +92,12 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     // Testing & Feedback management (Admin update/delete)
     Route::put('/testing_feedback/{id}', [TestingFeedbackController::class, 'update']);
     Route::delete('/testing_feedback/{id}', [TestingFeedbackController::class, 'destroy']);
+});
 
+// ==========================================
+// SHARED AUTHENTICATED ROUTES (Middleware: auth:sanctum)
+// ==========================================
+Route::middleware(['auth:sanctum'])->group(function () {
     // Fare & Fuel Cost Estimates
     Route::post('/fare_estimates', [FareestimateController::class, 'store']);
     Route::post('/fuel_cost_estimates', [FuelcostestimateController::class, 'store']);
