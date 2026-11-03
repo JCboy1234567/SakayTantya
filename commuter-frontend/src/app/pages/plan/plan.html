@@ -341,19 +341,20 @@
           </p>
         </div>
 
-        <!-- RESET ROUTE -->
+        <!-- MY LOCATION -->
         <button
           type="button"
-          (click)="clearRoute()"
-          title="Reset route"
+          (click)="getCurrentLocation()"
+          title="Use My Current Location"
           [ngClass]="isDarkMode
             ? 'border-gray-700 bg-gray-950/95 text-gray-100 hover:bg-gray-800'
             : 'border-white/70 bg-white/95 text-gray-700 hover:bg-green-50'"
           class="absolute bottom-3 right-3 z-1000 flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl border shadow-lg backdrop-blur-md transition"
         >
-          <svg lucideRotateCcw class="h-4 w-4"></svg>
+          <svg lucideMapPin class="h-4 w-4 text-green-600"></svg>
         </button>
 
+        
         <!-- MAP LOADING -->
         @if (mapLoading) {
           <div
@@ -397,11 +398,19 @@
     <!-- CALCULATE FARE -->
     <button
       type="button"
-      class="btn h-12 min-h-12 w-full cursor-pointer justify-between rounded-xl border-0 bg-[#155b32] px-4 text-xs font-bold text-white shadow-none hover:bg-[#104927]"
+      [disabled]="isCalculatingFare"
+      class="btn h-12 min-h-12 w-full cursor-pointer justify-between rounded-xl border-0 bg-[#155b32] px-4 text-xs font-bold text-white shadow-none hover:bg-[#104927] disabled:bg-[#155b32]/80 disabled:text-white"
       (click)="estimateFare()"
     >
-      <span>Calculate Total Fare</span>
-      <svg lucideArrowRight class="h-5 w-5"></svg>
+      @if (isCalculatingFare) {
+        <span class="flex items-center gap-2">
+          <span class="loading loading-spinner loading-sm"></span>
+          <span>Calculating fare...</span>
+        </span>
+      } @else {
+        <span>Calculate Total Fare</span>
+        <svg lucideArrowRight class="h-5 w-5"></svg>
+      }
     </button>
 
     <!-- FUEL INFORMATION -->
