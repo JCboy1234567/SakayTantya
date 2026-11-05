@@ -324,9 +324,15 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
         const rawVehicles = response?.data || response;
 
         if (Array.isArray(rawVehicles) && rawVehicles.length) {
-          this.vehicles = rawVehicles;
-          this.selectedVehicleId = Number(this.vehicles[0].id);
-          this.updateSelectedVehicle();
+          // Filter ONLY active vehicles for commuters (is_active == 1 or true)
+          this.vehicles = rawVehicles.filter((v: any) => v.is_active == 1 || v.is_active === true || v.is_active === '1');
+          
+          if (this.vehicles.length > 0) {
+            this.selectedVehicleId = Number(this.vehicles[0].id);
+            this.updateSelectedVehicle();
+          } else {
+            this.loadFallbackVehicles();
+          }
         } else {
           this.loadFallbackVehicles();
         }
@@ -592,9 +598,14 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
 
     const pickupIcon = L.divIcon({
       className: 'custom-pin-icon',
-      html: '<div style="background:#155b32;width:16px;height:16px;border-radius:50%;border:3px solid white;box-shadow:0 3px 6px rgba(0,0,0,.4)"></div>',
-      iconSize: [16, 16],
-      iconAnchor: [8, 8]
+      html: `
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+          <div style="background:linear-gradient(135deg,#10b981,#059669);color:white;font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px;box-shadow:0 2px 8px rgba(16,185,129,0.4);white-space:nowrap">You</div>
+          <img src="/icons/icon-indicator.png" style="width:36px;height:36px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))"/>
+        </div>
+      `,
+      iconSize: [36, 56],
+      iconAnchor: [18, 56]
     });
 
     const destinationIcon = L.divIcon({
@@ -723,6 +734,13 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
     this.updateMarkersAndRoute();
     this.fetchRouteDistance();
     this.cdr.detectChanges();
+    
+    // Auto-calculate fare after destination is selected
+    if (this.modalTargetType === 'destination') {
+      setTimeout(() => {
+        this.autoCalculateFare();
+      }, 800);
+    }
   }
 
   clearRoute(): void {
@@ -738,14 +756,8 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
     this.fetchRouteDistance();
   }
 
-  estimateFare(): void {
-    if (!this.selectedVehicle) {
-      this.routeError = 'Pumili muna ng transport vehicle.';
-      return;
-    }
-
-    if (this.routeLoading || this.distanceKm === null || this.distanceKm <= 0) {
-      this.routeError = 'Hintayin munang makuha ang valid road distance bago mag-estimate ng fare.';
+  private autoCalculateFare(): void {
+    if (!this.selectedVehicle || this.routeLoading || this.distanceKm === null || this.distanceKm <= 0) {
       return;
     }
 
@@ -785,7 +797,7 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
         Math.round((rawAdjustedFare + Number.EPSILON) * 100) / 100
       );
 
-      // Save calculation metrics for display in the modal
+      // Save calculation metrics for display
       const fuelAdjustment = Math.round((this.estimatedFareAmount - standardFare) * 100) / 100;
       const efficiency = this.toNumber(this.selectedVehicle.fuel_efficiency_km_per_liter);
       const liters = efficiency > 0 ? currentDistance / efficiency : 0;
@@ -834,9 +846,12 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
 
       this.isCalculatingFare = false;
       this.routeError = null;
-      this.successModal = true;
       this.cdr.detectChanges();
     }, 600);
+  }
+
+  estimateFare(): void {
+    this.autoCalculateFare();
   }
 
   closeModal(): void {

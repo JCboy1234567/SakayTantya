@@ -96,9 +96,9 @@
                 </td>
               </tr>
             } @else {
-              @for (fuel of fuelPrices; track fuel.id) {
+              @for (fuel of fuelPrices; track fuel.id; let i = $index) {
                 <tr class="hover:bg-base-200/40">
-                  <td class="font-mono text-xs opacity-60">#{{ fuel.id }}</td>
+                  <td class="font-mono text-xs opacity-60">{{ i + 1 }}</td>
                   <td>
                     <p class="font-bold text-base-content">{{ fuel.fuel_type }}</p>
                   </td>

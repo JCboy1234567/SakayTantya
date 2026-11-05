@@ -53,6 +53,14 @@ export class TestingFeedback implements OnInit {
   selectedModuleFilter = 'All';
   selectedRatingFilter = 'All';
 
+  // Computed filtered feedbacks based on module filter
+  get filteredFeedbacks(): any[] {
+    if (this.selectedModuleFilter === 'All') {
+      return this.feedbacks;
+    }
+    return this.feedbacks.filter(f => f.module_tested === this.selectedModuleFilter);
+  }
+
   // Success Modal State
   showSuccessModal = false;
   successModalTitle = 'Success!';
@@ -93,12 +101,24 @@ export class TestingFeedback implements OnInit {
     });
   }
 
-  get filteredFeedbacks(): any[] {
-    return this.feedbacks.filter(item => {
-      const matchModule = this.selectedModuleFilter === 'All' || item.module_tested === this.selectedModuleFilter;
-      const matchRating = this.selectedRatingFilter === 'All' || item.rating === this.selectedRatingFilter;
-      return matchModule && matchRating;
-    });
+  // Pagination
+  currentPage = 1;
+  itemsPerPage = 10;
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredFeedbacks.length / this.itemsPerPage);
+  }
+
+  get paginatedFeedbacks(): any[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filteredFeedbacks.slice(startIndex, startIndex + this.itemsPerPage);
+  }
+
+  changePage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.cdr.detectChanges();
+    }
   }
 
   openDeleteModal(item: any): void {
@@ -176,4 +196,7 @@ export class TestingFeedback implements OnInit {
         return 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20';
     }
   }
+
+  // Math helper for template
+  Math = Math;
 }

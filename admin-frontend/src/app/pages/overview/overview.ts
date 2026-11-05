@@ -82,15 +82,29 @@ export class Overview implements OnInit {
     { price: 65, expense: 13 }
   ];
 
-  selectedFuelType = 'All';
+  selectedFuelType = '';
   selectedScenario = 60;
+  selectedTimePeriod = 7; // 7, 30, 90, or 0 for all
+
+  readonly timePeriods = [
+    { label: 'Last 7 days', value: 7 },
+    { label: 'Last 30 days', value: 30 },
+    { label: 'Last 90 days', value: 90 },
+    { label: 'All history', value: 0 }
+  ];
+  
   get availableFuelTypes(): string[] {
     const types = this.fuelPricesList.map(item => item.fuel_type).filter(Boolean);
-    return Array.from(new Set(types));
+    const uniqueTypes = Array.from(new Set(types));
+    // Set default to first fuel type if not set
+    if (!this.selectedFuelType && uniqueTypes.length > 0) {
+      this.selectedFuelType = uniqueTypes[0];
+    }
+    return uniqueTypes;
   }
 
   get filteredFuelPrices(): any[] {
-    if (this.selectedFuelType === 'All') {
+    if (!this.selectedFuelType || this.selectedFuelType === 'All') {
       return this.fuelPricesList;
     }
     return this.fuelPricesList.filter(item => item.fuel_type === this.selectedFuelType);
@@ -114,10 +128,27 @@ export class Overview implements OnInit {
       next: (res: any) => {
         const prices = res.data || res || [];
         this.fuelPricesList = prices;
+        
+        // Get available fuel types and set the first one as default
+        const types = prices.map((item: any) => item.fuel_type).filter(Boolean);
+        const uniqueTypes = Array.from(new Set(types));
+        
+        if (uniqueTypes.length > 0 && !this.selectedFuelType) {
+          this.selectedFuelType = uniqueTypes[0] as string;
+        }
+        
         if (prices.length > 0) {
-          const filtered = this.selectedFuelType === 'All' ? prices : prices.filter((p: any) => p.fuel_type === this.selectedFuelType);
+          const filtered = this.selectedFuelType ? prices.filter((p: any) => p.fuel_type === this.selectedFuelType) : prices;
           const targetList = filtered.length > 0 ? filtered : prices;
-          const latest = targetList[targetList.length - 1];
+          
+          // Sort by date to get the latest
+          const sorted = [...targetList].sort((a: any, b: any) => {
+            const dateA = new Date(a.effective_date || a.created_at).getTime();
+            const dateB = new Date(b.effective_date || b.created_at).getTime();
+            return dateB - dateA;
+          });
+          
+          const latest = sorted[0];
           this.latestFuelPrice = Number(latest.price_per_liter) || 60.00;
           this.selectedScenario = this.latestFuelPrice;
           this.latestFuelDate = latest.effective_date || latest.created_at || 'Today';
@@ -178,16 +209,26 @@ export class Overview implements OnInit {
   }
 
   onFuelTypeChange(): void {
-    const filtered = this.selectedFuelType === 'All'
+    const filtered = !this.selectedFuelType || this.selectedFuelType === 'All'
       ? this.fuelPricesList
       : this.fuelPricesList.filter((p: any) => p.fuel_type === this.selectedFuelType);
 
     if (filtered.length > 0) {
-      const latest = filtered[filtered.length - 1];
+      // Sort by date and get the latest
+      const sorted = [...filtered].sort((a: any, b: any) => {
+        const dateA = new Date(a.effective_date || a.created_at).getTime();
+        const dateB = new Date(b.effective_date || b.created_at).getTime();
+        return dateB - dateA;
+      });
+      const latest = sorted[0];
       this.latestFuelPrice = Number(latest.price_per_liter) || 60.00;
       this.selectedScenario = this.latestFuelPrice;
       this.latestFuelDate = latest.effective_date || latest.created_at || 'Today';
     }
+    this.cdr.detectChanges();
+  }
+
+  onTimePeriodChange(): void {
     this.cdr.detectChanges();
   }
 
@@ -196,9 +237,29 @@ export class Overview implements OnInit {
   }
 
   get activeList(): any[] {
-    return this.selectedFuelType === 'All'
-      ? this.fuelPricesList
-      : this.fuelPricesList.filter(item => item.fuel_type === this.selectedFuelType);
+    if (!this.selectedFuelType || this.selectedFuelType === 'All') {
+      return this.fuelPricesList;
+    }
+    
+    let filtered = this.fuelPricesList.filter(item => item.fuel_type === this.selectedFuelType);
+    
+    // Apply time period filter
+    if (this.selectedTimePeriod > 0) {
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - this.selectedTimePeriod);
+      
+      filtered = filtered.filter(item => {
+        const recordDate = new Date(item.effective_date || item.created_at);
+        return recordDate >= cutoffDate;
+      });
+    }
+    
+    // Sort by date ascending for chart display
+    return [...filtered].sort((a: any, b: any) => {
+      const dateA = new Date(a.effective_date || a.created_at).getTime();
+      const dateB = new Date(b.effective_date || b.created_at).getTime();
+      return dateA - dateB;
+    });
   }
 
   get chartPoints(): string {
@@ -206,8 +267,7 @@ export class Overview implements OnInit {
     if (list.length === 0) return '20,100 548,100';
     const slice = list.slice(-7);
 
-    // Dynamic scale starting from 0 to 100 PHP
-    const minVal = 0;
+    const minVal = 50;
     const maxVal = 100;
     const range = maxVal - minVal;
 
@@ -215,20 +275,20 @@ export class Overview implements OnInit {
       .map((point: any, index: number) => {
         const x = slice.length === 1 ? 284 : 20 + index * (528 / (slice.length - 1));
         const val = Number(point.price_per_liter) || 60;
-        // Map 50-100 to y position between 115 (for 50) and 20 (for 100)
-        const clampedVal = Math.max(50, Math.min(100, val));
+        // Clamp values between 50-100
+        const clampedVal = Math.max(minVal, Math.min(maxVal, val));
         const y = 115 - ((clampedVal - minVal) / range) * 95;
-        return `${isNaN(x) ? 20 : x},${isNaN(y) ? 100 : y}`;
+        return `${isNaN(x) ? 20 : x},${isNaN(y) ? 100 : Math.max(20, Math.min(115, y))}`;
       })
       .join(' ');
   }
 
   get chartArea(): string {
     const list = this.activeList.slice(-7);
-    if (list.length === 0) return '20,112 548,112';
+    if (list.length === 0) return '20,115 548,115';
     const firstX = 20;
     const lastX = list.length === 1 ? 284 : 20 + (list.length - 1) * (528 / (list.length - 1));
-    return `${firstX},120 ${this.chartPoints} ${lastX},120`;
+    return `${firstX},115 ${this.chartPoints} ${lastX},115`;
   }
 
   openEditRuleModal(rule: any): void {
@@ -310,15 +370,20 @@ export class Overview implements OnInit {
         { day: 'Recent', value: this.latestFuelPrice, cx: 284, cy: 70 }
       ];
     }
+    
+    // Take up to 7 most recent records
     const slice = list.slice(-7);
-    const minVal = 0;
+    const minVal = 50;
     const maxVal = 100;
     const range = maxVal - minVal;
 
     return slice.map((item: any, index: number) => {
       const val = Number(item.price_per_liter) || 60;
       const x = slice.length === 1 ? 284 : 20 + index * (528 / (slice.length - 1));
-      const clampedVal = Math.max(0, Math.min(100, val));
+      
+      // Scale values within chart area (115px height, 20px top to 115px bottom)
+      // Clamp values between 50-100
+      const clampedVal = Math.max(minVal, Math.min(maxVal, val));
       const y = 115 - ((clampedVal - minVal) / range) * 95;
 
       let formattedDate = 'Recent';
@@ -340,8 +405,18 @@ export class Overview implements OnInit {
         day: formattedDate,
         value: val,
         cx: isNaN(x) ? 20 : x,
-        cy: isNaN(y) ? 100 : y
+        cy: isNaN(y) ? 100 : Math.max(20, Math.min(115, y))
       };
     });
+  }
+
+  get chartYAxisLabels(): { value: number, y: number }[] {
+    return [
+      { value: 50, y: 115 },
+      { value: 65, y: 91 },
+      { value: 75, y: 67 },
+      { value: 85, y: 43 },
+      { value: 100, y: 20 }
+    ];
   }
 }
