@@ -1,42 +1,58 @@
-<footer class="bg-gray-900 border-t border-gray-800 px-6 py-3 fixed bottom-0 inset-x-0 z-30 shadow-2xl backdrop-blur-md bg-opacity-95 pointer-events-auto">
-    <div class="max-w-md mx-auto flex items-center justify-around">
-      <!-- Plan / Trip -->
+<footer class="bg-gradient-to-t from-gray-900 via-gray-900/98 to-gray-900/95 border-t border-gray-800/50 px-4 py-2.5 fixed bottom-0 inset-x-0 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] backdrop-blur-xl pointer-events-auto">
+    <div class="max-w-sm mx-auto flex items-center justify-around gap-1">
+      <!-- Plan / Trip - Main Feature -->
       <a
         routerLink="/main-dashboard/plan"
-        routerLinkActive="text-green-400 bg-green-950/60 border-green-800/60"
-        class="flex flex-col items-center space-y-1 px-3.5 py-2 rounded-xl text-gray-400 hover:text-white transition border border-transparent text-[10px] font-semibold uppercase tracking-wider cursor-pointer"
+        routerLinkActive="text-green-400 bg-gradient-to-br from-green-500/20 to-emerald-500/10 border-green-500/30 shadow-[0_0_15px_rgba(34,197,94,0.2)]"
+        [class.text-gray-400]="!planLink.isActive"
+        [class.hover:text-gray-200]="!planLink.isActive"
+        [class.hover:bg-gray-800/50]="!planLink.isActive"
+        class="flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-300 ease-out border border-transparent text-[10px] font-semibold uppercase tracking-wider cursor-pointer group relative"
+        #planLink="routerLinkActive"
       >
-        <svg lucideMap class="w-5 h-5 pointer-events-none"></svg>
-        <span>Plan</span>
+        <div [class.bg-gradient-to-br]="planLink.isActive" [class.from-green-400]="planLink.isActive" [class.to-emerald-500]="planLink.isActive" [class.shadow-lg]="planLink.isActive" [class.shadow-green-500/30]="planLink.isActive" [class.bg-gray-800/80]="!planLink.isActive" [class.group-hover:bg-gray-700/80]="!planLink.isActive" class="p-2 rounded-xl transition-all duration-300">
+          <svg lucideMap class="w-5 h-5 pointer-events-none"></svg>
+        </div>
+        <span class="transition-all duration-300">Plan</span>
+        <div *ngIf="!planLink.isActive" class="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
       </a>
 
       <!-- Fuels -->
       <a
         routerLink="/main-dashboard/fuels"
-        routerLinkActive="text-green-400 bg-green-950/60 border-green-800/60"
-        class="flex flex-col items-center space-y-1 px-3.5 py-2 rounded-xl text-gray-400 hover:text-white transition border border-transparent text-[10px] font-semibold uppercase tracking-wider cursor-pointer"
+        routerLinkActive="text-green-400"
+        class="flex flex-col items-center gap-1 px-3 py-2 rounded-2xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition-all duration-300 ease-out border border-transparent text-[10px] font-semibold uppercase tracking-wider cursor-pointer group"
+        #fuelsLink="routerLinkActive"
       >
-        <svg lucideFuel class="w-5 h-5 pointer-events-none"></svg>
+        <div [class.bg-green-500/20]="fuelsLink.isActive" [class.bg-gray-800/60]="!fuelsLink.isActive" [class.group-hover:bg-gray-700/60]="!fuelsLink.isActive" class="p-1.5 rounded-lg transition-all duration-300">
+          <svg lucideFuel class="w-5 h-5 pointer-events-none"></svg>
+        </div>
         <span>Fuels</span>
       </a>
 
       <!-- Guide -->
       <a
         routerLink="/main-dashboard/guide"
-        routerLinkActive="text-green-400 bg-green-950/60 border-green-800/60"
-        class="flex flex-col items-center space-y-1 px-3.5 py-2 rounded-xl text-gray-400 hover:text-white transition border border-transparent text-[10px] font-semibold uppercase tracking-wider cursor-pointer"
+        routerLinkActive="text-green-400"
+        class="flex flex-col items-center gap-1 px-3 py-2 rounded-2xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition-all duration-300 ease-out border border-transparent text-[10px] font-semibold uppercase tracking-wider cursor-pointer group"
+        #guideLink="routerLinkActive"
       >
-        <svg lucideBookOpen class="w-5 h-5 pointer-events-none"></svg>
+        <div [class.bg-green-500/20]="guideLink.isActive" [class.bg-gray-800/60]="!guideLink.isActive" [class.group-hover:bg-gray-700/60]="!guideLink.isActive" class="p-1.5 rounded-lg transition-all duration-300">
+          <svg lucideBookOpen class="w-5 h-5 pointer-events-none"></svg>
+        </div>
         <span>Guide</span>
       </a>
 
       <!-- Profile -->
       <a
         routerLink="/main-dashboard/profile"
-        routerLinkActive="text-green-400 bg-green-950/60 border-green-800/60"
-        class="flex flex-col items-center space-y-1 px-3.5 py-2 rounded-xl text-gray-400 hover:text-white transition border border-transparent text-[10px] font-semibold uppercase tracking-wider cursor-pointer"
+        routerLinkActive="text-green-400"
+        class="flex flex-col items-center gap-1 px-3 py-2 rounded-2xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition-all duration-300 ease-out border border-transparent text-[10px] font-semibold uppercase tracking-wider cursor-pointer group"
+        #profileLink="routerLinkActive"
       >
-        <svg lucideUser class="w-5 h-5 pointer-events-none"></svg>
+        <div [class.bg-green-500/20]="profileLink.isActive" [class.bg-gray-800/60]="!profileLink.isActive" [class.group-hover:bg-gray-700/60]="!profileLink.isActive" class="p-1.5 rounded-lg transition-all duration-300">
+          <svg lucideUser class="w-5 h-5 pointer-events-none"></svg>
+        </div>
         <span>Profile</span>
       </a>
     </div>
