@@ -131,15 +131,32 @@
               </div>
             </div>
 
-            <!-- Fuel Type Filter Selector -->
-            <div class="flex items-center gap-2">
-              <span class="text-[10px] uppercase font-semibold text-base-content/60">Fuel Type:</span>
-              <select [(ngModel)]="selectedFuelType" (ngModelChange)="onFuelTypeChange()" class="select select-bordered select-xs w-auto max-w-full text-xs bg-base-100">
-                <option value="All">All Types</option>
-                @for (type of availableFuelTypes; track type) {
-                  <option [value]="type">{{ type }}</option>
-                }
-              </select>
+            <div class="flex flex-col gap-2">
+              <!-- Fuel Type Filter Selector -->
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] uppercase font-semibold text-base-content/60">Fuel Type:</span>
+                <select [(ngModel)]="selectedFuelType" (ngModelChange)="onFuelTypeChange()" class="select select-bordered select-xs w-auto max-w-full text-xs bg-base-100">
+                  @for (type of availableFuelTypes; track type) {
+                    <option [value]="type">{{ type }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Time Period Selector -->
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] uppercase font-semibold text-base-content/60">Period:</span>
+                <div class="flex gap-1">
+                  @for (period of timePeriods; track period.value) {
+                    <button
+                      type="button"
+                      (click)="selectedTimePeriod = period.value; onTimePeriodChange()"
+                      [class]="'btn btn-xs text-[10px] font-semibold ' + (selectedTimePeriod === period.value ? 'btn-success text-white' : 'btn-ghost border border-base-300')"
+                    >
+                      {{ period.label }}
+                    </button>
+                  }
+                </div>
+              </div>
             </div>
           </div>
 
@@ -162,11 +179,9 @@
               <line x1="20" y1="91" x2="548" y2="91" stroke="currentColor" opacity=".1"/>
               <line x1="20" y1="115" x2="548" y2="115" stroke="currentColor" opacity=".15"/>
 
-              <text x="0" y="23" font-size="9" fill="currentColor" opacity=".6">₱100</text>
-              <text x="0" y="46" font-size="9" fill="currentColor" opacity=".6">₱75</text>
-              <text x="0" y="70" font-size="9" fill="currentColor" opacity=".6">₱50</text>
-              <text x="0" y="94" font-size="9" fill="currentColor" opacity=".6">₱25</text>
-              <text x="0" y="118" font-size="9" fill="currentColor" opacity=".6">₱0</text>
+              @for (label of chartYAxisLabels; track label.value) {
+                <text [attr.x]="0" [attr.y]="label.y + 3" font-size="9" fill="currentColor" opacity=".6">₱{{ label.value }}</text>
+              }
 
               <polygon
                 [attr.points]="chartArea"

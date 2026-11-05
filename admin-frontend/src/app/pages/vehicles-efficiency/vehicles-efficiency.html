@@ -97,9 +97,9 @@
                 </td>
               </tr>
             } @else {
-              @for (vehicle of vehicles; track vehicle.id) {
+              @for (vehicle of vehicles; track vehicle.id; let i = $index) {
                 <tr class="hover:bg-base-200/40">
-                  <td class="font-mono text-xs opacity-60">#{{ vehicle.id }}</td>
+                  <td class="font-mono text-xs opacity-60">{{ i + 1 }}</td>
                   <td>
                     @if (vehicle.image) {
                       <div class="avatar">

@@ -19,6 +19,7 @@ import { CommonModule } from '@angular/common';
 })
 export class Header {
   showLogoutModal = false;
+  isLoggingOut = false;
 
   constructor(private router: Router, private cdr: ChangeDetectorRef) {}
 
@@ -33,13 +34,18 @@ export class Header {
     this.cdr.detectChanges();
   }
 
-  consultLogout(): void {}
-
   confirmLogout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    this.showLogoutModal = false;
+    this.isLoggingOut = true;
     this.cdr.detectChanges();
-    this.router.navigate(['/login-user']);
+
+    // Simulate logout delay for visual feedback
+    setTimeout(() => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      this.isLoggingOut = false;
+      this.showLogoutModal = false;
+      this.cdr.detectChanges();
+      this.router.navigate(['/login-user']);
+    }, 800);
   }
 }

@@ -240,23 +240,34 @@ export class VehiclesEfficiency implements OnInit {
     this.errorMessage = '';
     this.cdr.detectChanges();
 
-    const formData = new FormData();
-    formData.append('vehicle_name', this.editVehicle.vehicle_name);
-    formData.append('fuel_type', this.editVehicle.fuel_type);
-    formData.append('fuel_efficiency_km_per_liter', this.editVehicle.fuel_efficiency_km_per_liter.toString());
-    formData.append('description', this.editVehicle.description || '');
-    formData.append('is_active', this.editVehicle.is_active ? '1' : '0');
+    let payload: any;
+
     if (this.editSelectedFile) {
+      const formData = new FormData();
+      formData.append('vehicle_name', this.editVehicle.vehicle_name);
+      formData.append('fuel_type', this.editVehicle.fuel_type);
+      formData.append('fuel_efficiency_km_per_liter', this.editVehicle.fuel_efficiency_km_per_liter.toString());
+      formData.append('description', this.editVehicle.description || '');
+      formData.append('is_active', this.editVehicle.is_active ? '1' : '0');
       formData.append('image', this.editSelectedFile);
+      payload = formData;
+    } else {
+      payload = {
+        vehicle_name: this.editVehicle.vehicle_name,
+        fuel_type: this.editVehicle.fuel_type,
+        fuel_efficiency_km_per_liter: Number(this.editVehicle.fuel_efficiency_km_per_liter),
+        description: this.editVehicle.description || '',
+        is_active: this.editVehicle.is_active ? 1 : 0
+      };
     }
 
-    this.fareService.updateVehicle(this.editVehicleId, formData).subscribe({
+    this.fareService.updateVehicle(this.editVehicleId, payload).subscribe({
       next: () => {
         this.isEditing = false;
         this.closeEditModal();
         this.loadVehicles();
         this.successModalTitle = 'Vehicle Profile Updated Successfully!';
-        this.successModalText = 'The vehicle profile and photo have been successfully updated.';
+        this.successModalText = 'The vehicle profile has been successfully updated.';
         this.showSuccessModal = true;
         this.cdr.detectChanges();
       },

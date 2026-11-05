@@ -55,15 +55,21 @@ export class FareService {
     return this.http.post(`${this.apiUrl}/vehicle`, formData, { headers });
   }
 
-  updateVehicle(id: number, formData: FormData): Observable<any> {
+  updateVehicle(id: number, vehicleData: any): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Accept': 'application/json'
     });
-    // Append _method=PUT to allow Laravel to process multipart/form-data via POST
-    formData.append('_method', 'PUT');
-    return this.http.post(`${this.apiUrl}/vehicle/${id}`, formData, { headers });
+
+    if (vehicleData instanceof FormData) {
+      if (!vehicleData.has('_method')) {
+        vehicleData.append('_method', 'PUT');
+      }
+      return this.http.post(`${this.apiUrl}/vehicle/${id}`, vehicleData, { headers });
+    } else {
+      return this.http.put(`${this.apiUrl}/vehicle/${id}`, vehicleData, { headers });
+    }
   }
 
   deleteVehicle(id: number): Observable<any> {
