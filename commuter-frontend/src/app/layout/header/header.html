@@ -1,18 +1,18 @@
-<header class="sticky top-0 z-40 w-full bg-gray-900 border-b border-gray-800 shadow-md">
+<header class="sticky top-0 z-40 w-full bg-linear-to-b from-gray-900 via-gray-900/98 to-gray-900/95 border-b border-gray-800/50 shadow-[0_4px_20px_rgba(0,0,0,0.3)] backdrop-blur-xl">
   <div class="mx-auto flex max-w-md items-center justify-between px-4 py-3">
 
     <!-- Logo / Branding -->
     <a
       routerLink="/main-dashboard/plan"
-      class="flex items-center gap-2.5 no-underline"
+      class="flex items-center gap-2.5 no-underline group"
       aria-label="SakayTantya Home"
     >
       <!-- Logo Icon -->
-      <div class="relative flex h-9 w-9 items-center justify-center bg-green-950 border border-green-800 text-green-400 rounded-xl shadow-inner">
-        <img src="/icons/sakaytantiya-icon.svg" alt="">
+      <div class="relative flex h-10 w-10 items-center justify-center bg-linear-to-br from-green-950 to-emerald-950 border border-green-700/50 text-green-400 rounded-xl shadow-lg shadow-green-900/30 group-hover:shadow-green-500/20 transition-all duration-300">
+        <img src="/icons/sakaytantiya-icon.svg" alt="" class="w-6 h-6">
 
         <span
-          class="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-gray-900 bg-green-500 text-[9px] font-bold text-white"
+          class="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-gray-900 bg-linear-to-br from-green-400 to-emerald-500 text-[9px] font-bold text-white shadow-lg shadow-green-500/30"
         >
           ₱
         </span>
@@ -20,30 +20,31 @@
 
       <!-- Brand Name -->
       <span class="text-base font-bold tracking-tight text-white">
-        Sakay<span class="text-green-400">Tantya</span>
+        Sakay<span class="text-transparent bg-clip-text bg-linear-to-r from-green-400 to-emerald-400">Tantya</span>
       </span>
     </a>
 
     <!-- Right Icons (Guide & Logout) -->
-    <div class="flex items-center space-x-2">
+    <div class="flex items-center gap-2">
       <!-- Guide / Help Button -->
       <a
         routerLink="/main-dashboard/guide"
-        class="w-9 h-9 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-xl flex items-center justify-center transition border border-gray-700 shadow-sm"
+        routerLinkActive="bg-green-500/20 border-green-500/30"
+        class="w-10 h-10 bg-gray-800/60 hover:bg-gray-700/80 text-gray-200 rounded-xl flex items-center justify-center transition-all duration-300 border border-gray-700/50 shadow-sm hover:shadow-md hover:scale-105 group"
         aria-label="Help and guide"
         title="Help and Guide"
       >
-        <svg lucideBookOpen class="h-4 w-4 text-green-400"></svg>
+        <svg lucideBookOpen class="h-4 w-4 text-green-400 group-hover:scale-110 transition-transform duration-300"></svg>
       </a>
 
       <!-- Logout Button -->
       <button
         (click)="openLogoutModal($event)"
-        class="w-9 h-9 bg-red-950/80 hover:bg-red-900 text-red-300 rounded-xl flex items-center justify-center transition border border-red-800/80 shadow-sm cursor-pointer"
+        class="w-10 h-10 bg-red-950/60 hover:bg-red-900/80 text-red-300 rounded-xl flex items-center justify-center transition-all duration-300 border border-red-800/50 shadow-sm hover:shadow-md hover:scale-105 cursor-pointer group"
         aria-label="Sign Out"
         title="Sign Out"
       >
-        <svg lucideLogOut class="h-4 w-4 text-red-400"></svg>
+        <svg lucideLogOut class="h-4 w-4 text-red-400 group-hover:scale-110 transition-transform duration-300"></svg>
       </button>
     </div>
 
@@ -52,27 +53,27 @@
 
 <!-- LOGOUT CONFIRMATION MODAL -->
 @if (showLogoutModal) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in p-4">
-    <div class="w-full max-w-sm bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl p-6 text-center space-y-5">
-      <div class="w-16 h-16 bg-red-950 text-red-400 rounded-full flex items-center justify-center mx-auto border border-red-800 shadow-inner">
-        <svg lucideLogOut class="w-10 h-10 text-red-400 animate-pulse"></svg>
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md animate-fade-in p-4">
+    <div class="w-full max-w-sm bg-linear-to-br from-gray-900 to-gray-950 border border-gray-800/50 rounded-2xl shadow-2xl p-6 text-center space-y-5 transform transition-all duration-300">
+      <div class="w-16 h-16 bg-linear-to-br from-red-950 to-red-900 text-red-400 rounded-full flex items-center justify-center mx-auto border border-red-800/50 shadow-lg shadow-red-900/30">
+        <svg lucideLogOut class="w-8 h-8 text-red-400"></svg>
       </div>
-      <div class="space-y-1">
-        <h3 class="text-lg font-bold text-white">Confirm Sign Out</h3>
-        <p class="text-xs text-gray-400">Are you sure you want to log out from your commuter account?</p>
+      <div class="space-y-2">
+        <h3 class="text-xl font-bold text-white">Confirm Sign Out</h3>
+        <p class="text-sm text-gray-400">Are you sure you want to log out from your commuter account?</p>
       </div>
-      <div class="flex space-x-3 pt-2">
+      <div class="flex gap-3 pt-2">
         <button
           type="button"
           (click)="cancelLogout()"
-          class="flex-1 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold text-xs rounded-xl transition border border-gray-700 cursor-pointer"
+          class="flex-1 py-3 bg-gray-800/60 hover:bg-gray-700/80 text-gray-200 font-semibold text-sm rounded-xl transition-all duration-300 border border-gray-700/50 cursor-pointer hover:scale-[1.02]"
         >
           Cancel
         </button>
         <button
           type="button"
           (click)="confirmLogout()"
-          class="flex-1 py-2.5 bg-red-700 hover:bg-red-600 text-white font-semibold text-xs rounded-xl shadow-lg transition cursor-pointer flex items-center justify-center space-x-1.5"
+          class="flex-1 py-3 bg-linear-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-semibold text-sm rounded-xl shadow-lg shadow-red-900/30 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 hover:scale-[1.02]"
         >
           <svg lucideLogOut class="w-4 h-4"></svg>
           <span>Sign Out</span>
