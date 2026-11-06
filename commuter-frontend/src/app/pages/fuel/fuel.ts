@@ -47,7 +47,23 @@ export class Fuel implements OnInit {
         this.isLoading = false;
         const rawPrices = res?.data || res;
         if (Array.isArray(rawPrices) && rawPrices.length > 0) {
-          this.fuelPrices = rawPrices.map((item: any) => ({
+          const uniqueMap = new Map<string, any>();
+
+          for (const item of rawPrices) {
+            const type = item.fuel_type || item.type || 'Fuel';
+            if (!uniqueMap.has(type)) {
+              uniqueMap.set(type, item);
+            } else {
+              const existing = uniqueMap.get(type);
+              const dateExisting = new Date(existing.effective_date || existing.updated_at || existing.created_at).getTime();
+              const dateItem = new Date(item.effective_date || item.updated_at || item.created_at).getTime();
+              if (dateItem > dateExisting || (dateItem === dateExisting && item.id > existing.id)) {
+                uniqueMap.set(type, item);
+              }
+            }
+          }
+
+          this.fuelPrices = Array.from(uniqueMap.values()).map((item: any) => ({
             type: item.fuel_type || item.type || 'Fuel',
             price: Number(item.price_per_liter || item.price || 0),
             change: item.price_change || item.change || '0.00',

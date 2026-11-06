@@ -35,12 +35,14 @@ class FuelpriceController extends Controller
 
     /**
      * Update the specified fuel price in storage.
+     * To preserve history, this creates a new record instead of updating the existing one.
      */
     public function update(Request $request, int $id): JsonResponse
     {
-        $fuelPrice = FuelPrice::find($id);
+        // We find the old record to ensure it exists, but we don't update it.
+        $oldFuelPrice = FuelPrice::find($id);
 
-        if (!$fuelPrice) {
+        if (!$oldFuelPrice) {
             return response()->json([
                 'message' => 'Fuel price record not found.'
             ], 404);
@@ -53,12 +55,13 @@ class FuelpriceController extends Controller
             'source_reference' => 'nullable|string|max:255',
         ]);
 
-        $fuelPrice->update($validated);
+        // Instead of updating, create a new historical record
+        $newFuelPrice = FuelPrice::create($validated);
 
         return response()->json([
-            'message' => 'Fuel price record updated successfully.',
-            'data' => $fuelPrice
-        ], 200);
+            'message' => 'New fuel price record created successfully to preserve history.',
+            'data' => $newFuelPrice
+        ], 201);
     }
 
     /**
