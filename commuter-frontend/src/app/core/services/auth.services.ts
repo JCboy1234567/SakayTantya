@@ -63,4 +63,14 @@ export class AuthServices {
   calculateFare(data: { vehicle_id: number; distance_km: number; passengers?: number }): Observable<any> {
     return this.http.post(`${this.apiUrl}/fare_estimates`, data);
   }
+
+  // Delete Account API
+  deleteAccount(userId: number, password: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json'
+    });
+    return this.http.post(`${this.apiUrl}/users/${userId}/delete`, { password }, { headers });
+  }
 }

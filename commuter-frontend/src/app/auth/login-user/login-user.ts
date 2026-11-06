@@ -40,6 +40,8 @@ export class LoginUser {
   isLoading = false;
   successMessage = '';
   errorMessage = '';
+  emailError = '';
+  passwordError = '';
 
   // Register form fields
   regName = '';
@@ -64,22 +66,31 @@ export class LoginUser {
     this.isRegistering = register;
     this.successMessage = '';
     this.errorMessage = '';
+    this.emailError = '';
+    this.passwordError = '';
     this.regSuccessMessage = '';
     this.regErrorMessage = '';
+    this.showSuccessModal = false;
     this.cdr.detectChanges();
   }
 
   onLogin(): void {
-    if (!this.email || !this.password) {
-      this.errorMessage = 'Please enter both email and password.';
-      this.successMessage = '';
+    this.emailError = '';
+    this.passwordError = '';
+
+    if (!this.email) {
+      this.emailError = 'Please enter your email address.';
+    }
+    if (!this.password) {
+      this.passwordError = 'Please enter your password.';
+    }
+
+    if (this.emailError || this.passwordError) {
       this.cdr.detectChanges();
       return;
     }
 
     this.isLoading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
     this.cdr.detectChanges();
 
     this.authService.login({ email: this.email, password: this.password }).subscribe({
@@ -91,11 +102,8 @@ export class LoginUser {
             localStorage.setItem('user', JSON.stringify(response.user));
             this.loggedInUserName = response.user.name || 'Commuter';
           }
-
-          // Trigger Modern Success Modal
           this.showSuccessModal = true;
           this.cdr.detectChanges();
-
           setTimeout(() => {
             this.router.navigate(['/main-dashboard']);
           }, 1500);
@@ -107,8 +115,18 @@ export class LoginUser {
       error: (err: HttpErrorResponse) => {
         console.error('Login error:', err);
         this.isLoading = false;
-        const errObj: any = err.error;
-        this.errorMessage = errObj?.message || 'Invalid email or password. Please check your credentials.';
+        
+        if (err.error?.errors) {
+          this.emailError = err.error.errors.email ? err.error.errors.email[0] : '';
+          this.passwordError = err.error.errors.password ? err.error.errors.password[0] : '';
+        } else {
+          const msg = err.error?.message || 'Invalid email or password.';
+          if (msg.toLowerCase().includes('password')) {
+            this.passwordError = msg;
+          } else {
+            this.emailError = msg;
+          }
+        }
         this.cdr.detectChanges();
       }
     });

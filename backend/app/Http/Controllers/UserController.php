@@ -212,4 +212,37 @@ class UserController extends Controller
                 ]
             ], 200);
         }
+
+        /**
+         * Delete user account (with password confirmation).
+         */
+        public function destroy(Request $request, int $id)
+        {
+            $user = User::find($id);
+
+            if (!$user) {
+                return response()->json([
+                    'message' => 'User not found.'
+                ], 404);
+            }
+
+            // Validate password
+            $validated = $request->validate([
+                'password' => 'required|string',
+            ]);
+
+            // Check if password is correct
+            if (!Hash::check($validated['password'], $user->password)) {
+                return response()->json([
+                    'message' => 'Password is incorrect. Account deletion failed.'
+                ], 422);
+            }
+
+            // Delete user
+            $user->delete();
+
+            return response()->json([
+                'message' => 'Account deleted successfully.'
+            ], 200);
+        }
 }

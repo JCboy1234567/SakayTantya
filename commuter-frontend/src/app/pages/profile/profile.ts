@@ -1,7 +1,8 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideUser, LucideMail, LucideShield, LucideKey, LucideSave, LucideUserCheck, LucideSun, LucideMoon } from '@lucide/angular';
+import { Router } from '@angular/router';
+import { LucideUser, LucideMail, LucideShield, LucideKey, LucideSave, LucideUserCheck, LucideSun, LucideMoon, LucideTrash2, LucideAlertTriangle, LucideCheckCircle2 } from '@lucide/angular';
 import { AuthServices } from '../../core/services/auth.services';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -18,7 +19,10 @@ import { HttpErrorResponse } from '@angular/common/http';
     LucideSave,
     LucideUserCheck,
     LucideSun,
-    LucideMoon
+    LucideMoon,
+    LucideTrash2,
+    LucideAlertTriangle,
+    LucideCheckCircle2
   ],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
@@ -44,9 +48,17 @@ export class Profile {
   modalTitle = '';
   modalMessage = '';
 
+  // Delete Account State
+  showDeleteModal = false;
+  deleteConfirmPassword = '';
+  deleteError = '';
+  isDeletingAccount = false;
+  showDeleteSuccessModal = false;
+
   constructor(
     private authService: AuthServices,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -167,5 +179,65 @@ export class Profile {
   closeModal() {
     this.showModal = false;
     this.cdr.detectChanges();
+  }
+
+  openDeleteModal() {
+    this.showDeleteModal = true;
+    this.deleteConfirmPassword = '';
+    this.deleteError = '';
+    this.cdr.detectChanges();
+  }
+
+  closeDeleteModal() {
+    this.showDeleteModal = false;
+    this.deleteConfirmPassword = '';
+    this.deleteError = '';
+    this.cdr.detectChanges();
+  }
+
+  confirmDeleteAccount() {
+    this.deleteError = '';
+
+    if (!this.deleteConfirmPassword) {
+      this.deleteError = 'Please enter your password to confirm account deletion.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.isDeletingAccount = true;
+    this.cdr.detectChanges();
+
+    // Call backend API to delete account
+    this.authService.deleteAccount(this.userId, this.deleteConfirmPassword).subscribe({
+      next: () => {
+        // Show success modal
+        this.isDeletingAccount = false;
+        this.showDeleteModal = false;
+        this.showDeleteSuccessModal = true;
+        this.cdr.detectChanges();
+
+        // Redirect after 2 seconds
+        setTimeout(() => {
+          // Clear local storage
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          
+          // Redirect to login
+          this.router.navigate(['/login-user']);
+        }, 2000);
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error('Delete account error:', err);
+        this.isDeletingAccount = false;
+        const errObj: any = err.error;
+        
+        if (errObj && errObj.message) {
+          this.deleteError = errObj.message;
+        } else {
+          this.deleteError = 'Failed to delete account. Please check your password.';
+        }
+        this.cdr.detectChanges();
+      }
+    });
   }
 }
