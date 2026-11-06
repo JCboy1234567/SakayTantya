@@ -127,98 +127,124 @@
 
   <!-- MODERN MODAL: Add New Fuel Price -->
   @if (showAddModal) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-      <div class="bg-base-100 text-base-content rounded-2xl max-w-md w-full p-6 shadow-2xl border border-base-300 space-y-4">
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-fade-in">
+      <div class="bg-base-100 text-base-content rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-base-300 space-y-6 transform transition-all duration-300 scale-100">
 
         <!-- Modal Header -->
-        <div class="flex items-center justify-between border-b border-base-200 pb-3">
-          <div class="flex items-center gap-3">
-            <div class="flex size-10 items-center justify-center rounded-xl bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300">
-              <svg lucideFuel class="h-5 w-5"></svg>
+        <div class="flex items-center justify-between border-b border-base-200 pb-4">
+          <div class="flex items-center gap-4">
+            <div class="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-green-800 to-green-950 text-white shadow-lg shadow-green-900/30">
+              <svg lucideFuel class="h-7 w-7 text-green-300"></svg>
             </div>
             <div>
-              <h3 class="text-base font-bold text-base-content">Add Fuel Price Reference</h3>
-              <p class="text-xs opacity-70">Save new benchmark pricing to Laravel database</p>
+              <h3 class="text-xl font-bold tracking-tight text-base-content">Add Fuel Price Reference</h3>
+              <p class="text-xs text-base-content/60 mt-0.5">Save new benchmark pricing to the system database</p>
             </div>
           </div>
-          <button type="button" (click)="closeAddModal()" class="btn btn-sm btn-ghost btn-circle">
+          <button type="button" (click)="closeAddModal()" class="btn btn-sm btn-circle btn-ghost text-base-content/70 hover:bg-base-200">
             <svg lucideX class="h-5 w-5"></svg>
           </button>
         </div>
 
         <!-- Modal Form -->
-        <form (ngSubmit)="onSubmitFuel()" class="space-y-3 text-xs">
+        <form (ngSubmit)="onSubmitFuel()" class="space-y-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-          <!-- Fuel Type -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Fuel Commodity Type</span>
-            </label>
-            <select
-              [(ngModel)]="newFuel.fuel_type"
-              name="fuel_type"
-              class="select select-bordered select-sm w-full text-xs bg-base-100 text-base-content"
-              required
-            >
-              <option>Gasoline (Regular)</option>
-              <option>Gasoline (Premium)</option>
-              <option>Diesel</option>
-              <option>Kerosene</option>
-              <option>LPG / Autogas</option>
-            </select>
+            <!-- Fuel Type -->
+            <div class="form-control space-y-1.5">
+              <label class="label p-0">
+                <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Fuel Commodity Type</span>
+              </label>
+              <select
+                [(ngModel)]="newFuel.fuel_type"
+                name="fuel_type"
+                class="select select-bordered w-full text-sm bg-base-100 text-base-content focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
+                required
+              >
+                <option>Gasoline (Regular)</option>
+                <option>Gasoline (Premium)</option>
+                <option>Diesel</option>
+                <option>Kerosene</option>
+                <option>LPG / Autogas</option>
+              </select>
+            </div>
+
+            <!-- Price Per Liter -->
+            <div class="form-control space-y-1.5">
+              <label class="label p-0">
+                <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Price Per Liter (₱)</span>
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-sm font-bold text-green-800">₱</span>
+                <input
+                  type="number"
+                  step="0.25"
+                  [(ngModel)]="newFuel.price_per_liter"
+                  name="price_per_liter"
+                  placeholder="0.00"
+                  class="input input-bordered w-full pl-9 text-sm font-semibold bg-base-100 text-base-content focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Effective Date -->
+            <div class="form-control space-y-1.5">
+              <label class="label p-0">
+                <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Effective Date</span>
+              </label>
+              <input
+                type="date"
+                [(ngModel)]="newFuel.effective_date"
+                name="effective_date"
+                class="input input-bordered w-full text-sm bg-base-100 text-base-content focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
+                required
+              />
+            </div>
+
+            <!-- Source Reference -->
+            <div class="form-control space-y-1.5">
+              <label class="label p-0">
+                <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Source Reference</span>
+              </label>
+              <input
+                type="text"
+                [(ngModel)]="newFuel.source_reference"
+                name="source_reference"
+                class="input input-bordered w-full text-sm bg-base-100 text-base-content focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
+                placeholder="e.g. DOE Region XI Weekly Monitor"
+              />
+            </div>
+
           </div>
 
-          <!-- Price Per Liter -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Price Per Liter (₱)</span>
-            </label>
-            <input
-              type="number"
-              step="0.25"
-              [(ngModel)]="newFuel.price_per_liter"
-              name="price_per_liter"
-              class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
-              required
-            />
-          </div>
-
-          <!-- Effective Date -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Effective Date</span>
-            </label>
-            <input
-              type="date"
-              [(ngModel)]="newFuel.effective_date"
-              name="effective_date"
-              class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
-              required
-            />
-          </div>
-
-          <!-- Source Reference -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Source Reference</span>
-            </label>
-            <input
-              type="text"
-              [(ngModel)]="newFuel.source_reference"
-              name="source_reference"
-              class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
-              placeholder="e.g. DOE Region XI Weekly Monitor"
-            />
+          <!-- Helper Info Banner -->
+          <div class="p-3 bg-base-200/50 rounded-xl border border-base-200 flex items-start gap-2.5 text-xs text-base-content/70">
+            <svg lucideFuel class="h-4 w-4 text-green-800 shrink-0 mt-0.5"></svg>
+            <span>This reference price will be used across the commuter fare calculator to adjust distance-based fare components dynamically.</span>
           </div>
 
           <!-- Modal Actions -->
-          <div class="modal-action pt-3 flex gap-2 border-t border-base-200 mt-4">
-            <button type="button" (click)="closeAddModal()" class="btn btn-sm btn-ghost" [disabled]="isSubmitting">Cancel</button>
-            <button type="submit" class="btn btn-sm bg-green-900 text-white hover:bg-green-950 border-0 px-5 gap-2" [disabled]="isSubmitting">
+          <div class="modal-action pt-4 flex items-center justify-end gap-3 border-t border-base-200">
+            <button
+              type="button"
+              (click)="closeAddModal()"
+              class="btn btn-ghost text-xs font-semibold px-5 rounded-xl"
+              [disabled]="isSubmitting"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="btn bg-gradient-to-r from-green-800 to-green-950 text-white hover:from-green-900 hover:to-green-900 border-0 px-6 text-xs font-bold shadow-lg shadow-green-900/30 rounded-xl gap-2"
+              [disabled]="isSubmitting"
+            >
               @if (isSubmitting) {
-                <svg lucideLoader class="h-4 w-4 animate-spin"></svg> Saving...
+                <svg lucideLoader class="h-4 w-4 animate-spin"></svg>
+                <span>Saving to Database...</span>
               } @else {
-                Save to Database
+                <svg lucidePlus class="h-4 w-4"></svg>
+                <span>Save Fuel Price</span>
               }
             </button>
           </div>
@@ -230,98 +256,124 @@
 
   <!-- MODERN MODAL: Edit Fuel Price -->
   @if (showEditModal) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-      <div class="bg-base-100 text-base-content rounded-2xl max-w-md w-full p-6 shadow-2xl border border-base-300 space-y-4">
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-fade-in">
+      <div class="bg-base-100 text-base-content rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-base-300 space-y-6 transform transition-all duration-300 scale-100">
 
         <!-- Modal Header -->
-        <div class="flex items-center justify-between border-b border-base-200 pb-3">
-          <div class="flex items-center gap-3">
-            <div class="flex size-10 items-center justify-center rounded-xl bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300">
-              <svg lucidePencil class="h-5 w-5"></svg>
+        <div class="flex items-center justify-between border-b border-base-200 pb-4">
+          <div class="flex items-center gap-4">
+            <div class="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-green-800 to-green-950 text-white shadow-lg shadow-green-900/30">
+              <svg lucidePencil class="h-7 w-7 text-green-300"></svg>
             </div>
             <div>
-              <h3 class="text-base font-bold text-base-content">Edit Fuel Price Reference</h3>
-              <p class="text-xs opacity-70">Modify benchmark pricing in Laravel database</p>
+              <h3 class="text-xl font-bold tracking-tight text-base-content">Edit Fuel Price Reference</h3>
+              <p class="text-xs text-base-content/60 mt-0.5">Modify benchmark pricing in the system database</p>
             </div>
           </div>
-          <button type="button" (click)="closeEditModal()" class="btn btn-sm btn-ghost btn-circle">
+          <button type="button" (click)="closeEditModal()" class="btn btn-sm btn-circle btn-ghost text-base-content/70 hover:bg-base-200">
             <svg lucideX class="h-5 w-5"></svg>
           </button>
         </div>
 
         <!-- Modal Form -->
-        <form (ngSubmit)="onUpdateFuel()" class="space-y-3 text-xs">
+        <form (ngSubmit)="onUpdateFuel()" class="space-y-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-          <!-- Fuel Type -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Fuel Commodity Type</span>
-            </label>
-            <select
-              [(ngModel)]="editFuel.fuel_type"
-              name="edit_fuel_type"
-              class="select select-bordered select-sm w-full text-xs bg-base-100 text-base-content"
-              required
-            >
-              <option>Gasoline (Regular)</option>
-              <option>Gasoline (Premium)</option>
-              <option>Diesel</option>
-              <option>Kerosene</option>
-              <option>LPG / Autogas</option>
-            </select>
+            <!-- Fuel Type -->
+            <div class="form-control space-y-1.5">
+              <label class="label p-0">
+                <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Fuel Commodity Type</span>
+              </label>
+              <select
+                [(ngModel)]="editFuel.fuel_type"
+                name="edit_fuel_type"
+                class="select select-bordered w-full text-sm bg-base-100 text-base-content focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
+                required
+              >
+                <option>Gasoline (Regular)</option>
+                <option>Gasoline (Premium)</option>
+                <option>Diesel</option>
+                <option>Kerosene</option>
+                <option>LPG / Autogas</option>
+              </select>
+            </div>
+
+            <!-- Price Per Liter -->
+            <div class="form-control space-y-1.5">
+              <label class="label p-0">
+                <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Price Per Liter (₱)</span>
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-sm font-bold text-green-800">₱</span>
+                <input
+                  type="number"
+                  step="0.25"
+                  [(ngModel)]="editFuel.price_per_liter"
+                  name="edit_price_per_liter"
+                  placeholder="0.00"
+                  class="input input-bordered w-full pl-9 text-sm font-semibold bg-base-100 text-base-content focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Effective Date -->
+            <div class="form-control space-y-1.5">
+              <label class="label p-0">
+                <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Effective Date</span>
+              </label>
+              <input
+                type="date"
+                [(ngModel)]="editFuel.effective_date"
+                name="edit_effective_date"
+                class="input input-bordered w-full text-sm bg-base-100 text-base-content focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
+                required
+              />
+            </div>
+
+            <!-- Source Reference -->
+            <div class="form-control space-y-1.5">
+              <label class="label p-0">
+                <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Source Reference</span>
+              </label>
+              <input
+                type="text"
+                [(ngModel)]="editFuel.source_reference"
+                name="edit_source_reference"
+                class="input input-bordered w-full text-sm bg-base-100 text-base-content focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
+                placeholder="e.g. DOE Region XI Weekly Monitor"
+              />
+            </div>
+
           </div>
 
-          <!-- Price Per Liter -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Price Per Liter (₱)</span>
-            </label>
-            <input
-              type="number"
-              step="0.25"
-              [(ngModel)]="editFuel.price_per_liter"
-              name="edit_price_per_liter"
-              class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
-              required
-            />
-          </div>
-
-          <!-- Effective Date -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Effective Date</span>
-            </label>
-            <input
-              type="date"
-              [(ngModel)]="editFuel.effective_date"
-              name="edit_effective_date"
-              class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
-              required
-            />
-          </div>
-
-          <!-- Source Reference -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Source Reference</span>
-            </label>
-            <input
-              type="text"
-              [(ngModel)]="editFuel.source_reference"
-              name="edit_source_reference"
-              class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
-              placeholder="e.g. DOE Region XI Weekly Monitor"
-            />
+          <!-- Helper Info Banner -->
+          <div class="p-3 bg-base-200/50 rounded-xl border border-base-200 flex items-start gap-2.5 text-xs text-base-content/70">
+            <svg lucideFuel class="h-4 w-4 text-green-800 shrink-0 mt-0.5"></svg>
+            <span>Updating this record will instantly refresh the active fuel reference for all pending fare estimations.</span>
           </div>
 
           <!-- Modal Actions -->
-          <div class="modal-action pt-3 flex gap-2 border-t border-base-200 mt-4">
-            <button type="button" (click)="closeEditModal()" class="btn btn-sm btn-ghost" [disabled]="isEditing">Cancel</button>
-            <button type="submit" class="btn btn-sm bg-green-900 text-white hover:bg-green-950 border-0 px-5 gap-2" [disabled]="isEditing">
+          <div class="modal-action pt-4 flex items-center justify-end gap-3 border-t border-base-200">
+            <button
+              type="button"
+              (click)="closeEditModal()"
+              class="btn btn-ghost text-xs font-semibold px-5 rounded-xl"
+              [disabled]="isEditing"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="btn bg-gradient-to-r from-green-800 to-green-950 text-white hover:from-green-900 hover:to-green-900 border-0 px-6 text-xs font-bold shadow-lg shadow-green-900/30 rounded-xl gap-2"
+              [disabled]="isEditing"
+            >
               @if (isEditing) {
-                <svg lucideLoader class="h-4 w-4 animate-spin"></svg> Updating...
+                <svg lucideLoader class="h-4 w-4 animate-spin"></svg>
+                <span>Updating Record...</span>
               } @else {
-                Update Database
+                <svg lucidePencil class="h-4 w-4"></svg>
+                <span>Update Fuel Price</span>
               }
             </button>
           </div>

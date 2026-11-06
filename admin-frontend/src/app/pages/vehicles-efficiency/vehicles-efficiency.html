@@ -151,135 +151,139 @@
 
   <!-- MODERN MODAL: Add New Vehicle Profile -->
   @if (showAddModal) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-      <div class="bg-base-100 text-base-content rounded-2xl max-w-md w-full p-6 shadow-2xl border border-base-300 space-y-4 max-h-[90vh] overflow-y-auto">
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-fade-in">
+      <div class="bg-base-100 text-base-content rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-base-300 space-y-6 transform transition-all duration-300 scale-100">
 
         <!-- Modal Header -->
-        <div class="flex items-center justify-between border-b border-base-200 pb-3">
-          <div class="flex items-center gap-3">
-            <div class="flex size-10 items-center justify-center rounded-xl bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300">
-              <svg lucideTruck class="h-5 w-5"></svg>
+        <div class="flex items-center justify-between border-b border-base-200 pb-4">
+          <div class="flex items-center gap-4">
+            <div class="flex size-14 items-center justify-center rounded-2xl bg-linear-to-br from-green-800 to-green-950 text-white shadow-lg shadow-green-900/30">
+              <svg lucideTruck class="h-7 w-7 text-green-300"></svg>
             </div>
             <div>
-              <h3 class="text-base font-bold text-base-content">Add Vehicle Profile</h3>
-              <p class="text-xs opacity-70">Register fleet type, upload photo and efficiency in database</p>
+              <h3 class="text-xl font-bold tracking-tight text-base-content">Add Vehicle Profile</h3>
+              <p class="text-xs text-base-content/60 mt-0.5">Register fleet type, upload photo and efficiency in database</p>
             </div>
           </div>
-          <button type="button" (click)="closeAddModal()" class="btn btn-sm btn-ghost btn-circle">
+          <button type="button" (click)="closeAddModal()" class="btn btn-sm btn-circle btn-ghost text-base-content/70 hover:bg-base-200">
             <svg lucideX class="h-5 w-5"></svg>
           </button>
         </div>
 
         <!-- Modal Form -->
-        <form (ngSubmit)="onSubmitVehicle()" class="space-y-3 text-xs">
+        <form (ngSubmit)="onSubmitVehicle()" class="space-y-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-          <!-- Vehicle Name -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Vehicle / Transport Name</span>
-            </label>
-            <input
-              type="text"
-              [(ngModel)]="newVehicle.vehicle_name"
-              name="vehicle_name"
-              class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
-              placeholder="e.g. Motorized Tricycle (Standard)"
-              required
-            />
-          </div>
-
-          <!-- Dynamic Fuel Type -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Fuel Type (Fetched Live from Database)</span>
-            </label>
-            <select
-              [(ngModel)]="newVehicle.fuel_type"
-              name="fuel_type"
-              class="select select-bordered select-sm w-full text-xs bg-base-100 text-base-content"
-              required
-            >
-              @if (fuelPrices.length === 0) {
-                <option value="" disabled>Loading fuel prices from database...</option>
-              }
-              @for (fp of fuelPrices; track fp.id) {
-                <option [value]="fp.fuel_type || fp.name">{{ fp.fuel_type || fp.name }} (₱{{ fp.price }})</option>
-              }
-            </select>
-          </div>
-
-          <!-- Fuel Efficiency -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Fuel Efficiency (KM / Liter)</span>
-            </label>
-            <input
-              type="number"
-              step="0.1"
-              [(ngModel)]="newVehicle.fuel_efficiency_km_per_liter"
-              name="fuel_efficiency_km_per_liter"
-              class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
-              required
-            />
-          </div>
-
-          <!-- Vehicle Photo File Upload -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Vehicle Photo (from device)</span>
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              (change)="onFileSelected($event, 'new')"
-              class="file-input file-input-bordered file-input-sm w-full text-xs bg-base-100 text-base-content"
-            />
-            <label class="label pt-1">
-              <span class="label-text-alt text-[10px] opacity-60">Upload JPEG, PNG, WEBP or GIF image from your device.</span>
-            </label>
-          </div>
-
-          @if (newImagePreview) {
-            <div class="form-control">
-              <span class="text-[10px] opacity-70 mb-1">Selected Photo Preview:</span>
-              <div class="w-20 h-20 rounded-xl overflow-hidden border border-base-300 shadow-sm bg-base-200">
-                <img [src]="newImagePreview" alt="Preview" class="w-full h-full object-cover" />
-              </div>
+            <!-- Vehicle Name -->
+            <div class="form-control space-y-1.5 sm:col-span-2">
+              <label class="label p-0">
+                <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Vehicle / Transport Name</span>
+              </label>
+              <input
+                type="text"
+                [(ngModel)]="newVehicle.vehicle_name"
+                name="vehicle_name"
+                class="input input-bordered w-full text-sm font-semibold focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
+                placeholder="e.g. Motorized Tricycle (Standard)"
+                required
+              />
             </div>
-          }
 
-          <!-- Description -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Description / Notes</span>
-            </label>
-            <textarea
-              [(ngModel)]="newVehicle.description"
-              name="description"
-              class="textarea textarea-bordered textarea-sm text-xs w-full bg-base-100 text-base-content h-20"
-              placeholder="Optional route coverage or seating capacity notes..."
-            ></textarea>
-          </div>
+            <!-- Dynamic Fuel Type -->
+            <div class="form-control space-y-1.5">
+              <label class="label p-0">
+                <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Fuel Type</span>
+              </label>
+              <select
+                [(ngModel)]="newVehicle.fuel_type"
+                name="fuel_type"
+                class="select select-bordered w-full text-sm bg-base-100 focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
+                required
+              >
+                @if (fuelPrices.length === 0) {
+                  <option value="" disabled>Loading fuel prices from database...</option>
+                } @else {
+                  @for (fp of fuelPrices; track fp.id) {
+                    <option [value]="fp.fuel_type || fp.name">{{ fp.fuel_type || fp.name }}</option>
+                  }
+                }
+              </select>
+            </div>
 
-          <!-- Status -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Operational Status</span>
-            </label>
-            <select
-              [(ngModel)]="newVehicle.is_active"
-              name="is_active"
-              class="select select-bordered select-sm w-full text-xs bg-base-100 text-base-content"
-            >
-              <option [ngValue]="true">Active</option>
-              <option [ngValue]="false">Inactive</option>
-            </select>
+            <!-- Fuel Efficiency -->
+            <div class="form-control space-y-1.5">
+              <label class="label p-0">
+                <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Fuel Efficiency (KM/L)</span>
+              </label>
+              <input
+                type="number"
+                step="0.1"
+                [(ngModel)]="newVehicle.fuel_efficiency_km_per_liter"
+                name="fuel_efficiency_km_per_liter"
+                class="input input-bordered w-full text-sm font-semibold focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
+                required
+              />
+            </div>
+
+            <!-- Vehicle Photo File Upload -->
+            <div class="form-control space-y-1.5 sm:col-span-2">
+              <label class="label p-0">
+                <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Vehicle Photo</span>
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                (change)="onFileSelected($event, 'new')"
+                class="file-input file-input-bordered w-full text-sm bg-base-100 focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
+              />
+              <label class="label p-0">
+                <span class="label-text-alt text-[10px] text-base-content/60">Upload JPEG, PNG, WEBP or GIF image from your device.</span>
+              </label>
+            </div>
+
+            @if (newImagePreview) {
+              <div class="form-control space-y-2 sm:col-span-2">
+                <span class="text-xs font-semibold text-base-content/80">Selected Photo Preview:</span>
+                <div class="w-28 h-28 rounded-2xl overflow-hidden border border-base-300 shadow-lg bg-base-200 mx-auto">
+                  <img [src]="newImagePreview" alt="Preview" class="w-full h-full object-cover" />
+                </div>
+              </div>
+            }
+
+            <!-- Description -->
+            <div class="form-control space-y-1.5 sm:col-span-2">
+              <label class="label p-0">
+                <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Description / Notes</span>
+              </label>
+              <textarea
+                [(ngModel)]="newVehicle.description"
+                name="description"
+                class="textarea textarea-bordered w-full text-sm bg-base-100 focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl h-24"
+                placeholder="Optional route coverage or seating capacity notes..."
+              ></textarea>
+            </div>
+
+            <!-- Status -->
+            <div class="form-control space-y-1.5 sm:col-span-2">
+              <label class="label p-0">
+                <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Operational Status</span>
+              </label>
+              <select
+                [(ngModel)]="newVehicle.is_active"
+                name="is_active"
+                class="select select-bordered w-full text-sm bg-base-100 focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
+              >
+                <option [ngValue]="true">Active</option>
+                <option [ngValue]="false">Inactive</option>
+              </select>
+            </div>
+
           </div>
 
           <!-- Modal Actions -->
-          <div class="modal-action pt-3 flex gap-2 border-t border-base-200 mt-4">
-            <button type="button" (click)="closeAddModal()" class="btn btn-sm btn-ghost" [disabled]="isSubmitting">Cancel</button>
-            <button type="submit" class="btn btn-sm bg-green-900 text-white hover:bg-green-950 border-0 px-5 gap-2" [disabled]="isSubmitting">
+          <div class="modal-action pt-4 flex items-center justify-end gap-3 border-t border-base-200">
+            <button type="button" (click)="closeAddModal()" class="btn btn-ghost text-xs font-semibold px-5 rounded-xl">Cancel</button>
+            <button type="submit" class="btn bg-linear-to-r from-green-800 to-green-950 text-white hover:from-green-900 hover:to-green-900 border-0 px-6 text-xs font-bold shadow-lg shadow-green-900/30 rounded-xl gap-2" [disabled]="isSubmitting">
               @if (isSubmitting) {
                 <svg lucideLoader class="h-4 w-4 animate-spin"></svg> Saving...
               } @else {
@@ -295,51 +299,51 @@
 
   <!-- MODERN MODAL: Edit Vehicle Profile -->
   @if (showEditModal) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-      <div class="bg-base-100 text-base-content rounded-2xl max-w-md w-full p-6 shadow-2xl border border-base-300 space-y-4 max-h-[90vh] overflow-y-auto">
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fade-in">
+      <div class="bg-base-100/90 text-base-content rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-base-300/50 backdrop-blur-xl space-y-4 max-h-[90vh] overflow-y-auto">
 
         <!-- Modal Header -->
-        <div class="flex items-center justify-between border-b border-base-200 pb-3">
-          <div class="flex items-center gap-3">
-            <div class="flex size-10 items-center justify-center rounded-xl bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300">
-              <svg lucidePencil class="h-5 w-5"></svg>
+        <div class="flex items-center justify-between border-b border-base-200/60 pb-4 mb-2">
+          <div class="flex items-center gap-4">
+            <div class="flex size-12 items-center justify-center rounded-2xl bg-linear-to-br from-green-800 to-green-950 text-white shadow-lg shadow-green-900/40">
+              <svg lucidePencil class="h-6 w-6"></svg>
             </div>
             <div>
-              <h3 class="text-base font-bold text-base-content">Edit Vehicle Profile</h3>
+              <h3 class="text-lg font-bold text-base-content">Edit Vehicle Profile</h3>
               <p class="text-xs opacity-70">Modify specifications and update photo in database</p>
             </div>
           </div>
-          <button type="button" (click)="closeEditModal()" class="btn btn-sm btn-ghost btn-circle">
-            <svg lucideX class="h-5 w-5"></svg>
+          <button type="button" (click)="closeEditModal()" class="btn btn-ghost btn-circle text-base-content/60 hover:text-base-content hover:bg-base-200">
+            <svg lucideX class="h-6 w-6"></svg>
           </button>
         </div>
 
         <!-- Modal Form -->
-        <form (ngSubmit)="onUpdateVehicle()" class="space-y-3 text-xs">
+        <form (ngSubmit)="onUpdateVehicle()" class="space-y-4 text-sm">
 
           <!-- Vehicle Name -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Vehicle / Transport Name</span>
+          <div class="form-control space-y-1.5">
+            <label class="label p-0">
+              <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Vehicle / Transport Name</span>
             </label>
             <input
               type="text"
               [(ngModel)]="editVehicle.vehicle_name"
               name="edit_vehicle_name"
-              class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
+              class="input input-bordered w-full text-sm font-semibold focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
               required
             />
           </div>
 
           <!-- Dynamic Fuel Type -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Fuel Type (Fetched Live from Database)</span>
+          <div class="form-control space-y-1.5">
+            <label class="label p-0">
+              <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Fuel Type (Live from Database)</span>
             </label>
             <select
               [(ngModel)]="editVehicle.fuel_type"
               name="edit_fuel_type"
-              class="select select-bordered select-sm w-full text-xs bg-base-100 text-base-content"
+              class="select select-bordered w-full text-sm bg-base-100 focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
               required
             >
               @if (fuelPrices.length === 0) {
@@ -352,63 +356,66 @@
           </div>
 
           <!-- Fuel Efficiency -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Fuel Efficiency (KM / Liter)</span>
+          <div class="form-control space-y-1.5">
+            <label class="label p-0">
+              <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Fuel Efficiency (KM/L)</span>
             </label>
             <input
               type="number"
               step="0.1"
               [(ngModel)]="editVehicle.fuel_efficiency_km_per_liter"
               name="edit_fuel_efficiency_km_per_liter"
-              class="input input-bordered input-sm text-xs w-full bg-base-100 text-base-content"
+              class="input input-bordered w-full text-sm font-semibold focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
               required
             />
           </div>
 
           <!-- Vehicle Photo File Upload -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Change Vehicle Photo (from device)</span>
+          <div class="form-control space-y-1.5">
+            <label class="label p-0">
+              <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Change Vehicle Photo</span>
             </label>
             <input
               type="file"
               accept="image/*"
               (change)="onFileSelected($event, 'edit')"
-              class="file-input file-input-bordered file-input-sm w-full text-xs bg-base-100 text-base-content"
+              class="file-input file-input-bordered w-full text-sm bg-base-100 focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
             />
+            <label class="label p-0">
+              <span class="label-text-alt text-[10px] text-base-content/60">Upload JPEG, PNG, WEBP or GIF image from your device.</span>
+            </label>
           </div>
 
           @if (editImagePreview) {
-            <div class="form-control">
-              <span class="text-[10px] opacity-70 mb-1">Current / New Photo Preview:</span>
-              <div class="w-20 h-20 rounded-xl overflow-hidden border border-base-300 shadow-sm bg-base-200">
+            <div class="form-control space-y-2">
+              <span class="text-xs font-semibold text-base-content/80">New Photo Preview:</span>
+              <div class="w-32 h-32 rounded-2xl overflow-hidden border border-base-300 shadow-lg bg-base-200 mx-auto">
                 <img [src]="editImagePreview" alt="Preview" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=100&auto=format&fit=crop&q=60'" />
               </div>
             </div>
           }
 
           <!-- Description -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Description / Notes</span>
+          <div class="form-control space-y-1.5">
+            <label class="label p-0">
+              <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Description / Notes</span>
             </label>
             <textarea
               [(ngModel)]="editVehicle.description"
               name="edit_description"
-              class="textarea textarea-bordered textarea-sm text-xs w-full bg-base-100 text-base-content h-20"
+              class="textarea textarea-bordered w-full text-sm bg-base-100 focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl h-24"
             ></textarea>
           </div>
 
           <!-- Status -->
-          <div class="form-control">
-            <label class="label font-semibold pb-1">
-              <span class="label-text text-xs font-semibold text-base-content">Operational Status</span>
+          <div class="form-control space-y-1.5">
+            <label class="label p-0">
+              <span class="label-text text-xs font-bold uppercase tracking-wider text-base-content/80">Operational Status</span>
             </label>
             <select
               [(ngModel)]="editVehicle.is_active"
               name="edit_is_active"
-              class="select select-bordered select-sm w-full text-xs bg-base-100 text-base-content"
+              class="select select-bordered w-full text-sm bg-base-100 focus:border-green-800 focus:ring-2 focus:ring-green-800/20 rounded-xl"
             >
               <option [ngValue]="true">Active</option>
               <option [ngValue]="false">Inactive</option>
@@ -416,9 +423,9 @@
           </div>
 
           <!-- Modal Actions -->
-          <div class="modal-action pt-3 flex gap-2 border-t border-base-200 mt-4">
-            <button type="button" (click)="closeEditModal()" class="btn btn-sm btn-ghost" [disabled]="isEditing">Cancel</button>
-            <button type="submit" class="btn btn-sm bg-green-900 text-white hover:bg-green-950 border-0 px-5 gap-2" [disabled]="isEditing">
+          <div class="modal-action pt-4 flex items-center justify-end gap-3 border-t border-base-200/60 mt-4">
+            <button type="button" (click)="closeEditModal()" class="btn btn-ghost text-sm font-semibold px-5 rounded-xl" [disabled]="isEditing">Cancel</button>
+            <button type="submit" class="btn bg-linear-to-r from-green-800 to-green-950 text-white hover:from-green-900 hover:to-green-900 border-0 px-6 text-sm font-bold shadow-lg shadow-green-900/30 rounded-xl gap-2" [disabled]="isEditing">
               @if (isEditing) {
                 <svg lucideLoader class="h-4 w-4 animate-spin"></svg> Updating...
               } @else {

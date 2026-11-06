@@ -190,6 +190,37 @@
       </div>
     </div>
 
+    <!-- DANGER ZONE -->
+    <div [ngClass]="isDarkMode ? 'bg-red-950/20 border-red-900/50 text-white' : 'bg-red-50/50 border-red-200 text-[#1d3025]'" class="border rounded-2xl p-4 md:p-6 shadow-sm space-y-4 transition-colors duration-300">
+      <div [ngClass]="isDarkMode ? 'border-red-900/50' : 'border-red-200'" class="flex items-center space-x-3 border-b pb-3">
+        <div [ngClass]="isDarkMode ? 'bg-red-950 text-red-400 border-red-900' : 'bg-red-100 text-red-700 border-red-200'" class="w-9 h-9 rounded-xl flex items-center justify-center border shrink-0">
+          <svg lucideAlertTriangle class="w-4 h-4"></svg>
+        </div>
+        <div>
+          <h2 class="text-xs md:text-sm font-bold text-red-600">Danger Zone</h2>
+          <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-600'" class="text-[10px] md:text-[11px]">Permanent account deletion</p>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <div [ngClass]="isDarkMode ? 'bg-red-950/30 border-red-900/50' : 'bg-red-50 border-red-200'" class="border rounded-xl p-3">
+          <p [ngClass]="isDarkMode ? 'text-gray-300' : 'text-gray-700'" class="text-xs leading-relaxed">
+            <strong class="text-red-600">Warning:</strong> Deleting your account is permanent and cannot be undone. All your data, including trip history and preferences, will be permanently removed from our system.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="openDeleteModal()"
+          [ngClass]="isDarkMode ? 'bg-red-900/80 hover:bg-red-900 border-red-800' : 'bg-red-600 hover:bg-red-700 border-red-700'"
+          class="w-full py-3 text-white font-semibold text-xs rounded-xl shadow-sm transition duration-200 flex items-center justify-center space-x-2 cursor-pointer border"
+        >
+          <svg lucideTrash2 class="w-4 h-4"></svg>
+          <span>Delete My Account</span>
+        </button>
+      </div>
+    </div>
+
     <!-- MODERN SUCCESS MODAL -->
     @if (showModal) {
       <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in p-4">
@@ -209,6 +240,111 @@
             >
               Okay
             </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- DELETE ACCOUNT CONFIRMATION MODAL -->
+    @if (showDeleteModal) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md animate-fade-in p-4">
+        <div [ngClass]="isDarkMode ? 'bg-gray-900 border-red-900/50 text-white' : 'bg-white border-red-200 text-[#1d3025]'" class="w-full max-w-sm border rounded-2xl shadow-2xl p-6 space-y-4">
+          <!-- Warning Icon -->
+          <div class="w-16 h-16 bg-red-950 text-red-400 rounded-full flex items-center justify-center mx-auto border border-red-800 shadow-inner">
+            <svg lucideAlertTriangle class="w-10 h-10 text-red-400"></svg>
+          </div>
+
+          <!-- Title & Description -->
+          <div class="space-y-2 text-center">
+            <h3 class="text-lg font-bold text-red-600">Delete Account?</h3>
+            <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-600'" class="text-xs leading-relaxed">
+              This action is <strong>permanent</strong> and cannot be undone. All your data will be permanently deleted from our system.
+            </p>
+          </div>
+
+          <!-- Error Message -->
+          @if (deleteError) {
+            <div class="p-2.5 text-xs bg-red-950/80 border border-red-800 text-red-300 rounded-xl flex items-center space-x-2">
+              <svg lucideAlertTriangle class="w-4 h-4 text-red-400 shrink-0"></svg>
+              <span>{{ deleteError }}</span>
+            </div>
+          }
+
+          <!-- Password Confirmation -->
+          <div class="space-y-2">
+            <label [ngClass]="isDarkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-xs font-semibold text-left">
+              Enter your password to confirm
+            </label>
+            <div class="relative">
+              <span [ngClass]="isDarkMode ? 'text-gray-500' : 'text-gray-400'" class="absolute inset-y-0 left-0 flex items-center pl-3.5">
+                <svg lucideKey class="w-4 h-4"></svg>
+              </span>
+              <input
+                type="password"
+                [(ngModel)]="deleteConfirmPassword"
+                placeholder="Enter your password"
+                [ngClass]="isDarkMode ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-600 focus:ring-red-600' : 'bg-gray-50 border-gray-200 text-[#1d3025] placeholder-gray-400 focus:ring-red-600'"
+                class="w-full pl-10 pr-4 py-2.5 border rounded-xl text-xs focus:outline-none focus:ring-2 transition"
+                [disabled]="isDeletingAccount"
+              />
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex gap-3 pt-2">
+            <button
+              type="button"
+              (click)="closeDeleteModal()"
+              [disabled]="isDeletingAccount"
+              [ngClass]="isDarkMode ? 'bg-gray-800 hover:bg-gray-700 border-gray-700' : 'bg-gray-100 hover:bg-gray-200 border-gray-300'"
+              class="flex-1 py-3 font-semibold text-xs rounded-xl transition border cursor-pointer disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              (click)="confirmDeleteAccount()"
+              [disabled]="isDeletingAccount"
+              class="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs rounded-xl shadow-lg transition cursor-pointer flex items-center justify-center space-x-2 disabled:opacity-70"
+            >
+              @if (isDeletingAccount) {
+                <span class="loading loading-spinner loading-sm"></span>
+                <span>Deleting...</span>
+              } @else {
+                <svg lucideTrash2 class="w-4 h-4"></svg>
+                <span>Delete Account</span>
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- DELETE ACCOUNT SUCCESS MODAL -->
+    @if (showDeleteSuccessModal) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md animate-fade-in p-4">
+        <div [ngClass]="isDarkMode ? 'bg-gray-900 border-red-900/50 text-white' : 'bg-white border-red-200 text-[#1d3025]'" class="w-full max-w-sm border rounded-2xl shadow-2xl p-6 space-y-4 text-center">
+          <!-- Loading Animation -->
+          <div class="flex justify-center">
+            <div class="w-16 h-16 rounded-full border-4 border-red-200 border-t-red-600 animate-spin"></div>
+          </div>
+
+          <!-- Success Message -->
+          <div class="space-y-2">
+            <h3 class="text-lg font-bold text-red-600">Account Deleting...</h3>
+            <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-600'" class="text-xs">
+              Your account is being permanently deleted. You will be redirected shortly.
+            </p>
+          </div>
+
+          <!-- Progress Indicator -->
+          <div class="space-y-2">
+            <div class="w-full bg-gray-300 rounded-full h-1.5">
+              <div class="bg-red-600 h-1.5 rounded-full animate-pulse" style="width: 100%"></div>
+            </div>
+            <p [ngClass]="isDarkMode ? 'text-gray-500' : 'text-gray-400'" class="text-[10px]">
+              Redirecting to login...
+            </p>
           </div>
         </div>
       </div>

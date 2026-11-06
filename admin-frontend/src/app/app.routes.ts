@@ -32,8 +32,14 @@ export const routes: Routes = [
         data: { role: 'admin' }, // Admin role lamang ang pinapayagan dito
         children: [
             {
+                path: '',
+                redirectTo: 'overview',
+                pathMatch: 'full'
+            },
+            {
                 path: 'dashboard',
-                component: Overview
+                redirectTo: 'overview',
+                pathMatch: 'full'
             },
             {
                 path: 'overview',

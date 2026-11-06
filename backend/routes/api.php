@@ -50,6 +50,7 @@ Route::get('/test-mail', function () {
 // ==========================================
 Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
     Route::put('/users/{id}', [UserController::class, 'update']);
+    Route::post('/users/{id}/delete', [UserController::class, 'destroy']);
     
     // User notification preferences
     Route::get('/users/{id}/notification-preferences', [UserController::class, 'getNotificationPreferences']);

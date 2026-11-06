@@ -73,7 +73,7 @@ export class Login {
         this.cdr.detectChanges();
 
         setTimeout(() => {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/overview']);
         }, 1800);
       },
       error: (err: any) => {
