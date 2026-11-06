@@ -89,14 +89,14 @@
                   Fetching fuel price records from Laravel API...
                 </td>
               </tr>
-            } @else if (fuelPrices.length === 0) {
+            } @else if (uniqueFuelPrices.length === 0) {
               <tr>
                 <td colspan="7" class="text-center py-8 text-base-content/60 text-xs">
                   No fuel price records found in the database. Click "Add Fuel Price" to create one.
                 </td>
               </tr>
             } @else {
-              @for (fuel of fuelPrices; track fuel.id; let i = $index) {
+              @for (fuel of uniqueFuelPrices; track fuel.id; let i = $index) {
                 <tr class="hover:bg-base-200/40">
                   <td class="font-mono text-xs opacity-60">{{ i + 1 }}</td>
                   <td>
@@ -133,7 +133,7 @@
         <!-- Modal Header -->
         <div class="flex items-center justify-between border-b border-base-200 pb-4">
           <div class="flex items-center gap-4">
-            <div class="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-green-800 to-green-950 text-white shadow-lg shadow-green-900/30">
+            <div class="flex size-14 items-center justify-center rounded-2xl bg-linear-to-br from-green-800 to-green-950 text-white shadow-lg shadow-green-900/30">
               <svg lucideFuel class="h-7 w-7 text-green-300"></svg>
             </div>
             <div>
@@ -236,7 +236,7 @@
             </button>
             <button
               type="submit"
-              class="btn bg-gradient-to-r from-green-800 to-green-950 text-white hover:from-green-900 hover:to-green-900 border-0 px-6 text-xs font-bold shadow-lg shadow-green-900/30 rounded-xl gap-2"
+              class="btn bg-linear-to-r from-green-800 to-green-950 text-white hover:from-green-900 hover:to-green-900 border-0 px-6 text-xs font-bold shadow-lg shadow-green-900/30 rounded-xl gap-2"
               [disabled]="isSubmitting"
             >
               @if (isSubmitting) {
@@ -262,7 +262,7 @@
         <!-- Modal Header -->
         <div class="flex items-center justify-between border-b border-base-200 pb-4">
           <div class="flex items-center gap-4">
-            <div class="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-green-800 to-green-950 text-white shadow-lg shadow-green-900/30">
+            <div class="flex size-14 items-center justify-center rounded-2xl bg-linear-to-br from-green-800 to-green-950 text-white shadow-lg shadow-green-900/30">
               <svg lucidePencil class="h-7 w-7 text-green-300"></svg>
             </div>
             <div>
@@ -365,7 +365,7 @@
             </button>
             <button
               type="submit"
-              class="btn bg-gradient-to-r from-green-800 to-green-950 text-white hover:from-green-900 hover:to-green-900 border-0 px-6 text-xs font-bold shadow-lg shadow-green-900/30 rounded-xl gap-2"
+              class="btn bg-linear-to-r from-green-800 to-green-950 text-white hover:from-green-900 hover:to-green-900 border-0 px-6 text-xs font-bold shadow-lg shadow-green-900/30 rounded-xl gap-2"
               [disabled]="isEditing"
             >
               @if (isEditing) {

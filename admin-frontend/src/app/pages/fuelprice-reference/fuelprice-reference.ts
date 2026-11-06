@@ -70,6 +70,24 @@ export class FuelpriceReference implements OnInit {
 
   readonly Number = Number;
 
+  get uniqueFuelPrices(): any[] {
+    const map = new Map();
+    for (const item of this.fuelPrices) {
+      const type = item.fuel_type;
+      if (!map.has(type)) {
+        map.set(type, item);
+      } else {
+        const existing = map.get(type);
+        const dateExisting = new Date(existing.effective_date || existing.created_at).getTime();
+        const dateItem = new Date(item.effective_date || item.created_at).getTime();
+        if (dateItem > dateExisting || (dateItem === dateExisting && item.id > existing.id)) {
+          map.set(type, item);
+        }
+      }
+    }
+    return Array.from(map.values());
+  }
+
   constructor(
     private fareService: FareService,
     private cdr: ChangeDetectorRef

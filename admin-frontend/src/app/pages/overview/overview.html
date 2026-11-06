@@ -199,12 +199,54 @@
               />
 
               @for (point of fuelPrices; track point.day; let i = $index) {
-                <circle
-                  [attr.cx]="point.cx"
-                  [attr.cy]="point.cy"
-                  r="3.2"
-                  fill="#166534"
-                />
+                @let isLatest = i === fuelPrices.length - 1;
+
+                <!-- Group for each point with CSS hover behavior for previous prices -->
+                <g class="cursor-pointer group">
+                  <!-- Green background badge: always visible for latest price, hidden by default and shown on hover for previous prices -->
+                  <rect
+                    [attr.x]="point.cx - 20"
+                    [attr.y]="point.cy - 19"
+                    width="40"
+                    height="13"
+                    rx="4"
+                    fill="#14532d"
+                    [class.opacity-0]="!isLatest"
+                    [class.group-hover:opacity-100]="!isLatest"
+                    class="transition-opacity duration-200"
+                  />
+
+                  <!-- White Price text: always visible for latest price, hidden by default and shown on hover for previous prices -->
+                  <text
+                    [attr.x]="point.cx"
+                    [attr.y]="point.cy - 10"
+                    text-anchor="middle"
+                    font-size="8"
+                    font-weight="bold"
+                    fill="#ffffff"
+                    [class.opacity-0]="!isLatest"
+                    [class.group-hover:opacity-100]="!isLatest"
+                    class="transition-opacity duration-200"
+                  >
+                    ₱{{ point.value.toFixed(2) }}
+                  </text>
+
+                  <!-- Dot indicator fixed in place without sliding/shifting -->
+                  <circle
+                    [attr.cx]="point.cx"
+                    [attr.cy]="point.cy"
+                    r="10"
+                    fill="transparent"
+                  />
+                  <circle
+                    [attr.cx]="point.cx"
+                    [attr.cy]="point.cy"
+                    r="3.5"
+                    fill="#166534"
+                    stroke="#ffffff"
+                    stroke-width="1.5"
+                  />
+                </g>
 
                 <text
                   [attr.x]="point.cx"
@@ -217,9 +259,7 @@
                   {{ point.day }}
                 </text>
               }
-
-              <rect x="510" y="37" width="38" height="16" rx="4" fill="#14532d"/>
-              <text x="529" y="48" text-anchor="middle" font-size="8" fill="white">₱{{ latestFuelPrice.toFixed(0) }}</text>
+              
             </svg>
           </div>
 
