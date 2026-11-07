@@ -161,10 +161,12 @@ export class FuelpriceReference implements OnInit {
   // Buksan ang Edit Modal
   openEditModal(fuel: any): void {
     this.editFuelId = fuel.id;
+    // Default to today's date so historical records accurately reflect when the change was made
+    const today = new Date().toISOString().split('T')[0];
     this.editFuel = {
       fuel_type: fuel.fuel_type,
       price_per_liter: Number(fuel.price_per_liter),
-      effective_date: fuel.effective_date,
+      effective_date: today,
       source_reference: fuel.source_reference || ''
     };
     this.showEditModal = true;
