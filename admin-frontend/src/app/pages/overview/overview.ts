@@ -254,10 +254,13 @@ export class Overview implements OnInit {
       });
     }
     
-    // Sort by date ascending for chart display
+    // Sort by date/id ascending for chart display so newer updates appear as separate points
     return [...filtered].sort((a: any, b: any) => {
       const dateA = new Date(a.effective_date || a.created_at).getTime();
       const dateB = new Date(b.effective_date || b.created_at).getTime();
+      if (dateA === dateB) {
+        return (a.id || 0) - (b.id || 0);
+      }
       return dateA - dateB;
     });
   }
@@ -390,14 +393,24 @@ export class Overview implements OnInit {
       const rawDate = item.effective_date || item.created_at;
       if (rawDate) {
         try {
-          const d = new Date(rawDate);
+          // If effective_date is just YYYY-MM-DD, new Date() parses it in UTC which can shift day backwards in local time.
+          // Let's parse year, month, day explicitly if it matches YYYY-MM-DD format.
+          const strVal = String(rawDate).trim();
+          let d: Date;
+          if (/^\d{4}-\d{2}-\d{2}$/.test(strVal)) {
+            const [y, m, dayNum] = strVal.split('-').map(Number);
+            d = new Date(y, m - 1, dayNum);
+          } else {
+            d = new Date(rawDate);
+          }
+
           if (!isNaN(d.getTime())) {
             formattedDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
           } else {
-            formattedDate = String(rawDate).substring(0, 10);
+            formattedDate = strVal.substring(5, 10);
           }
         } catch {
-          formattedDate = String(rawDate).substring(0, 10);
+          formattedDate = String(rawDate).substring(5, 10);
         }
       }
 
