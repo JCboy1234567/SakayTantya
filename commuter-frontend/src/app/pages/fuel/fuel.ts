@@ -47,30 +47,54 @@ export class Fuel implements OnInit {
         this.isLoading = false;
         const rawPrices = res?.data || res;
         if (Array.isArray(rawPrices) && rawPrices.length > 0) {
-          const uniqueMap = new Map<string, any>();
-
+          // Group all records by fuel type to calculate changes dynamically from history
+          const groupedByType = new Map<string, any[]>();
           for (const item of rawPrices) {
             const type = item.fuel_type || item.type || 'Fuel';
-            if (!uniqueMap.has(type)) {
-              uniqueMap.set(type, item);
-            } else {
-              const existing = uniqueMap.get(type);
-              const dateExisting = new Date(existing.effective_date || existing.updated_at || existing.created_at).getTime();
-              const dateItem = new Date(item.effective_date || item.updated_at || item.created_at).getTime();
-              if (dateItem > dateExisting || (dateItem === dateExisting && item.id > existing.id)) {
-                uniqueMap.set(type, item);
-              }
+            if (!groupedByType.has(type)) {
+              groupedByType.set(type, []);
             }
+            groupedByType.get(type)!.push(item);
           }
 
-          this.fuelPrices = Array.from(uniqueMap.values()).map((item: any) => ({
-            type: item.fuel_type || item.type || 'Fuel',
-            price: Number(item.price_per_liter || item.price || 0),
-            change: item.price_change || item.change || '0.00',
-            updated: item.effective_date
-              ? new Date(item.effective_date).toLocaleDateString()
-              : (item.updated_at ? new Date(item.updated_at).toLocaleDateString() : 'Today')
-          }));
+          const processedFuels: any[] = [];
+
+          groupedByType.forEach((records, type) => {
+            // Sort records by date ascending
+            records.sort((a, b) => {
+              const dateA = new Date(a.effective_date || a.updated_at || a.created_at).getTime();
+              const dateB = new Date(b.effective_date || b.updated_at || b.created_at).getTime();
+              return dateA - dateB;
+            });
+
+            const latest = records[records.length - 1];
+            let changeStr = '0.00';
+
+            if (records.length >= 2) {
+              const previous = records[records.length - 2];
+              const diff = Number(latest.price_per_liter || latest.price || 0) - Number(previous.price_per_liter || previous.price || 0);
+              if (diff > 0) {
+                changeStr = `+₱${diff.toFixed(2)}`;
+              } else if (diff < 0) {
+                changeStr = `-₱${Math.abs(diff).toFixed(2)}`;
+              } else {
+                changeStr = '0.00';
+              }
+            } else if (latest.price_change || latest.change) {
+              changeStr = latest.price_change || latest.change;
+            }
+
+            processedFuels.push({
+              type: type,
+              price: Number(latest.price_per_liter || latest.price || 0),
+              change: changeStr,
+              updated: latest.effective_date
+                ? new Date(latest.effective_date).toLocaleDateString()
+                : (latest.updated_at ? new Date(latest.updated_at).toLocaleDateString() : 'Today')
+            });
+          });
+
+          this.fuelPrices = processedFuels;
         }
         this.cdr.detectChanges();
       },
