@@ -88,6 +88,7 @@ export class Profile {
   toggleTheme() {
     this.isDarkMode = !this.isDarkMode;
     localStorage.setItem('theme', this.isDarkMode ? 'dark' : 'light');
+    window.dispatchEvent(new Event('themechange'));
     this.cdr.detectChanges();
   }
 

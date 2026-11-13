@@ -61,14 +61,10 @@
     <!-- Module Filter -->
     <div class="bg-base-100 p-4 rounded-2xl border border-base-300 shadow-sm flex flex-col justify-center">
       <label class="text-xs uppercase tracking-wider font-semibold text-base-content/60 mb-1">Filter by Module</label>
-      <select [(ngModel)]="selectedModuleFilter" class="select select-bordered select-sm w-full bg-base-200">
-        <option value="All">All Modules / Help Center</option>
-        <option value="Help Center Ticket">Help Center Ticket</option>
-        <option value="Fare Estimator">Fare Estimator</option>
-        <option value="Fuel Price Reference">Fuel Price Reference</option>
-        <option value="Vehicle Profiles">Vehicle Profiles</option>
-        <option value="Dashboard & Navigation">Dashboard & Navigation</option>
-        <option value="General UI / UX">General UI / UX</option>
+      <select [ngModel]="selectedModuleFilter" (ngModelChange)="onModuleFilterChange($event)" class="select select-bordered select-sm w-full bg-base-200">
+        <option value="All">All Modules</option>
+        <option value="PlateReports">Plate Number Reports</option>
+        <option value="GeneralInquiries">General Inquiries / No Plate Number</option>
       </select>
     </div>
   </div>

@@ -88,7 +88,18 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('routeMap', { static: false })
   routeMapContainer!: ElementRef<HTMLDivElement>;
 
-  tagumLocations: TagumLocation[] = [];
+  tagumLocations: TagumLocation[] = [
+    { name: 'Tagum City Hall', category: 'Government / Landmark', coords: [7.4478, 125.8083], address: 'JV Ayala Avenue, Tagum City' },
+    { name: 'Gaisano Grand Mall Tagum', category: 'Shopping Mall', coords: [7.4432, 125.8051], address: 'National Highway, Tagum City' },
+    { name: 'Robinsons Place Tagum', category: 'Shopping Mall', coords: [7.4265, 125.8042], address: 'National Highway, Tagum City' },
+    { name: 'Tagum Doctors Hospital', category: 'Medical / Hospital', coords: [7.4410, 125.8078], address: 'Rizal Street, Tagum City' },
+    { name: 'Tagum City Public Market', category: 'Market / Commercial', coords: [7.4490, 125.8112], address: 'Pioneer Avenue, Tagum City' },
+    { name: 'New Tagum City Overland Transport Terminal', category: 'Transport Terminal', coords: [7.4201, 125.8009], address: 'Diversion Road, Tagum City' },
+    { name: 'Tagum National Trade School', category: 'School / Education', coords: [7.4520, 125.8150], address: 'Apokon Road, Tagum City' },
+    { name: 'Davao del Norte State College', category: 'College / Education', coords: [7.4612, 125.8234], address: 'Panabo - Tagum Road, New Visayas, Tagum City' },
+    { name: 'Christ the King Cathedral', category: 'Religious Landmark', coords: [7.4445, 125.8090], address: 'Rizal Street, Tagum City' },
+    { name: 'Energy Park (E-Park)', category: 'Park / Recreation', coords: [7.4678, 125.8035], address: 'Apokon, Tagum City' }
+  ];
 
   pickupLocation = '';
   destinationLocation = '';
@@ -119,10 +130,35 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
     return `₱${this.fuelPricePerLiter.toFixed(2)}/L`;
   }
 
+  get driverFareComparison(): { status: 'higher' | 'lower' | 'same'; difference: number } | null {
+    if (
+      this.estimatedFareAmount === null ||
+      this.driverFare === null ||
+      !Number.isFinite(this.driverFare) ||
+      this.driverFare < 0
+    ) {
+      return null;
+    }
+
+    const difference = Math.round(
+      Math.abs(this.driverFare - this.estimatedFareAmount) * 100
+    ) / 100;
+
+    return {
+      status: difference === 0
+        ? 'same'
+        : this.driverFare > this.estimatedFareAmount ? 'higher' : 'lower',
+      difference
+    };
+  }
+
   isDarkMode = false;
 
   showLocationModal = false;
   modalTargetType: 'pickup' | 'destination' = 'pickup';
+  modalDragOffset = 0;
+  isDraggingLocationModal = false;
+  private modalDragStartY: number | null = null;
   searchQuery = '';
   selectionMode: 'pickup' | 'destination' = 'pickup';
 
@@ -144,6 +180,7 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
 
   estimatedFareAmount: number | null = null;
   estimatedFuelExpense: number | null = null;
+  driverFare: number | null = null;
   successModal = false;
 
   private map: L.Map | null = null;
@@ -301,10 +338,13 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
     const query = this.searchQuery.trim().toLowerCase();
 
     if (!query) {
-      return [];
+      // Return the 10 popular Tagum City suggested places when query is empty
+      return this.tagumLocations;
     }
 
-    return this.remoteLocations.filter(location => {
+    const combinedList = [...this.tagumLocations, ...this.remoteLocations];
+
+    return combinedList.filter(location => {
       const searchableText = [
         location.name,
         location.category,
@@ -434,6 +474,7 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
 
     this.estimatedFareAmount = null;
     this.estimatedFuelExpense = null;
+    this.driverFare = null;
     this.successModal = false;
   }
 
@@ -474,7 +515,6 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
 
         setTimeout(() => {
           this.map?.invalidateSize();
-          this.getCurrentLocation();
         }, 200);
       }, 0);
     });
@@ -519,6 +559,7 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
 
           this.estimatedFareAmount = null;
           this.estimatedFuelExpense = null;
+          this.driverFare = null;
 
           this.updateMarkersAndRoute();
           this.fetchRouteDistance();
@@ -545,42 +586,6 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  getCurrentLocation(): void {
-    if (!isPlatformBrowser(this.platformId) || !navigator.geolocation) {
-      return;
-    }
-
-    this.mapLoading = true;
-    this.routeError = null;
-
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        this.ngZone.run(() => {
-          this.pickupCoords = [position.coords.latitude, position.coords.longitude];
-          this.pickupLocation = 'My Current Location';
-
-          if (this.map) {
-            this.map.setView(this.pickupCoords, 15);
-            this.map.invalidateSize();
-          }
-
-          this.updateMarkersAndRoute();
-          this.fetchRouteDistance();
-
-          this.mapLoading = false;
-          this.cdr.detectChanges();
-        });
-      },
-      () => {
-        this.ngZone.run(() => {
-          this.mapLoading = false;
-          this.cdr.detectChanges();
-        });
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-    );
-  }
-
   private updateMarkersAndRoute(): void {
     if (!this.map) {
       return;
@@ -600,7 +605,7 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
       className: 'custom-pin-icon',
       html: `
         <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-          <div style="background:linear-gradient(135deg,#10b981,#059669);color:white;font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px;box-shadow:0 2px 8px rgba(16,185,129,0.4);white-space:nowrap">You</div>
+          <div style="background:linear-gradient(135deg,#10b981,#059669);color:white;font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px;box-shadow:0 2px 8px rgba(16,185,129,0.4);white-space:nowrap">Pickup</div>
           <img src="/icons/icon-indicator.png" style="width:36px;height:36px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))"/>
         </div>
       `,
@@ -636,6 +641,7 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
     this.distanceKm = null;
     this.estimatedFareAmount = null;
     this.estimatedFuelExpense = null;
+    this.driverFare = null;
 
     this.cdr.detectChanges();
 
@@ -706,6 +712,9 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
 
   openLocationModal(target: 'pickup' | 'destination'): void {
     this.modalTargetType = target;
+    this.modalDragOffset = 0;
+    this.isDraggingLocationModal = false;
+    this.modalDragStartY = null;
     this.searchQuery = '';
     this.remoteLocations = [];
     this.placeSearchError = null;
@@ -716,6 +725,43 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
 
   closeLocationModal(): void {
     this.showLocationModal = false;
+    this.modalDragStartY = null;
+    this.modalDragOffset = 0;
+    this.isDraggingLocationModal = false;
+  }
+
+  startLocationModalDrag(event: PointerEvent): void {
+    if (
+      event.button !== 0 ||
+      (event.target instanceof Element && event.target.closest('button'))
+    ) {
+      return;
+    }
+
+    this.modalDragStartY = event.clientY;
+    this.modalDragOffset = 0;
+    this.isDraggingLocationModal = true;
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+    event.preventDefault();
+  }
+
+  moveLocationModalDrag(event: PointerEvent): void {
+    if (this.modalDragStartY === null || !this.isDraggingLocationModal) {
+      return;
+    }
+
+    this.modalDragOffset = Math.max(0, event.clientY - this.modalDragStartY);
+  }
+
+  endLocationModalDrag(): void {
+    if (this.modalDragOffset > 90) {
+      this.closeLocationModal();
+      return;
+    }
+
+    this.modalDragStartY = null;
+    this.modalDragOffset = 0;
+    this.isDraggingLocationModal = false;
   }
 
   selectPlace(location: TagumLocation): void {
@@ -730,6 +776,7 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
     this.showLocationModal = false;
     this.estimatedFareAmount = null;
     this.estimatedFuelExpense = null;
+    this.driverFare = null;
 
     this.updateMarkersAndRoute();
     this.fetchRouteDistance();
@@ -751,6 +798,7 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
     this.selectionMode = 'pickup';
     this.estimatedFareAmount = null;
     this.estimatedFuelExpense = null;
+    this.driverFare = null;
 
     this.updateMarkersAndRoute();
     this.fetchRouteDistance();
