@@ -26,6 +26,48 @@
   border: none;
 }
 
+.location-sheet-enter {
+  animation: locationSheetEnter 280ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.location-sheet-enter.location-sheet-dragging {
+  animation: none !important;
+}
+
+@keyframes locationSheetEnter {
+  from {
+    opacity: 0.75;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 640px) {
+  .location-sheet-enter {
+    animation-name: locationModalEnter;
+  }
+
+  @keyframes locationModalEnter {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .location-sheet-enter {
+    animation-duration: 1ms;
+  }
+}
+
 /* Page fade-in animation */
 :host {
   animation: pageIn 0.4s ease-out;

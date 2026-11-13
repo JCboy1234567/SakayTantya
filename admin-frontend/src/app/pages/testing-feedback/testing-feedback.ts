@@ -58,7 +58,25 @@ export class TestingFeedback implements OnInit {
     if (this.selectedModuleFilter === 'All') {
       return this.feedbacks;
     }
-    return this.feedbacks.filter(f => f.module_tested === this.selectedModuleFilter);
+
+    if (this.selectedModuleFilter === 'PlateReports') {
+      return this.feedbacks.filter(
+        f => this.hasVehiclePlate(f.vehicle_plate)
+      );
+    }
+
+    return this.feedbacks.filter(
+      f => !this.hasVehiclePlate(f.vehicle_plate)
+    );
+  }
+
+  private hasVehiclePlate(plate: unknown): boolean {
+    return plate != null && String(plate).trim().length > 0;
+  }
+
+  onModuleFilterChange(filter: string): void {
+    this.selectedModuleFilter = filter;
+    this.currentPage = 1;
   }
 
   // Success Modal State

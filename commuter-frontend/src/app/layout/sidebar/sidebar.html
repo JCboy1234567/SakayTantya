@@ -1,16 +1,20 @@
-<footer class="bg-gradient-to-t from-gray-900 via-gray-900/98 to-gray-900/95 border-t border-gray-800/50 px-4 py-2.5 fixed bottom-0 inset-x-0 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] backdrop-blur-xl pointer-events-auto">
-    <div class="max-w-sm mx-auto flex items-center justify-around gap-1">
+<footer
+  [ngClass]="isDarkMode
+    ? 'border-gray-500/60 bg-gray-900/85 shadow-[0_12px_40px_rgba(0,0,0,0.5)] ring-white/10'
+    : 'border-green-900/20 bg-white/85 shadow-[0_12px_40px_rgba(15,23,42,0.22)] ring-green-900/10'"
+  class="pointer-events-auto fixed bottom-3 left-1/2 z-30 w-[calc(100%-1.5rem)] max-w-md -translate-x-1/2 rounded-3xl border px-2 py-2 ring-1 backdrop-blur-2xl backdrop-saturate-150 sm:bottom-5"
+>
+    <div class="mx-auto flex w-full items-center justify-around gap-1">
       <!-- Plan / Trip - Main Feature -->
       <a
         routerLink="/main-dashboard/plan"
-        routerLinkActive="text-green-400 bg-gradient-to-br from-green-500/20 to-emerald-500/10 border-green-500/30 shadow-[0_0_15px_rgba(34,197,94,0.2)]"
-        [class.text-gray-400]="!planLink.isActive"
-        [class.hover:text-gray-200]="!planLink.isActive"
-        [class.hover:bg-gray-800/50]="!planLink.isActive"
-        class="flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-300 ease-out border border-transparent text-[10px] font-semibold uppercase tracking-wider cursor-pointer group relative"
+        routerLinkActive="route-active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        [ngClass]="planLink.isActive ? (isDarkMode ? 'text-green-300 bg-green-500/10 border-green-500/30 shadow-[0_0_15px_rgba(34,197,94,0.12)]' : 'text-green-900 bg-green-50 border-green-200 shadow-sm') : (isDarkMode ? 'text-gray-400 hover:text-gray-100 hover:bg-gray-800/60' : 'text-gray-500 hover:text-green-900 hover:bg-green-50')"
+        class="relative flex flex-col items-center gap-1 rounded-2xl border border-transparent px-3 py-2 text-[10px] font-semibold uppercase tracking-wider transition-all duration-300 ease-out cursor-pointer group sm:px-4"
         #planLink="routerLinkActive"
       >
-        <div [class.bg-gradient-to-br]="planLink.isActive" [class.from-green-400]="planLink.isActive" [class.to-emerald-500]="planLink.isActive" [class.shadow-lg]="planLink.isActive" [class.shadow-green-500/30]="planLink.isActive" [class.bg-gray-800/80]="!planLink.isActive" [class.group-hover:bg-gray-700/80]="!planLink.isActive" class="p-2 rounded-xl transition-all duration-300">
+        <div [ngClass]="planLink.isActive ? (isDarkMode ? 'bg-gradient-to-br from-green-400 to-emerald-500 shadow-lg shadow-green-500/30 text-gray-950' : 'bg-green-100 text-green-800') : (isDarkMode ? 'bg-gray-800/80 group-hover:bg-gray-700/80' : 'bg-gray-100 group-hover:bg-green-100')" class="rounded-xl p-2 transition-all duration-300">
           <svg lucideMap class="w-5 h-5 pointer-events-none"></svg>
         </div>
         <span class="transition-all duration-300">Plan</span>
@@ -20,11 +24,13 @@
       <!-- Fuels -->
       <a
         routerLink="/main-dashboard/fuels"
-        routerLinkActive="text-green-400"
-        class="flex flex-col items-center gap-1 px-3 py-2 rounded-2xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition-all duration-300 ease-out border border-transparent text-[10px] font-semibold uppercase tracking-wider cursor-pointer group"
+        routerLinkActive="route-active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        [ngClass]="fuelsLink.isActive ? (isDarkMode ? 'text-green-300 bg-green-500/10 border-green-500/30' : 'text-green-900 bg-green-50 border-green-200') : (isDarkMode ? 'text-gray-400 hover:text-gray-100 hover:bg-gray-800/60' : 'text-gray-500 hover:text-green-900 hover:bg-green-50')"
+        class="flex flex-col items-center gap-1 rounded-2xl border border-transparent px-3 py-2 text-[10px] font-semibold uppercase tracking-wider transition-all duration-300 ease-out cursor-pointer group"
         #fuelsLink="routerLinkActive"
       >
-        <div [class.bg-green-500/20]="fuelsLink.isActive" [class.bg-gray-800/60]="!fuelsLink.isActive" [class.group-hover:bg-gray-700/60]="!fuelsLink.isActive" class="p-1.5 rounded-lg transition-all duration-300">
+        <div [ngClass]="fuelsLink.isActive ? (isDarkMode ? 'bg-green-500/20 text-green-300' : 'bg-green-100 text-green-800') : (isDarkMode ? 'bg-gray-800/60 group-hover:bg-gray-700/60' : 'bg-gray-100 group-hover:bg-green-100')" class="rounded-lg p-1.5 transition-all duration-300">
           <svg lucideFuel class="w-5 h-5 pointer-events-none"></svg>
         </div>
         <span>Fuels</span>
@@ -33,11 +39,13 @@
       <!-- Guide -->
       <a
         routerLink="/main-dashboard/guide"
-        routerLinkActive="text-green-400"
-        class="flex flex-col items-center gap-1 px-3 py-2 rounded-2xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition-all duration-300 ease-out border border-transparent text-[10px] font-semibold uppercase tracking-wider cursor-pointer group"
+        routerLinkActive="route-active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        [ngClass]="guideLink.isActive ? (isDarkMode ? 'text-green-300 bg-green-500/10 border-green-500/30' : 'text-green-900 bg-green-50 border-green-200') : (isDarkMode ? 'text-gray-400 hover:text-gray-100 hover:bg-gray-800/60' : 'text-gray-500 hover:text-green-900 hover:bg-green-50')"
+        class="flex flex-col items-center gap-1 rounded-2xl border border-transparent px-3 py-2 text-[10px] font-semibold uppercase tracking-wider transition-all duration-300 ease-out cursor-pointer group"
         #guideLink="routerLinkActive"
       >
-        <div [class.bg-green-500/20]="guideLink.isActive" [class.bg-gray-800/60]="!guideLink.isActive" [class.group-hover:bg-gray-700/60]="!guideLink.isActive" class="p-1.5 rounded-lg transition-all duration-300">
+        <div [ngClass]="guideLink.isActive ? (isDarkMode ? 'bg-green-500/20 text-green-300' : 'bg-green-100 text-green-800') : (isDarkMode ? 'bg-gray-800/60 group-hover:bg-gray-700/60' : 'bg-gray-100 group-hover:bg-green-100')" class="rounded-lg p-1.5 transition-all duration-300">
           <svg lucideBookOpen class="w-5 h-5 pointer-events-none"></svg>
         </div>
         <span>Guide</span>
@@ -46,11 +54,13 @@
       <!-- Profile -->
       <a
         routerLink="/main-dashboard/profile"
-        routerLinkActive="text-green-400"
-        class="flex flex-col items-center gap-1 px-3 py-2 rounded-2xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition-all duration-300 ease-out border border-transparent text-[10px] font-semibold uppercase tracking-wider cursor-pointer group"
+        routerLinkActive="route-active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        [ngClass]="profileLink.isActive ? (isDarkMode ? 'text-green-300 bg-green-500/10 border-green-500/30' : 'text-green-900 bg-green-50 border-green-200') : (isDarkMode ? 'text-gray-400 hover:text-gray-100 hover:bg-gray-800/60' : 'text-gray-500 hover:text-green-900 hover:bg-green-50')"
+        class="flex flex-col items-center gap-1 rounded-2xl border border-transparent px-3 py-2 text-[10px] font-semibold uppercase tracking-wider transition-all duration-300 ease-out cursor-pointer group"
         #profileLink="routerLinkActive"
       >
-        <div [class.bg-green-500/20]="profileLink.isActive" [class.bg-gray-800/60]="!profileLink.isActive" [class.group-hover:bg-gray-700/60]="!profileLink.isActive" class="p-1.5 rounded-lg transition-all duration-300">
+        <div [ngClass]="profileLink.isActive ? (isDarkMode ? 'bg-green-500/20 text-green-300' : 'bg-green-100 text-green-800') : (isDarkMode ? 'bg-gray-800/60 group-hover:bg-gray-700/60' : 'bg-gray-100 group-hover:bg-green-100')" class="rounded-lg p-1.5 transition-all duration-300">
           <svg lucideUser class="w-5 h-5 pointer-events-none"></svg>
         </div>
         <span>Profile</span>

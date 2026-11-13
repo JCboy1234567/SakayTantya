@@ -4,12 +4,12 @@
     : 'bg-[#f7f8f2] text-[#1d3025]'"
   class="min-h-screen transition-colors duration-300"
 >
-  <!-- FULL WIDTH HERO BANNER WITH LINEAR GRADIENT & IMAGE BACKGROUND -->
+  <!-- FULL WIDTH HERO BANNER WITH LINEAR GRADIENT & IMAGE BACKGROUND & SMOOTH BOTTOM FADE -->
   <section
-    class="relative w-full overflow-hidden bg-cover bg-center py-7 px-6 text-white shadow-md transition-all duration-300"
+    class="relative w-full overflow-hidden bg-cover bg-center pt-8 pb-12 px-6 text-white shadow-sm transition-all duration-300"
     style="background-image: linear-gradient(135deg, rgba(6, 44, 21, 0.92) 0%, rgba(37, 92, 59, 0.515) 100%), url('/images/tagum-image.jpg');"
   >
-    <div class="mx-auto max-w-md space-y-2">
+    <div class="relative z-10 mx-auto max-w-md space-y-2">
       <!-- LOCATION -->
       <div class="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-green-300">
         <svg lucideMapPin class="h-3.5 w-3.5 text-green-400"></svg>
@@ -27,6 +27,14 @@
         Select a vehicle, choose your destination, and estimate your fare.
       </p>
     </div>
+
+    <!-- SMOOTH GRADIENT OVERLAY FADE AT THE BOTTOM EDGE -->
+    <div
+      class="absolute inset-x-0 bottom-0 h-10 pointer-events-none transition-colors duration-300"
+      [ngClass]="isDarkMode
+        ? 'bg-linear-to-t from-gray-950 via-gray-950/60 to-transparent'
+        : 'bg-linear-to-t from-[#f7f8f2] via-[#f7f8f2]/60 to-transparent'"
+    ></div>
   </section>
 
   <div class="mx-auto max-w-md space-y-5 px-4 pb-28 pt-4">
@@ -49,63 +57,70 @@
       </div>
 
       <!-- VEHICLE CARDS -->
-      <div class="grid grid-cols-3 gap-2.5">
+      <div class="grid grid-cols-3 gap-3">
         @for (v of vehicles; track v.id) {
           <button
             type="button"
             (click)="selectVehicle(v)"
             [ngClass]="selectedVehicleId === v.id
               ? (isDarkMode
-                  ? 'border-green-500 bg-green-950 ring-2 ring-green-600 shadow-md'
-                  : 'border-green-700 bg-green-50 ring-2 ring-green-600 shadow-md')
+                  ? 'border-green-500 bg-linear-to-b from-green-950/80 to-gray-900 ring-2 ring-green-500/80 shadow-lg shadow-green-950/40 scale-[1.02]'
+                  : 'border-green-600 bg-linear-to-b from-green-50/90 to-white ring-2 ring-green-600/70 shadow-lg shadow-green-900/10 scale-[1.02]')
               : (isDarkMode
-                  ? 'border-gray-800 bg-gray-900 hover:border-gray-600'
-                  : 'border-gray-200 bg-white hover:border-green-300')"
-            class="group flex min-w-0 cursor-pointer flex-col items-center rounded-2xl border p-2 text-center transition"
+                  ? 'border-gray-800/80 bg-gray-900/90 hover:border-gray-700 hover:bg-gray-800/80'
+                  : 'border-gray-200/90 bg-white/90 hover:border-green-300 hover:shadow-md')"
+            class="group relative flex min-w-0 cursor-pointer flex-col items-center rounded-3xl border p-3 text-center backdrop-blur-md transition-all duration-300"
           >
+            <!-- Selected check badge -->
+            @if (selectedVehicleId === v.id) {
+              <div class="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-green-600 text-white shadow-md">
+                <svg lucideCheck class="h-3 w-3 stroke-3"></svg>
+              </div>
+            }
+
             <!-- Vehicle Image -->
             <div
               [ngClass]="isDarkMode
-                ? 'border-gray-700 bg-gray-800'
-                : 'border-gray-200 bg-gray-100'"
-              class="relative mb-1.5 h-14 w-14 overflow-hidden rounded-xl border shadow-sm"
+                ? 'border-gray-700/60 bg-gray-800/80'
+                : 'border-gray-200/80 bg-gray-100/80'"
+              class="relative mb-2 h-16 w-16 overflow-hidden rounded-2xl border shadow-inner transition group-hover:scale-105"
             >
               @if (v.image) {
                 <img
                   [src]="v.image"
                   [alt]="v.vehicle_name || v.name"
-                  class="h-full w-full object-cover transition group-hover:scale-105"
+                  class="h-full w-full object-cover"
                 />
               } @else {
                 <div
                   [ngClass]="isDarkMode
-                    ? 'bg-green-950 text-green-400'
+                    ? 'bg-green-950/80 text-green-400'
                     : 'bg-green-100 text-green-800'"
                   class="flex h-full w-full items-center justify-center"
                 >
-                  <svg lucideTruck class="h-6 w-6"></svg>
+                  <svg lucideTruck class="h-7 w-7"></svg>
                 </div>
               }
             </div>
-
+            
             <!-- Vehicle Name -->
             <p
-              [ngClass]="isDarkMode ? 'text-gray-100' : 'text-gray-800'"
-              class="w-full truncate text-[11px] font-bold"
+              [ngClass]="isDarkMode ? 'text-gray-100' : 'text-gray-900'"
+              class="w-full truncate text-[11px] font-bold tracking-tight"
             >
               {{ v.vehicle_name || v.name }}
             </p>
 
-            <!-- Base Fare -->
-            <p
-              [ngClass]="isDarkMode ? 'text-green-400' : 'text-green-700'"
-              class="mt-1 text-[9px] font-mono font-semibold"
+            <!-- Base Fare Badge -->
+            <div
+              [ngClass]="isDarkMode ? 'bg-green-950/60 text-green-400 border-green-800/40' : 'bg-green-50 text-green-800 border-green-200/60'"
+              class="mt-1.5 rounded-full border px-2 py-0.5 text-[9px] font-mono font-bold shadow-sm"
             >
               ₱{{ toNumber(
                 fareRulesMap[toNumber(v.id)]?.base_fare ?? v.base_fare ?? 0
               ).toFixed(2) }}
               base
-            </p>
+            </div>
           </button>
         }
       </div>
@@ -268,7 +283,7 @@
         [ngClass]="isDarkMode
           ? 'border-gray-800 bg-gray-900'
           : 'border-gray-200 bg-gray-100'"
-        class="relative isolate h-105 w-full overflow-hidden rounded-3xl border shadow-xl sm:h-120"
+        class="relative left-1/2 isolate h-105 w-screen -translate-x-1/2 overflow-hidden border-y shadow-xl sm:h-120 sm:rounded-3xl sm:border"
       >
         <div
           #routeMap
@@ -276,23 +291,23 @@
           style="width: 100%; height: 100%;"
         ></div>
 
-        <!-- FLOATING DESTINATION -->
-        <div class="absolute left-3 right-3 top-3 z-1000 sm:left-4 sm:right-4 sm:top-4">
+        <!-- FLOATING PICKUP AND DESTINATION -->
+        <div class="absolute left-3 right-3 top-3 z-1000 grid grid-cols-2 gap-2 sm:left-4 sm:right-4 sm:top-4">
           <button
             type="button"
-            (click)="openLocationModal('destination')"
+            (click)="openLocationModal('pickup')"
             [ngClass]="isDarkMode
               ? 'border-gray-700 bg-gray-950/95 text-gray-100'
               : 'border-white/80 bg-white/95 text-[#1d3025]'"
-            class="flex w-full cursor-pointer items-center gap-3 rounded-2xl border p-3 text-left shadow-lg backdrop-blur-md transition hover:border-red-500"
+            class="flex min-w-0 w-full cursor-pointer items-center gap-2 rounded-xl border p-2 text-left shadow-lg backdrop-blur-md transition hover:border-green-500"
           >
             <div
               [ngClass]="isDarkMode
-                ? 'bg-red-950 text-red-400'
-                : 'bg-red-100 text-red-600'"
-              class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+                ? 'bg-green-950 text-green-400'
+                : 'bg-green-100 text-green-700'"
+              class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
             >
-              <svg lucideMapPin class="h-5 w-5"></svg>
+              <img src="/icons/icon-indicator.png" alt="" class="h-7 w-7 object-contain drop-shadow-sm" />
             </div>
 
             <div class="min-w-0 flex-1">
@@ -300,19 +315,46 @@
                 [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'"
                 class="text-[9px] font-bold uppercase tracking-wider"
               >
-                Destination Location
+                Pickup
               </p>
 
-              <p class="mt-1 truncate text-xs font-bold">
-                {{ destinationLocation }}
+              <p class="truncate text-[10px] font-bold">
+                {{ pickupLocation || 'Select location' }}
               </p>
             </div>
 
-            <svg
-              lucideChevronRight
-              [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'"
-              class="h-4 w-4 shrink-0"
-            ></svg>
+          </button>
+
+          <button
+            type="button"
+            (click)="openLocationModal('destination')"
+            [ngClass]="isDarkMode
+              ? 'border-gray-700 bg-gray-950/95 text-gray-100'
+              : 'border-white/80 bg-white/95 text-[#1d3025]'"
+            class="flex min-w-0 w-full cursor-pointer items-center gap-2 rounded-xl border p-2 text-left shadow-lg backdrop-blur-md transition hover:border-red-500"
+          >
+            <div
+              [ngClass]="isDarkMode
+                ? 'bg-red-950 text-red-400'
+                : 'bg-red-100 text-red-600'"
+              class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+            >
+              <span class="h-3.5 w-3.5 rounded-full border-[3px] border-white bg-red-600 shadow-sm"></span>
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <p
+                [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'"
+                class="text-[9px] font-bold uppercase tracking-wider"
+              >
+                Destination
+              </p>
+
+              <p class="truncate text-[10px] font-bold">
+                {{ destinationLocation || 'Select location' }}
+              </p>
+            </div>
+
           </button>
         </div>
 
@@ -342,20 +384,6 @@
           </p>
         </div>
 
-        <!-- MY LOCATION -->
-        <button
-          type="button"
-          (click)="getCurrentLocation()"
-          title="Use My Current Location"
-          [ngClass]="isDarkMode
-            ? 'border-gray-700 bg-gray-950/95 text-gray-100 hover:bg-gray-800'
-            : 'border-white/70 bg-white/95 text-gray-700 hover:bg-green-50'"
-          class="absolute bottom-3 right-3 z-1000 flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl border shadow-lg backdrop-blur-md transition"
-        >
-          <svg lucideMapPin class="h-4 w-4 text-green-600"></svg>
-        </button>
-
-        
         <!-- MAP LOADING -->
         @if (mapLoading) {
           <div
@@ -441,6 +469,60 @@
             </div>
           </div>
 
+          <!-- DRIVER FARE COMPARISON -->
+          <div
+            [ngClass]="isDarkMode ? 'border-gray-800 bg-gray-950/70' : 'border-gray-200 bg-white/80'"
+            class="space-y-3 rounded-2xl border p-3"
+          >
+            <div>
+              <label
+                for="driverQuotedFare"
+                [ngClass]="isDarkMode ? 'text-gray-100' : 'text-gray-900'"
+                class="text-xs font-bold"
+              >
+                Driver's quoted fare
+              </label>
+              <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="mt-1 text-[10px]">
+                Enter the fare the driver asks for to compare it with the estimate.
+              </p>
+            </div>
+
+            <div class="relative">
+              <span [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-semibold">₱</span>
+              <input
+                id="driverQuotedFare"
+                type="number"
+                min="0"
+                step="0.01"
+                inputmode="decimal"
+                [(ngModel)]="driverFare"
+                name="driverQuotedFare"
+                placeholder="0.00"
+                [ngClass]="isDarkMode
+                  ? 'border-gray-700 bg-gray-900 text-white placeholder-gray-600 focus:border-green-700'
+                  : 'border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 focus:border-green-600'"
+                class="w-full rounded-xl border py-3 pl-8 pr-3 text-sm font-semibold shadow-inner focus:outline-none focus:ring-2 focus:ring-green-600/20"
+              />
+            </div>
+
+            @if (driverFareComparison; as comparison) {
+              <div
+                [ngClass]="comparison.status === 'higher'
+                  ? (isDarkMode ? 'border-amber-900 bg-amber-950/40 text-amber-300' : 'border-amber-200 bg-amber-50 text-amber-800')
+                  : (isDarkMode ? 'border-green-900 bg-green-950/40 text-green-300' : 'border-green-200 bg-green-50 text-green-800')"
+                class="rounded-xl border px-3 py-2.5 text-[11px] font-semibold"
+              >
+                @if (comparison.status === 'same') {
+                  Driver's fare matches the system estimate.
+                } @else if (comparison.status === 'higher') {
+                  Driver's fare is ₱{{ comparison.difference.toFixed(2) }} higher than the system estimate.
+                } @else {
+                  Driver's fare is ₱{{ comparison.difference.toFixed(2) }} lower than the system estimate.
+                }
+              </div>
+            }
+          </div>
+
           <!-- FARE BREAKDOWN -->
           <div
             [ngClass]="isDarkMode ? 'border-gray-800 bg-gray-950' : 'border-gray-200 bg-white'"
@@ -469,69 +551,102 @@
         type="button"
         (click)="openFuelCosts()"
         [ngClass]="isDarkMode
-          ? 'border border-gray-800 bg-gray-900 text-gray-100 hover:bg-gray-800'
-          : 'bg-[#edf3e6] text-[#1d3025] hover:bg-[#e3edd9]'"
-        class="flex w-full cursor-pointer items-center gap-3 rounded-2xl p-3 text-left transition"
+          ? 'border-gray-800 bg-linear-to-r from-gray-900 to-gray-950 text-gray-100 hover:border-green-900'
+          : 'border-green-200 bg-linear-to-r from-white via-green-50 to-[#edf3e6] text-[#1d3025] hover:border-green-300'"
+        class="group flex w-full cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
       >
         <div
           [ngClass]="isDarkMode
-            ? 'bg-gray-800 text-green-400'
-            : 'bg-white/85 text-green-800'"
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+            ? 'bg-green-950 text-green-400 ring-1 ring-green-900'
+            : 'bg-linear-to-br from-green-600 to-emerald-500 text-white shadow-sm shadow-green-900/20'"
+          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
         >
-          <svg lucideFuel class="h-5 w-5"></svg>
+          <svg lucideFuel class="h-5 w-5 transition-transform duration-200 group-hover:scale-110"></svg>
         </div>
 
         <div class="min-w-0 flex-1">
-          <p class="text-xs font-bold">Explore fuel costs</p>
+          <p class="text-sm font-extrabold tracking-tight">Explore fuel costs</p>
 
           <p
             [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'"
-            class="mt-1 text-[9px]"
+            class="mt-1 text-[10px]"
           >
             {{ fuelPriceLabel }} · Reference price only
           </p>
         </div>
 
-        <svg lucideArrowUpRight class="h-4 w-4 shrink-0"></svg>
+        <span
+          [ngClass]="isDarkMode ? 'bg-gray-800 text-green-400 group-hover:bg-green-950' : 'bg-white/80 text-green-800 group-hover:bg-green-100'"
+          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
+        >
+          <svg lucideArrowUpRight class="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"></svg>
+        </span>
       </button>
     </section>
   </div>
 
   <!-- LOCATION SEARCH MODAL -->
   @if (showLocationModal) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+    <div class="fixed inset-0 z-50 flex items-end justify-center bg-gray-950/70 p-0 backdrop-blur-sm sm:items-center sm:p-4">
       <div
         [ngClass]="isDarkMode
-          ? 'border-gray-800 bg-gray-900 text-gray-100'
-          : 'border-[#e1e7dc] bg-white text-[#1d3025]'"
-        class="flex max-h-[85vh] w-full max-w-md flex-col space-y-4 rounded-2xl border p-5 shadow-2xl"
+          ? 'border-gray-800 bg-gray-900 text-gray-100 shadow-black/40'
+          : 'border-green-100 bg-white text-[#1d3025] shadow-gray-900/20'"
+        [style.transform]="'translateY(' + modalDragOffset + 'px)'"
+        [style.transition]="isDraggingLocationModal ? 'none' : 'transform 180ms ease-out'"
+        [class.location-sheet-dragging]="isDraggingLocationModal"
+        class="location-sheet-enter flex h-[70dvh] max-h-[70dvh] w-full max-w-lg flex-col gap-4 overflow-hidden rounded-t-3xl border p-4 shadow-2xl will-change-transform sm:h-auto sm:max-h-[85vh] sm:gap-5 sm:rounded-3xl sm:p-6"
       >
+        <div class="mx-auto h-1.5 w-12 shrink-0 rounded-full bg-gray-400/50 sm:hidden"></div>
+
         <!-- MODAL HEADER -->
         <div
           [ngClass]="isDarkMode ? 'border-gray-800' : 'border-gray-200'"
-          class="flex items-center justify-between border-b pb-3"
+          class="location-sheet-drag-handle flex touch-none cursor-grab items-start justify-between gap-3 border-b pb-4 active:cursor-grabbing sm:touch-auto sm:cursor-default"
+          (pointerdown)="startLocationModalDrag($event)"
+          (pointermove)="moveLocationModalDrag($event)"
+          (pointerup)="endLocationModalDrag()"
+          (pointercancel)="endLocationModalDrag()"
         >
-          <div>
-            <h3 class="text-sm font-bold uppercase tracking-wide">
-              Select Destination in Tagum City
-            </h3>
-
-            <p
-              [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'"
-              class="mt-1 text-[10px]"
+          <div class="flex min-w-0 items-center gap-3">
+            <div
+              [ngClass]="modalTargetType === 'pickup'
+                ? (isDarkMode ? 'bg-green-950 text-green-400 ring-green-900' : 'bg-green-100 text-green-800 ring-green-200')
+                : (isDarkMode ? 'bg-red-950 text-red-400 ring-red-900' : 'bg-red-100 text-red-700 ring-red-200')"
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ring-1"
             >
-              Search online or choose a popular location
-            </p>
+              @if (modalTargetType === 'pickup') {
+                <img
+                  src="/icons/icon-indicator.png"
+                  alt="Pickup location indicator"
+                  class="h-8 w-8 object-contain drop-shadow-sm"
+                />
+              } @else {
+                <span class="h-4 w-4 rounded-full border-[3px] border-white bg-red-600 shadow-md"></span>
+              }
+            </div>
+            <div class="min-w-0">
+              <p [ngClass]="modalTargetType === 'pickup' ? (isDarkMode ? 'text-green-400' : 'text-green-700') : (isDarkMode ? 'text-red-400' : 'text-red-700')" class="text-[9px] font-bold uppercase tracking-[0.18em]">
+                {{ modalTargetType === 'pickup' ? 'Starting point' : 'Where to?' }}
+              </p>
+              <h3 class="mt-0.5 text-base font-extrabold tracking-tight sm:text-lg">
+                Choose {{ modalTargetType === 'pickup' ? 'pickup' : 'destination' }}
+              </h3>
+
+              <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="mt-0.5 text-[10px] sm:text-xs">
+                Search for a place in or near Tagum City
+              </p>
+            </div>
           </div>
 
           <button
             type="button"
             (click)="closeLocationModal()"
             [ngClass]="isDarkMode
-              ? 'text-gray-300 hover:bg-gray-800'
-              : 'text-gray-600 hover:bg-gray-100'"
-            class="btn btn-sm btn-circle btn-ghost"
+              ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+            class="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors"
+            aria-label="Close location picker"
           >
             <svg lucideX class="h-5 w-5"></svg>
           </button>
@@ -541,7 +656,7 @@
         <div class="relative">
           <span
             [ngClass]="isDarkMode ? 'text-gray-500' : 'text-gray-400'"
-            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4"
           >
             <svg lucideSearch class="h-4 w-4"></svg>
           </span>
@@ -552,17 +667,17 @@
             (ngModelChange)="onSearchQueryChange($event)"
             placeholder="Search streets, malls, schools, barangays..."
             [ngClass]="isDarkMode
-              ? 'border-gray-800 bg-gray-950 text-white placeholder-gray-500'
-              : 'border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400'"
-            class="w-full rounded-xl border py-2.5 pl-9 pr-3 text-xs focus:outline-none focus:ring-2 focus:ring-green-700"
+              ? 'border-gray-800 bg-gray-950 text-white placeholder-gray-500 focus:border-green-800'
+              : 'border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 focus:border-green-500'"
+            class="w-full rounded-2xl border py-3.5 pl-11 pr-4 text-xs shadow-inner focus:outline-none focus:ring-2 focus:ring-green-600/30"
           />
         </div>
 
         <p
           [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'"
-          class="text-[10px]"
+          class="-mt-2 text-[10px]"
         >
-          Type at least 3 characters to search online. Results may include nearby places.
+          Browse popular places or start typing to search online.
         </p>
 
         @if (isSearchingPlaces) {
@@ -585,11 +700,11 @@
         }
 
         <!-- SEARCH RESULTS -->
-        <div class="max-h-80 flex-1 space-y-1.5 overflow-y-auto pr-1">
+        <div class="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain pr-1">
           @if (filteredLocations.length === 0) {
             <div
               [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'"
-              class="py-8 text-center text-xs"
+              class="rounded-2xl py-10 text-center text-xs"
             >
               No matching places found. Try another keyword.
             </div>
@@ -602,16 +717,16 @@
                 type="button"
                 (click)="selectPlace(loc)"
                 [ngClass]="isDarkMode
-                  ? 'border-gray-800 hover:bg-gray-800'
-                  : 'border-gray-100 hover:bg-green-50/80'"
-                class="flex w-full cursor-pointer items-center justify-between rounded-xl border p-3 text-left transition"
+                  ? 'border-gray-800 bg-gray-900 hover:border-green-900 hover:bg-gray-800'
+                  : 'border-gray-100 bg-white hover:border-green-200 hover:bg-green-50/70'"
+                class="flex w-full cursor-pointer items-center justify-between rounded-2xl border p-3 text-left shadow-sm transition-all duration-150 hover:-translate-y-px hover:shadow-md sm:p-3.5"
               >
                 <div class="flex min-w-0 items-center gap-3">
                   <div
                     [ngClass]="isDarkMode
                       ? 'border-green-800 bg-green-950 text-green-400'
                       : 'border-green-200 bg-green-50 text-green-800'"
-                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border"
+                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border"
                   >
                     <svg lucideMapPin class="h-4 w-4"></svg>
                   </div>
@@ -619,7 +734,7 @@
                   <div class="min-w-0">
                     <p
                       [ngClass]="isDarkMode ? 'text-gray-100' : 'text-gray-900'"
-                      class="truncate text-xs font-bold"
+                      class="truncate text-xs font-bold sm:text-[13px]"
                     >
                       {{ loc.name }}
                     </p>
@@ -633,14 +748,7 @@
                   </div>
                 </div>
 
-                <span
-                  [ngClass]="isDarkMode
-                    ? 'bg-green-950 text-green-400'
-                    : 'bg-green-100 text-green-700'"
-                  class="shrink-0 rounded px-2 py-1 font-mono text-[10px] font-semibold"
-                >
-                  Select
-                </span>
+                <svg lucideChevronRight [ngClass]="isDarkMode ? 'text-gray-500' : 'text-gray-400'" class="h-4 w-4 shrink-0"></svg>
               </button>
             }
           }
