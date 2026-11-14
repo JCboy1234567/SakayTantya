@@ -398,6 +398,52 @@
         }
       </div>
 
+      @if (pickupLocation && destinationLocation && suggestedRoutes.length > 0 && !routeLoading) {
+        <div class="space-y-3">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <h3 class="text-sm font-extrabold">Suggested routes</h3>
+              <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="mt-1 text-[10px]">
+                Choose an option or tap a route on the map.
+              </p>
+            </div>
+            <span [ngClass]="isDarkMode ? 'bg-green-950 text-green-300' : 'bg-green-50 text-green-800'" class="shrink-0 rounded-full px-2.5 py-1 text-[9px] font-bold">
+              {{ suggestedRoutes.length }} {{ suggestedRoutes.length === 1 ? 'option' : 'options' }}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            @for (route of suggestedRoutes; track $index; let routeIndex = $index) {
+              <button
+                type="button"
+                (click)="selectSuggestedRoute(routeIndex)"
+                [ngClass]="selectedRouteIndex === routeIndex
+                  ? (isDarkMode ? 'border-green-700 bg-green-950/50 ring-1 ring-green-700/60' : 'border-green-500 bg-green-50 ring-1 ring-green-500/40')
+                  : (isDarkMode ? 'border-gray-800 bg-gray-900 hover:border-gray-700' : 'border-gray-200 bg-white hover:border-green-200')"
+                class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl border p-3 text-left shadow-sm transition-all hover:shadow-md"
+              >
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span [ngClass]="selectedRouteIndex === routeIndex ? 'bg-green-600 text-white' : (isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600')" class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-extrabold">
+                      {{ routeIndex + 1 }}
+                    </span>
+                    <p [ngClass]="isDarkMode ? 'text-gray-100' : 'text-gray-900'" class="truncate text-xs font-bold">
+                      {{ routeIndex === 0 ? 'Recommended route' : 'Alternative route' }}
+                    </p>
+                  </div>
+                  <p [ngClass]="isDarkMode ? 'text-gray-400' : 'text-gray-500'" class="mt-2 pl-8 text-[10px]">
+                    {{ route.distanceKm | number:'1.1-2' }} km · {{ route.durationMinutes | number:'1.0-0' }} min
+                  </p>
+                </div>
+                <span [ngClass]="selectedRouteIndex === routeIndex ? 'text-green-600' : (isDarkMode ? 'text-gray-500' : 'text-gray-400')" class="shrink-0 text-[9px] font-bold uppercase">
+                  {{ selectedRouteIndex === routeIndex ? 'Selected' : 'Choose' }}
+                </span>
+              </button>
+            }
+          </div>
+        </div>
+      }
+
       <!-- ROUTE LOADING -->
       @if (routeLoading) {
         <div

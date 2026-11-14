@@ -64,6 +64,12 @@ interface PhotonFeature {
   };
 }
 
+interface SuggestedRoute {
+  distanceKm: number;
+  durationMinutes: number;
+  coordinates: [number, number][];
+}
+
 @Component({
   selector: 'app-plan',
   standalone: true,
@@ -167,6 +173,8 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
   isCalculatingFare = false;
   routeError: string | null = null;
   distanceKm: number | null = null;
+  suggestedRoutes: SuggestedRoute[] = [];
+  selectedRouteIndex = 0;
 
   isSearchingPlaces = false;
   placeSearchError: string | null = null;
@@ -186,7 +194,7 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
   private map: L.Map | null = null;
   private pickupMarker: L.Marker | null = null;
   private destinationMarker: L.Marker | null = null;
-  private routePolyline: L.Polyline | null = null;
+  private routePolylines: L.Polyline[] = [];
 
   private browser = false;
   private storageListener?: (event: StorageEvent) => void;
@@ -648,7 +656,7 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
     const [pickupLat, pickupLng] = this.pickupCoords;
     const [destinationLat, destinationLng] = this.destinationCoords;
 
-    const url = `https://router.project-osrm.org/route/v1/driving/${pickupLng},${pickupLat};${destinationLng},${destinationLat}?overview=full&geometries=geojson`;
+    const url = `https://router.project-osrm.org/route/v1/driving/${pickupLng},${pickupLat};${destinationLng},${destinationLat}?alternatives=2&overview=full&geometries=geojson&steps=false`;
 
     this.http.get<any>(url).subscribe({
       next: response => {
@@ -660,35 +668,49 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
 
         if (response?.code !== 'Ok' || !response.routes?.length) {
           this.distanceKm = null;
+          this.suggestedRoutes = [];
+          this.selectedRouteIndex = 0;
           this.routeError = 'Walang road route na nakita para sa napiling locations.';
           this.removeRouteLine();
           this.cdr.detectChanges();
           return;
         }
 
-        const route = response.routes[0];
-        this.distanceKm = Number(route.distance) / 1000;
+        this.suggestedRoutes = (response.routes || [])
+          .map((route: any): SuggestedRoute | null => {
+            const coordinates = route.geometry?.coordinates;
+            const distanceKm = Number(route.distance) / 1000;
+            const durationMinutes = Number(route.duration) / 60;
 
-        if (route.geometry?.coordinates && this.map) {
+            if (!Array.isArray(coordinates) || !coordinates.length || !Number.isFinite(distanceKm)) {
+              return null;
+            }
+
+            return {
+              distanceKm,
+              durationMinutes: Number.isFinite(durationMinutes) ? durationMinutes : 0,
+              coordinates: coordinates.map(
+                (coord: [number, number]) => [coord[1], coord[0]] as [number, number]
+              )
+            };
+          })
+          .filter((route: SuggestedRoute | null): route is SuggestedRoute => route !== null);
+
+        if (!this.suggestedRoutes.length) {
+          this.distanceKm = null;
+          this.routeError = 'Walang road route na nakita para sa napiling locations.';
           this.removeRouteLine();
-
-          const routeCoords: [number, number][] = route.geometry.coordinates.map(
-            (coord: [number, number]) => [coord[1], coord[0]]
-          );
-
-          this.routePolyline = L.polyline(routeCoords, {
-            color: '#15803d',
-            weight: 5,
-            opacity: 0.9
-          }).addTo(this.map);
-
-          this.map.fitBounds(this.routePolyline.getBounds(), {
-            padding: [35, 35],
-            maxZoom: 16
-          });
+          this.cdr.detectChanges();
+          return;
         }
 
+        this.selectedRouteIndex = 0;
+        this.distanceKm = this.suggestedRoutes[0].distanceKm;
+        this.drawSuggestedRoutes(true);
         this.cdr.detectChanges();
+        if (this.pickupLocation && this.destinationLocation) {
+          this.autoCalculateFare();
+        }
       },
       error: () => {
         if (requestId !== this.routeRequestId) {
@@ -696,6 +718,8 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
         }
         this.routeLoading = false;
         this.distanceKm = null;
+        this.suggestedRoutes = [];
+        this.selectedRouteIndex = 0;
         this.routeError = 'Hindi makuha ang road distance ngayon.';
         this.removeRouteLine();
         this.cdr.detectChanges();
@@ -704,10 +728,65 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private removeRouteLine(): void {
-    if (this.map && this.routePolyline) {
-      this.map.removeLayer(this.routePolyline);
+    if (this.map) {
+      this.routePolylines.forEach(polyline => this.map?.removeLayer(polyline));
     }
-    this.routePolyline = null;
+    this.routePolylines = [];
+  }
+
+  private drawSuggestedRoutes(fitBounds = false): void {
+    if (!this.map) {
+      return;
+    }
+
+    this.removeRouteLine();
+
+    const routeOrder = this.suggestedRoutes
+      .map((_, index) => index)
+      .sort((first, second) => Number(first === this.selectedRouteIndex) - Number(second === this.selectedRouteIndex));
+
+    routeOrder.forEach(index => {
+      const route = this.suggestedRoutes[index];
+      const isSelected = index === this.selectedRouteIndex;
+      const line = L.polyline(route.coordinates, {
+        color: isSelected ? '#15803d' : '#86efac',
+        weight: isSelected ? 6 : 5,
+        opacity: isSelected ? 1 : 0.95,
+        bubblingMouseEvents: false
+      }).addTo(this.map!);
+
+      line.on('click', () => {
+        this.ngZone.run(() => this.selectSuggestedRoute(index));
+      });
+
+      this.routePolylines.push(line);
+    });
+
+    if (fitBounds && this.routePolylines.length) {
+      const bounds = L.featureGroup(this.routePolylines).getBounds();
+      if (bounds.isValid()) {
+        this.map.fitBounds(bounds, { padding: [35, 35], maxZoom: 16 });
+      }
+    }
+  }
+
+  selectSuggestedRoute(index: number): void {
+    const route = this.suggestedRoutes[index];
+    if (!route) {
+      return;
+    }
+
+    this.selectedRouteIndex = index;
+    this.distanceKm = route.distanceKm;
+    this.estimatedFareAmount = null;
+    this.estimatedFuelExpense = null;
+    this.driverFare = null;
+    this.drawSuggestedRoutes();
+    this.cdr.detectChanges();
+
+    if (this.pickupLocation && this.destinationLocation) {
+      this.autoCalculateFare();
+    }
   }
 
   openLocationModal(target: 'pickup' | 'destination'): void {
@@ -781,13 +860,6 @@ export class Plan implements OnInit, AfterViewInit, OnDestroy {
     this.updateMarkersAndRoute();
     this.fetchRouteDistance();
     this.cdr.detectChanges();
-    
-    // Auto-calculate fare after destination is selected
-    if (this.modalTargetType === 'destination') {
-      setTimeout(() => {
-        this.autoCalculateFare();
-      }, 800);
-    }
   }
 
   clearRoute(): void {
